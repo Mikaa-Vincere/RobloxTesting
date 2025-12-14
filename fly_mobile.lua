@@ -1,5 +1,5 @@
 --==================================================
--- Mikaa Fly + Noclip (Android Only FIX + Minimal UI)
+-- Mikaa Fly
 --==================================================
 
 local Players = game:GetService("Players")
