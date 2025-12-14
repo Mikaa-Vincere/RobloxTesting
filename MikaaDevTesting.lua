@@ -164,33 +164,37 @@ waterBtn.MouseButton1Click:Connect(function()
 end)
 
 --=========================
--- LOOP
+-- LOOP (WALK ON WATER FIX)
 --=========================
 RunService.RenderStepped:Connect(function()
+    -- SPEED SMOOTH
     if hum then
         currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * SPEED_SMOOTH
         hum.WalkSpeed = currentSpeed
     end
 
-    if walkOnWater and hrp then
+    -- WALK ON WATER (ANTI TENGGELAM)
+    if walkOnWater and hrp and waterPad then
         local rayParams = RaycastParams.new()
         rayParams.FilterDescendantsInstances = {char}
         rayParams.FilterType = Enum.RaycastFilterType.Blacklist
 
         local result = workspace:Raycast(
             hrp.Position,
-            Vector3.new(0,-12,0),
+            Vector3.new(0, -20, 0), -- ⬅ LEBIH PANJANG
             rayParams
         )
 
         if result and result.Material == Enum.Material.Water then
+            -- PAD SELALU IKUT PLAYER
             waterPad.Position = Vector3.new(
                 hrp.Position.X,
-                result.Position.Y + 0.5,
+                result.Position.Y + 0.3, -- ⬅ STABIL DI ATAS AIR
                 hrp.Position.Z
             )
         else
-            waterPad.Position = Vector3.new(0,-1000,0)
+            -- JIKA BUKAN AIR, PAD DISEMBUNYIKAN
+            waterPad.Position = Vector3.new(0, -1000, 0)
         end
     end
 end)
