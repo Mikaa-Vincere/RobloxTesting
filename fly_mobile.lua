@@ -24,6 +24,7 @@ local noclip = false
 local speed = 0
 
 local bg, bv
+local MAX_SPEED = 200
 
 --==================================================
 -- UI (MINIMAL + TOGGLE)
@@ -83,6 +84,17 @@ spTxt.TextColor3 = Color3.new(1,1,1)
 spTxt.TextScaled = true
 spTxt.Text = "SPEED : 0%"
 
+-- SPEED INPUT (ANGKA)
+local spInput = Instance.new("TextBox", frame)
+spInput.Size = UDim2.new(0,42,0,18)
+spInput.Position = UDim2.new(1,-50,0,96)
+spInput.BackgroundColor3 = Color3.fromRGB(35,35,35)
+spInput.TextColor3 = Color3.new(1,1,1)
+spInput.TextScaled = true
+spInput.Text = "0"
+spInput.ClearTextOnFocus = false
+spInput.PlaceholderText = "0-100"
+
 -- SLIDER
 local bar = Instance.new("Frame", frame)
 bar.Size = UDim2.new(1,-16,0,6)
@@ -96,6 +108,40 @@ fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 -- TOGGLE UI
 toggleBtn.MouseButton1Click:Connect(function()
     frame.Visible = not frame.Visible
+end)
+
+--==================================================
+-- SPEED SYNC (INTI PERBAIKAN)
+--==================================================
+local function setSpeed(percent)
+    percent = math.clamp(percent, 0, 100)
+
+    speed = (percent / 100) * MAX_SPEED
+    fill.Size = UDim2.new(percent / 100, 0, 1, 0)
+
+    spTxt.Text = "SPEED : "..percent.."%"
+    spInput.Text = tostring(percent)
+end
+
+-- SLIDER → ANGKA
+bar.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch then
+        local x = math.clamp(
+            (i.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X,
+            0,1
+        )
+        setSpeed(math.floor(x * 100))
+    end
+end)
+
+-- ANGKA → SLIDER
+spInput.FocusLost:Connect(function()
+    local val = tonumber(spInput.Text)
+    if not val then
+        setSpeed(0)
+        return
+    end
+    setSpeed(math.floor(val))
 end)
 
 --==================================================
@@ -122,9 +168,7 @@ local function stopFly()
     flyBtn.Text = "FLY : OFF"
 end
 
---==================================================
 -- BUTTONS
---==================================================
 flyBtn.MouseButton1Click:Connect(function()
     if fly then stopFly() else startFly() end
 end)
@@ -134,20 +178,8 @@ clipBtn.MouseButton1Click:Connect(function()
     clipBtn.Text = "NOCLIP : "..(noclip and "ON" or "OFF")
 end)
 
-bar.InputBegan:Connect(function(i)
-    if i.UserInputType == Enum.UserInputType.Touch then
-        local x = math.clamp(
-            (i.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X,
-            0,1
-        )
-        fill.Size = UDim2.new(x,0,1,0)
-        speed = x * 180
-        spTxt.Text = "SPEED : "..math.floor(x*100).."%"
-    end
-end)
-
 --==================================================
--- LOOP (FIX TOTAL)
+-- LOOP
 --==================================================
 RunService.RenderStepped:Connect(function()
     if fly and bv and bg then
@@ -174,4 +206,4 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-print("Mikaa Fly Android Minimal UI Loaded")
+print("Mikaa Fly Android Minimal UI + Speed Input Loaded")
