@@ -1,45 +1,42 @@
---[[ 
-Mikaa Fly V1
-]]
+--==================================================
+-- Mikaa Fly V1 (FIX)
+--==================================================
 
 -- SERVICES
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UIS = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
-local humanoid = char:WaitForChild("Humanoid")
 local cam = workspace.CurrentCamera
 
 -- STATES
 local fly = false
 local noclip = false
-local walkWater = false
-local rusuh = false
-
+local opened = false
 local speedPercent = 0
 local flySpeed = 0
 local goingUp, goingDown = false, false
 
--- BODY
 local bg, bv
 
---------------------------------------------------
--- UI BASE
---------------------------------------------------
-local gui = Instance.new("ScreenGui", player.PlayerGui)
+--==================================================
+-- UI
+--==================================================
+local gui = Instance.new("ScreenGui")
 gui.Name = "MikaaFlyUI"
 gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
 
--- HEADER (DRAG)
+-- HEADER
 local header = Instance.new("Frame", gui)
 header.Size = UDim2.new(0,260,0,35)
-header.Position = UDim2.new(0.5,-130,0.2,0)
+header.Position = UDim2.new(0.5,-130,0.25,0)
 header.BackgroundColor3 = Color3.fromRGB(20,20,20)
 header.Active = true
-header.Draggable = true
 
 local title = Instance.new("TextLabel", header)
 title.Size = UDim2.new(1,-40,1,0)
@@ -47,7 +44,7 @@ title.Position = UDim2.new(0,10,0,0)
 title.BackgroundTransparency = 1
 title.Text = "Mikaa Fly V1"
 title.TextColor3 = Color3.new(1,1,1)
-title.TextXAlignment = Left
+title.TextXAlignment = Enum.TextXAlignment.Left
 title.TextScaled = true
 
 local close = Instance.new("TextButton", header)
@@ -62,72 +59,110 @@ close.TextColor3 = Color3.new(1,1,1)
 local panel = Instance.new("Frame", gui)
 panel.Size = UDim2.new(0,260,0,0)
 panel.Position = header.Position + UDim2.new(0,0,0,35)
-panel.BackgroundColor3 = Color3.fromRGB(25,25,25)
+panel.BackgroundColor3 = Color3.fromRGB(30,30,30)
 panel.ClipsDescendants = true
 
---------------------------------------------------
--- UI HELPERS
---------------------------------------------------
+--==================================================
+-- TOGGLE BUTTON MAKER
+--==================================================
 local function makeToggle(text,y)
     local b = Instance.new("TextButton", panel)
     b.Size = UDim2.new(1,-20,0,35)
     b.Position = UDim2.new(0,10,0,y)
-    b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    b.BackgroundColor3 = Color3.fromRGB(45,45,45)
     b.TextColor3 = Color3.new(1,1,1)
     b.TextScaled = true
     b.Text = text.." : OFF"
     return b
 end
 
---------------------------------------------------
--- TOGGLES
---------------------------------------------------
-local flyBtn    = makeToggle("FLY",10)
-local clipBtn   = makeToggle("NOCLIP",55)
-local waterBtn  = makeToggle("WALK TO WATER",100)
-local rusuhBtn  = makeToggle("RUSUH PLAYER",145)
+local flyBtn = makeToggle("FLY",10)
+local clipBtn = makeToggle("NOCLIP",55)
 
--- SPEED TEXT
+-- SPEED
 local speedTxt = Instance.new("TextLabel", panel)
 speedTxt.Size = UDim2.new(1,-20,0,30)
-speedTxt.Position = UDim2.new(0,10,0,190)
+speedTxt.Position = UDim2.new(0,10,0,100)
 speedTxt.BackgroundTransparency = 1
 speedTxt.TextColor3 = Color3.new(1,1,1)
 speedTxt.TextScaled = true
 speedTxt.Text = "SPEED : 0%"
 
--- SLIDER
 local sliderBg = Instance.new("Frame", panel)
 sliderBg.Size = UDim2.new(1,-20,0,10)
-sliderBg.Position = UDim2.new(0,10,0,225)
+sliderBg.Position = UDim2.new(0,10,0,135)
 sliderBg.BackgroundColor3 = Color3.fromRGB(60,60,60)
 
 local slider = Instance.new("Frame", sliderBg)
 slider.Size = UDim2.new(0,0,1,0)
 slider.BackgroundColor3 = Color3.fromRGB(0,170,255)
 
---------------------------------------------------
--- DRAG BUTTON UP / DOWN
---------------------------------------------------
-local function makeMoveBtn(txt,pos)
+--==================================================
+-- UP / DOWN BUTTONS (DRAGGABLE)
+--==================================================
+local function moveBtn(text,pos)
     local b = Instance.new("TextButton", gui)
     b.Size = UDim2.new(0,60,0,60)
     b.Position = pos
     b.BackgroundColor3 = Color3.fromRGB(30,30,30)
     b.TextColor3 = Color3.new(1,1,1)
     b.TextScaled = true
-    b.Text = txt
+    b.Text = text
     b.Active = true
-    b.Draggable = true
     return b
 end
 
-local upBtn = makeMoveBtn("▲", UDim2.new(0.5,-90,0.75,0))
-local dnBtn = makeMoveBtn("▼", UDim2.new(0.5,30,0.75,0))
+local upBtn = moveBtn("▲", UDim2.new(0.5,-90,0.75,0))
+local dnBtn = moveBtn("▼", UDim2.new(0.5,30,0.75,0))
 
---------------------------------------------------
--- LOGIC
---------------------------------------------------
+--==================================================
+-- CUSTOM DRAG FUNCTION (REUSABLE)
+--==================================================
+local function enableDrag(frame, moveWith)
+    local dragging, dragStart, startPos
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch
+        or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
+    end)
+
+    frame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch
+        or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if dragging and (
+            input.UserInputType == Enum.UserInputType.Touch
+            or input.UserInputType == Enum.UserInputType.MouseMovement
+        ) then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+            if moveWith then
+                moveWith.Position = frame.Position + UDim2.new(0,0,0,35)
+            end
+        end
+    end)
+end
+
+enableDrag(header, panel)
+enableDrag(upBtn)
+enableDrag(dnBtn)
+
+--==================================================
+-- FLY SYSTEM
+--==================================================
 local function startFly()
     fly = true
     bg = Instance.new("BodyGyro", hrp)
@@ -148,9 +183,9 @@ local function stopFly()
     flyBtn.Text = "FLY : OFF"
 end
 
---------------------------------------------------
--- BUTTON EVENTS
---------------------------------------------------
+--==================================================
+-- BUTTON LOGIC
+--==================================================
 flyBtn.MouseButton1Click:Connect(function()
     if fly then stopFly() else startFly() end
 end)
@@ -160,26 +195,14 @@ clipBtn.MouseButton1Click:Connect(function()
     clipBtn.Text = "NOCLIP : "..(noclip and "ON" or "OFF")
 end)
 
-waterBtn.MouseButton1Click:Connect(function()
-    walkWater = not walkWater
-    waterBtn.Text = "WALK TO WATER : "..(walkWater and "ON" or "OFF")
-end)
-
-rusuhBtn.MouseButton1Click:Connect(function()
-    rusuh = not rusuh
-    rusuhBtn.Text = "RUSUH PLAYER : "..(rusuh and "ON" or "OFF")
-end)
-
 upBtn.MouseButton1Down:Connect(function() goingUp = true end)
 upBtn.MouseButton1Up:Connect(function() goingUp = false end)
 dnBtn.MouseButton1Down:Connect(function() goingDown = true end)
 dnBtn.MouseButton1Up:Connect(function() goingDown = false end)
 
---------------------------------------------------
--- SLIDER CONTROL
---------------------------------------------------
 sliderBg.InputBegan:Connect(function(i)
-    if i.UserInputType.Name == "MouseButton1" then
+    if i.UserInputType == Enum.UserInputType.MouseButton1
+    or i.UserInputType == Enum.UserInputType.Touch then
         local x = math.clamp((i.Position.X - sliderBg.AbsolutePosition.X) / sliderBg.AbsoluteSize.X,0,1)
         slider.Size = UDim2.new(x,0,1,0)
         speedPercent = math.floor(x*100)
@@ -188,45 +211,54 @@ sliderBg.InputBegan:Connect(function(i)
     end
 end)
 
---------------------------------------------------
+-- TAP HEADER TO OPEN MENU
+local tapTime = 0
+header.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch
+    or i.UserInputType == Enum.UserInputType.MouseButton1 then
+        tapTime = tick()
+    end
+end)
+
+header.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch
+    or i.UserInputType == Enum.UserInputType.MouseButton1 then
+        if tick() - tapTime < 0.25 then
+            opened = not opened
+            TweenService:Create(panel, TweenInfo.new(0.25), {
+                Size = opened and UDim2.new(0,260,0,170) or UDim2.new(0,260,0,0)
+            }):Play()
+        end
+    end
+end)
+
+close.MouseButton1Click:Connect(function()
+    opened = false
+    panel.Size = UDim2.new(0,260,0,0)
+end)
+
+--==================================================
 -- RUNTIME
---------------------------------------------------
+--==================================================
 RunService.RenderStepped:Connect(function()
     if fly and bv then
         bg.CFrame = cam.CFrame
-
-        local vel = Vector3.new(0,0,0)
+        local vel = Vector3.zero
         if speedPercent > 0 then
             vel += cam.CFrame.LookVector * flySpeed
         end
         if goingUp then vel += Vector3.new(0,40,0) end
         if goingDown then vel -= Vector3.new(0,40,0) end
-
         bv.Velocity = vel
     end
 
     if noclip then
         for _,v in pairs(char:GetDescendants()) do
-            if v:IsA("BasePart") then v.CanCollide = false end
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
         end
     end
 end)
 
---------------------------------------------------
--- PANEL TOGGLE
---------------------------------------------------
-local opened = false
-header.InputBegan:Connect(function(i)
-    if i.UserInputType.Name == "MouseButton1" then
-        opened = not opened
-        TweenService:Create(panel,TweenInfo.new(0.25),{
-            Size = opened and UDim2.new(0,260,0,260) or UDim2.new(0,260,0,0)
-        }):Play()
-    end
-end)
-
-close.MouseButton1Click:Connect(function()
-    panel.Size = UDim2.new(0,260,0,0)
-end)
-
-print("Mikaa Fly V1 Loaded")
+print("Mikaa Fly V1 FIX Loaded")
