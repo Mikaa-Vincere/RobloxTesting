@@ -1,4 +1,6 @@
+--==================================================
 -- Mikaa Dev Testing 
+--==================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -9,17 +11,24 @@ local char, hum, hrp
 local speed = 0
 local targetSpeed = 16
 local currentSpeed = 16
+
+local targetJump = 50
+local currentJump = 50
+
 local walkOnWater = false
 
+--=========================
 -- CONFIG
-
-local MAX_WALK_SPEED = 500   -- TOP SPEED PLAYER
+--=========================
+local MAX_WALK_SPEED = 800
+local MAX_JUMP_POWER = 150
 local SPEED_SMOOTH = 0.15
 
 local waterPad
 
+--=========================
 -- CHARACTER LOAD
-
+--=========================
 local function loadChar(c)
     char = c
     hum = char:WaitForChild("Humanoid")
@@ -27,7 +36,11 @@ local function loadChar(c)
 
     targetSpeed = 16
     currentSpeed = 16
+    targetJump = 50
+    currentJump = 50
+
     hum.WalkSpeed = 16
+    hum.JumpPower = 50
 
     if waterPad then waterPad:Destroy() end
     waterPad = Instance.new("Part")
@@ -40,16 +53,21 @@ local function loadChar(c)
     if spTxt then spTxt.Text = "SPEED : 0%" end
     if spInput then spInput.Text = "0" end
     if fill then fill.Size = UDim2.new(0,0,1,0) end
-    if waterBtn then waterBtn.Text = "WATER : OFF" end
 
+    if jpTxt then jpTxt.Text = "JUMP : 0%" end
+    if jpInput then jpInput.Text = "0" end
+    if jpFill then jpFill.Size = UDim2.new(0,0,1,0) end
+
+    if waterBtn then waterBtn.Text = "WATER : OFF" end
     walkOnWater = false
 end
 
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
 
+--=========================
 -- UI
-
+--=========================
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
@@ -61,7 +79,6 @@ toggleBtn.BorderSizePixel = 0
 toggleBtn.Active = true
 toggleBtn.Draggable = true
 toggleBtn.AutoButtonColor = true
-
 toggleBtn.Image = "rbxassetid://100166477433523"
 toggleBtn.ScaleType = Enum.ScaleType.Fit
 
@@ -69,12 +86,16 @@ local corner = Instance.new("UICorner", toggleBtn)
 corner.CornerRadius = UDim.new(0,6)
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,200,0,140)
+frame.Size = UDim2.new(0,200,0,170)
 frame.Position = UDim2.new(0.5,-100,0.3,0)
 frame.BackgroundColor3 = Color3.fromRGB(22,22,22)
 frame.Active = true
 frame.Draggable = true
 frame.Visible = true
+
+toggleBtn.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+end)
 
 -- TITLE
 local title = Instance.new("TextLabel", frame)
@@ -98,7 +119,9 @@ end
 
 waterBtn = btn("WATER : OFF",28)
 
+--=========================
 -- SPEED UI
+--=========================
 spTxt = Instance.new("TextLabel", frame)
 spTxt.Size = UDim2.new(1,-16,0,18)
 spTxt.Position = UDim2.new(0,8,0,64)
@@ -125,17 +148,41 @@ fill = Instance.new("Frame", bar)
 fill.Size = UDim2.new(0,0,1,0)
 fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 
-toggleBtn.MouseButton1Click:Connect(function()
-    frame.Visible = not frame.Visible
-end)
+--=========================
+-- JUMP UI
+--=========================
+jpTxt = Instance.new("TextLabel", frame)
+jpTxt.Size = UDim2.new(1,-16,0,18)
+jpTxt.Position = UDim2.new(0,8,0,100)
+jpTxt.BackgroundTransparency = 1
+jpTxt.TextColor3 = Color3.new(1,1,1)
+jpTxt.TextScaled = true
+jpTxt.Text = "JUMP : 0%"
 
+jpInput = Instance.new("TextBox", frame)
+jpInput.Size = UDim2.new(0,42,0,18)
+jpInput.Position = UDim2.new(1,-50,0,100)
+jpInput.BackgroundColor3 = Color3.fromRGB(35,35,35)
+jpInput.TextColor3 = Color3.new(1,1,1)
+jpInput.TextScaled = true
+jpInput.Text = "0"
+jpInput.ClearTextOnFocus = false
+
+jpBar = Instance.new("Frame", frame)
+jpBar.Size = UDim2.new(1,-16,0,6)
+jpBar.Position = UDim2.new(0,8,0,120)
+jpBar.BackgroundColor3 = Color3.fromRGB(60,60,60)
+
+jpFill = Instance.new("Frame", jpBar)
+jpFill.Size = UDim2.new(0,0,1,0)
+jpFill.BackgroundColor3 = Color3.fromRGB(255,140,0)
+
+--=========================
 -- SPEED SYSTEM
-
+--=========================
 local function setSpeed(percent)
     percent = math.clamp(percent,0,100)
-    speed = percent
     targetSpeed = 16 + (MAX_WALK_SPEED - 16) * (percent / 100)
-
     fill.Size = UDim2.new(percent/100,0,1,0)
     spTxt.Text = "SPEED : "..percent.."%"
     spInput.Text = tostring(percent)
@@ -143,9 +190,7 @@ end
 
 bar.InputBegan:Connect(function(i)
     if i.UserInputType == Enum.UserInputType.Touch then
-        local x = math.clamp(
-            (i.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X,0,1
-        )
+        local x = math.clamp((i.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X,0,1)
         setSpeed(math.floor(x * 100))
     end
 end)
@@ -154,46 +199,60 @@ spInput.FocusLost:Connect(function()
     setSpeed(tonumber(spInput.Text) or 0)
 end)
 
--- BUTTON
+--=========================
+-- JUMP SYSTEM
+--=========================
+local function setJump(percent)
+    percent = math.clamp(percent,0,100)
+    targetJump = 50 + (MAX_JUMP_POWER - 50) * (percent / 100)
+    jpFill.Size = UDim2.new(percent/100,0,1,0)
+    jpTxt.Text = "JUMP : "..percent.."%"
+    jpInput.Text = tostring(percent)
+end
 
+jpBar.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch then
+        local x = math.clamp((i.Position.X - jpBar.AbsolutePosition.X) / jpBar.AbsoluteSize.X,0,1)
+        setJump(math.floor(x * 100))
+    end
+end)
+
+jpInput.FocusLost:Connect(function()
+    setJump(tonumber(jpInput.Text) or 0)
+end)
+
+--=========================
+-- WATER BUTTON
+--=========================
 waterBtn.MouseButton1Click:Connect(function()
     walkOnWater = not walkOnWater
     waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
 end)
 
+--=========================
 -- LOOP
-
+--=========================
 RunService.RenderStepped:Connect(function()
-    -- SPEED SMOOTH
     if hum then
-        currentSpeed = currentSpeed + (targetSpeed - currentSpeed) * SPEED_SMOOTH
+        currentSpeed += (targetSpeed - currentSpeed) * SPEED_SMOOTH
         hum.WalkSpeed = currentSpeed
+
+        currentJump += (targetJump - currentJump) * SPEED_SMOOTH
+        hum.JumpPower = currentJump
     end
 
-    -- WALK ON WATER (ANTI TENGGELAM)
     if walkOnWater and hrp and waterPad then
         local rayParams = RaycastParams.new()
         rayParams.FilterDescendantsInstances = {char}
         rayParams.FilterType = Enum.RaycastFilterType.Blacklist
 
-        local result = workspace:Raycast(
-            hrp.Position,
-            Vector3.new(0, -20, 0), 
-            rayParams
-        )
-
+        local result = workspace:Raycast(hrp.Position, Vector3.new(0,-20,0), rayParams)
         if result and result.Material == Enum.Material.Water then
-            -- PAD SELALU IKUT PLAYER
-            waterPad.Position = Vector3.new(
-                hrp.Position.X,
-                result.Position.Y + 0.3,
-                hrp.Position.Z
-            )
+            waterPad.Position = Vector3.new(hrp.Position.X, result.Position.Y + 0.3, hrp.Position.Z)
         else
-            -- JIKA BUKAN AIR, PAD DISEMBUNYIKAN
-            waterPad.Position = Vector3.new(0, -1000, 0)
+            waterPad.Position = Vector3.new(0,-1000,0)
         end
     end
 end)
 
-print("Mikaa Dev Testing Loaded")
+print("Mikaa Dev Testing Loaded ✅")
