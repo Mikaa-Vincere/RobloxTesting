@@ -214,10 +214,9 @@ waterBtn.MouseButton1Click:Connect(function()
 end)
 
 --=========================
--- LOOP (FULL FIX WATER)
+-- LOOP (WALK ON WATER FIX FINAL)
 --=========================
 RunService.RenderStepped:Connect(function()
-    -- SPEED & JUMP SMOOTH
     if hum then
         currentSpeed += (targetSpeed - currentSpeed) * SPEED_SMOOTH
         hum.WalkSpeed = currentSpeed
@@ -226,42 +225,30 @@ RunService.RenderStepped:Connect(function()
         hum.JumpPower = currentJump
     end
 
-    -- WALK ON WATER FIX
     if walkOnWater and hrp and hum and waterPad and antiSinkForce then
         local rp = RaycastParams.new()
         rp.FilterDescendantsInstances = {char}
         rp.FilterType = Enum.RaycastFilterType.Blacklist
 
-        local r = workspace:Raycast(
+        local ray = workspace:Raycast(
             hrp.Position,
-            Vector3.new(0, -35, 0), -- ⬅ cukup, jangan kepanjangan
+            Vector3.new(0, -50, 0),
             rp
         )
 
-        local vy = hrp.Velocity.Y
+        if ray and ray.Material == Enum.Material.Water then
+            -- POSISI PAD TEPAT DI PERMUKAAN AIR
+            local targetY = ray.Position.Y + 0.15
+            waterPad.Position = Vector3.new(hrp.Position.X, targetY, hrp.Position.Z)
 
-        if r
-            and r.Material == Enum.Material.Water
-            and vy > -22 then -- ⬅ KUNCI: cegah terbang & jatuh brutal
-            waterPad.CanCollide = true
-            waterPad.Position = Vector3.new(
-                hrp.Position.X,
-                r.Position.Y + 0.18,
-                hrp.Position.Z
-            )
+            -- TAHAN AGAR TIDAK TURUN (BUKAN DORONG)
+            antiSinkForce.Velocity = Vector3.new(0, math.max(0, -hrp.AssemblyLinearVelocity.Y), 0)
 
-            -- ANTI TENGGELAM HALUS (BUKAN TERBANG)
-            antiSinkForce.Velocity = Vector3.new(
-                0,
-                math.clamp(-vy, 0, 18),
-                0
-            )
-
+            -- PAKSA HUMANOID KE STATE NORMAL
             if hum:GetState() == Enum.HumanoidStateType.Swimming then
                 hum:ChangeState(Enum.HumanoidStateType.Running)
             end
         else
-            waterPad.CanCollide = false
             waterPad.Position = Vector3.new(0, -1000, 0)
             antiSinkForce.Velocity = Vector3.zero
         end
@@ -269,10 +256,7 @@ RunService.RenderStepped:Connect(function()
         if antiSinkForce then
             antiSinkForce.Velocity = Vector3.zero
         end
-        if waterPad then
-            waterPad.CanCollide = false
-            waterPad.Position = Vector3.new(0, -1000, 0)
-        end
     end
 end)
+
 print("Mikaa Dev Testing Loaded ✅")
