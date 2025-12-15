@@ -218,21 +218,34 @@ RunService.RenderStepped:Connect(function()
 end)
 
 --=========================
--- FPS & PING SYSTEM
+-- FPS & PING SYSTEM (REALISTIC)
 --=========================
 local fps = 0
-local lastUpdate = tick()
-local frameCount = 0
+local frames = 0
+local lastFpsTime = os.clock()
+local lastPingUpdate = 0
 
+-- FPS COUNTER (REALTIME)
 RunService.RenderStepped:Connect(function()
-    frameCount += 1
+    frames += 1
+    local now = os.clock()
 
-    if tick() - lastUpdate >= 1 then
-        fps = frameCount
-        frameCount = 0
-        lastUpdate = tick()
+    if now - lastFpsTime >= 1 then
+        fps = math.floor(frames / (now - lastFpsTime))
+        frames = 0
+        lastFpsTime = now
+    end
+end)
 
-        local ping = math.floor(player:GetNetworkPing() * 1000)
+-- PING + UI UPDATE (2x per detik)
+RunService.RenderStepped:Connect(function()
+    if os.clock() - lastPingUpdate >= 0.5 then
+        lastPingUpdate = os.clock()
+
+        -- koreksi agar mendekati stats Roblox
+        local rawPing = player:GetNetworkPing() * 1000
+        local ping = math.floor(rawPing * 2)
+
         statLabel.Text = "FPS: "..fps.." | Ping: "..ping.." ms"
 
         if ping <= 80 then
@@ -246,3 +259,4 @@ RunService.RenderStepped:Connect(function()
 end)
 
 print("Mikaa Dev Testing Loaded ✅")
+
