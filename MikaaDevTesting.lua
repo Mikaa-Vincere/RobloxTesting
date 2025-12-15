@@ -58,15 +58,20 @@ if player.Character then loadChar(player.Character) end
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
-local toggleBtn = Instance.new("TextButton", gui)
-toggleBtn.Size = UDim2.new(0,36,0,36)
-toggleBtn.Position = UDim2.new(0,10,0.5,-18)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
-toggleBtn.Text = "☰"
-toggleBtn.TextScaled = true
-toggleBtn.TextColor3 = Color3.new(1,1,1)
+local toggleBtn = Instance.new("ImageButton", gui)
+toggleBtn.Size = UDim2.new(0,40,0,40)
+toggleBtn.Position = UDim2.new(0,10,0.5,-20)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+toggleBtn.BorderSizePixel = 0
 toggleBtn.Active = true
 toggleBtn.Draggable = true
+toggleBtn.AutoButtonColor = true
+
+toggleBtn.Image = "rbxassetid://100166477433523"
+toggleBtn.ScaleType = Enum.ScaleType.Fit
+
+local corner = Instance.new("UICorner", toggleBtn)
+corner.CornerRadius = UDim.new(0,6)
 
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0,200,0,140)
