@@ -169,7 +169,7 @@ waterBtn.MouseButton1Click:Connect(function()
 end)
 
 --=========================
--- LOOP (WALK ON WATER FIX)
+-- LOOP (WALK ON WATER + SPEED)
 --=========================
 RunService.RenderStepped:Connect(function()
     -- SPEED SMOOTH
@@ -186,7 +186,7 @@ RunService.RenderStepped:Connect(function()
 
         local result = workspace:Raycast(
             hrp.Position,
-            Vector3.new(0, -20, 0), -- ⬅ LEBIH PANJANG
+            Vector3.new(0, -20, 0),
             rayParams
         )
 
@@ -194,12 +194,40 @@ RunService.RenderStepped:Connect(function()
             -- PAD SELALU IKUT PLAYER
             waterPad.Position = Vector3.new(
                 hrp.Position.X,
-                result.Position.Y + 0.3, -- ⬅ STABIL DI ATAS AIR
+                result.Position.Y + 0.3,
                 hrp.Position.Z
             )
         else
             -- JIKA BUKAN AIR, PAD DISEMBUNYIKAN
             waterPad.Position = Vector3.new(0, -1000, 0)
+        end
+    end
+end)
+
+--=========================
+-- FPS & PING SYSTEM
+--=========================
+local fps = 0
+local lastUpdate = tick()
+local frameCount = 0
+
+RunService.RenderStepped:Connect(function()
+    frameCount += 1
+
+    if tick() - lastUpdate >= 1 then
+        fps = frameCount
+        frameCount = 0
+        lastUpdate = tick()
+
+        local ping = math.floor(player:GetNetworkPing() * 1000)
+        statLabel.Text = "FPS: "..fps.." | Ping: "..ping.." ms"
+
+        if ping <= 80 then
+            statLabel.TextColor3 = Color3.fromRGB(0,255,0)
+        elseif ping <= 150 then
+            statLabel.TextColor3 = Color3.fromRGB(255,170,0)
+        else
+            statLabel.TextColor3 = Color3.fromRGB(255,60,60)
         end
     end
 end)
