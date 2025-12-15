@@ -1,205 +1,145 @@
---========================================
--- Combat Assist 1v1 (FULL FIX)
--- Owner : MikaaDev
---========================================
+--// Tinju Beta Combat Assist
+--// Mobile Friendly | Analog SAFE
+--// Owner : MikaaDev
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
+local UIS = game:GetService("UserInputService")
+local VIM = game:GetService("VirtualInputManager")
 
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
---=====================
--- CONFIG
---=====================
+--================ CONFIG =================
 local ENABLED = false
-
-local AUTO_RADIUS = 14
-local HIT_RANGE = 4.5
-
-local MAX_LOCK = 0.15
-local LOCK_STRENGTH = 0.10
-
-local MIN_SPAM = 0.10
-local MAX_SPAM = 0.15
-local CLICK_DELAY = 0.15
+local LOCK_STRENGTH = 0.14      -- camera assist (0.05 - 0.15)
+local CLICK_DELAY = 0.1        -- spam speed (0.15 - 0.10)
+local HIT_RANGE = 6             -- jarak spam (sangat dekat)
+--========================================
 
 local lockedTarget = nil
 local isLocked = false
 local lastClick = 0
 
---=====================
--- UI
---=====================
+--================ UI =====================
 local gui = Instance.new("ScreenGui", player.PlayerGui)
-gui.ResetOnSpawn = false
+gui.Name = "CombatAssist"
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,230,0,210)
-frame.Position = UDim2.new(0.5,-115,0.3,0)
+frame.Size = UDim2.fromScale(0.32,0.28)
+frame.Position = UDim2.fromScale(0.62,0.32)
 frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0,10)
 
 local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1,0,0,30)
+title.Size = UDim2.fromScale(1,0.18)
 title.Text = "Combat Assist"
 title.TextColor3 = Color3.new(1,1,1)
+title.BackgroundTransparency = 1
 title.TextScaled = true
-title.BackgroundColor3 = Color3.fromRGB(15,15,15)
 
--- Toggle
-local toggle = Instance.new("TextButton", frame)
-toggle.Size = UDim2.new(1,-20,0,30)
-toggle.Position = UDim2.new(0,10,0,40)
-toggle.Text = "STATUS : OFF"
-toggle.TextScaled = true
-toggle.BackgroundColor3 = Color3.fromRGB(120,0,0)
-toggle.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", toggle).CornerRadius = UDim.new(0,8)
+local status = Instance.new("TextButton", frame)
+status.Position = UDim2.fromScale(0.05,0.2)
+status.Size = UDim2.fromScale(0.9,0.18)
+status.Text = "STATUS : OFF"
+status.BackgroundColor3 = Color3.fromRGB(120,40,40)
+status.TextColor3 = Color3.new(1,1,1)
+status.TextScaled = true
 
--- Camera slider
-local camTxt = Instance.new("TextLabel", frame)
-camTxt.Size = UDim2.new(1,-20,0,18)
-camTxt.Position = UDim2.new(0,10,0,80)
-camTxt.Text = "Camera Strength : 0.10"
-camTxt.TextColor3 = Color3.new(1,1,1)
-camTxt.BackgroundTransparency = 1
-camTxt.TextScaled = true
+status.MouseButton1Click:Connect(function()
+	ENABLED = not ENABLED
+	if ENABLED then
+		status.Text = "STATUS : ON"
+		status.BackgroundColor3 = Color3.fromRGB(40,120,40)
+	else
+		status.Text = "STATUS : OFF"
+		status.BackgroundColor3 = Color3.fromRGB(120,40,40)
+		lockedTarget = nil
+		isLocked = false
+		lastClick = 0
+	end
+end)
 
-local camBar = Instance.new("Frame", frame)
-camBar.Size = UDim2.new(1,-20,0,6)
-camBar.Position = UDim2.new(0,10,0,102)
-camBar.BackgroundColor3 = Color3.fromRGB(60,60,60)
+-- Camera Strength
+local camText = Instance.new("TextLabel", frame)
+camText.Position = UDim2.fromScale(0.05,0.42)
+camText.Size = UDim2.fromScale(0.9,0.12)
+camText.Text = "Camera Strength : "..LOCK_STRENGTH
+camText.TextColor3 = Color3.new(1,1,1)
+camText.BackgroundTransparency = 1
+camText.TextScaled = true
 
-local camFill = Instance.new("Frame", camBar)
-camFill.Size = UDim2.new(LOCK_STRENGTH/MAX_LOCK,0,1,0)
-camFill.BackgroundColor3 = Color3.fromRGB(255,80,80)
+-- Spam Speed
+local spamText = Instance.new("TextLabel", frame)
+spamText.Position = UDim2.fromScale(0.05,0.58)
+spamText.Size = UDim2.fromScale(0.9,0.12)
+spamText.Text = "Spam Speed : "..CLICK_DELAY
+spamText.TextColor3 = Color3.new(1,1,1)
+spamText.BackgroundTransparency = 1
+spamText.TextScaled = true
 
--- Spam slider
-local spamTxt = Instance.new("TextLabel", frame)
-spamTxt.Size = UDim2.new(1,-20,0,18)
-spamTxt.Position = UDim2.new(0,10,0,118)
-spamTxt.Text = "Spam Speed : 0.15"
-spamTxt.TextColor3 = Color3.new(1,1,1)
-spamTxt.BackgroundTransparency = 1
-spamTxt.TextScaled = true
-
-local spamBar = Instance.new("Frame", frame)
-spamBar.Size = UDim2.new(1,-20,0,6)
-spamBar.Position = UDim2.new(0,10,0,140)
-spamBar.BackgroundColor3 = Color3.fromRGB(60,60,60)
-
-local spamFill = Instance.new("Frame", spamBar)
-spamFill.Size = UDim2.new(1,0,1,0)
-spamFill.BackgroundColor3 = Color3.fromRGB(255,120,0)
-
--- Owner
 local owner = Instance.new("TextLabel", frame)
-owner.Size = UDim2.new(1,0,0,18)
-owner.Position = UDim2.new(0,0,1,-18)
+owner.Position = UDim2.fromScale(0,0.85)
+owner.Size = UDim2.fromScale(1,0.12)
 owner.Text = "Owner : MikaaDev"
 owner.TextColor3 = Color3.fromRGB(180,180,180)
 owner.BackgroundTransparency = 1
 owner.TextScaled = true
 
---=====================
--- UI LOGIC
---=====================
-toggle.MouseButton1Click:Connect(function()
-	ENABLED = not ENABLED
-	toggle.Text = "STATUS : "..(ENABLED and "ON" or "OFF")
-	toggle.BackgroundColor3 = ENABLED and Color3.fromRGB(0,140,0) or Color3.fromRGB(120,0,0)
+--================ TARGET =================
+local function getClosestEnemy()
+	local char = player.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
 
-	if not ENABLED then
-		lockedTarget = nil
-		isLocked = false
-		lastClick = 0
-		CLICK_DELAY = 0.15
-		spamFill.Size = UDim2.new(1,0,1,0)
-		spamTxt.Text = "Spam Speed : 0.15"
-	end
-end)
-
-camBar.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.Touch then
-		local p = math.clamp((i.Position.X-camBar.AbsolutePosition.X)/camBar.AbsoluteSize.X,0,1)
-		LOCK_STRENGTH = math.clamp(p*MAX_LOCK,0,MAX_LOCK)
-		camFill.Size = UDim2.new(p,0,1,0)
-		camTxt.Text = string.format("Camera Strength : %.2f",LOCK_STRENGTH)
-	end
-end)
-
-spamBar.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.Touch then
-		local p = math.clamp((i.Position.X-spamBar.AbsolutePosition.X)/spamBar.AbsoluteSize.X,0,1)
-		CLICK_DELAY = MAX_SPAM - (MAX_SPAM-MIN_SPAM)*p
-		spamFill.Size = UDim2.new(p,0,1,0)
-		spamTxt.Text = string.format("Spam Speed : %.2f",CLICK_DELAY)
-	end
-end)
-
---=====================
--- TARGET SEARCH (1v1)
---=====================
-local function getEnemy()
-	if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return nil end
-	local myPos = player.Character.HumanoidRootPart.Position
-	local found = {}
-
+	local closest, dist = nil, math.huge
 	for _,plr in pairs(Players:GetPlayers()) do
 		if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-			local hum = plr.Character:FindFirstChildOfClass("Humanoid")
-			if hum and hum.Health > 0 then
-				local d = (plr.Character.HumanoidRootPart.Position-myPos).Magnitude
-				if d <= AUTO_RADIUS then
-					table.insert(found,plr.Character.HumanoidRootPart)
-				end
+			local d = (plr.Character.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
+			if d < dist then
+				dist = d
+				closest = plr.Character.HumanoidRootPart
 			end
 		end
 	end
-	if #found == 1 then
-		return found[1]
-	end
-	return nil
+	return closest
 end
 
---=====================
--- MAIN LOOP (FULL FIX)
---=====================
+--================ LOOP ===================
 RunService.RenderStepped:Connect(function()
 	if not ENABLED then return end
 
-	lockedTarget = getEnemy()
+	lockedTarget = getClosestEnemy()
 	if not lockedTarget then
 		isLocked = false
 		return
 	end
 
-	-- CAMERA ASSIST (SAFE)
-	local camCF = camera.CFrame
-	local dir = (lockedTarget.Position-camCF.Position).Unit
-	local targetCF = CFrame.new(camCF.Position, camCF.Position+dir)
-	camera.CFrame = camCF:Lerp(targetCF, LOCK_STRENGTH)
+	-- CAMERA ASSIST (SAFE, ANALOG TIDAK MATI)
+	local camPos = camera.CFrame.Position
+	local look = camera.CFrame.LookVector
+	local targetLook = (lockedTarget.Position - camPos).Unit
+	local newLook = look:Lerp(targetLook, LOCK_STRENGTH)
+	camera.CFrame = CFrame.new(camPos, camPos + newLook)
 
 	-- LOCK VALID CHECK
-	local dot = camera.CFrame.LookVector:Dot(dir)
+	local dot = newLook:Dot(targetLook)
 	isLocked = dot > 0.98
 
-	-- SPAM ONLY IF LOCKED & VERY CLOSE
+	-- SPAM LOGIC
 	local char = player.Character
 	if char and char:FindFirstChild("HumanoidRootPart") then
-		local dist = (lockedTarget.Position-char.HumanoidRootPart.Position).Magnitude
+		local dist = (lockedTarget.Position - char.HumanoidRootPart.Position).Magnitude
 		if isLocked and dist <= HIT_RANGE then
-			if tick()-lastClick > CLICK_DELAY then
+			if tick() - lastClick >= CLICK_DELAY then
 				lastClick = tick()
-				VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
-				VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+				VIM:SendMouseButtonEvent(0,0,0,true,game,0)
+				VIM:SendMouseButtonEvent(0,0,0,false,game,0)
 			end
 		end
 	end
 end)
 
 print("Combat Assist FULL FIX Loaded | MikaaDev")
+
