@@ -1,6 +1,4 @@
---==================================================
 -- Mikaa Dev Testing 
---==================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -13,17 +11,15 @@ local targetSpeed = 16
 local currentSpeed = 16
 local walkOnWater = false
 
---=========================
 -- CONFIG
---=========================
-local MAX_WALK_SPEED = 800   -- ⬅ TOP SPEED PLAYER
+
+local MAX_WALK_SPEED = 500   -- TOP SPEED PLAYER
 local SPEED_SMOOTH = 0.15
 
 local waterPad
 
---=========================
 -- CHARACTER LOAD
---=========================
+
 local function loadChar(c)
     char = c
     hum = char:WaitForChild("Humanoid")
@@ -52,9 +48,8 @@ end
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
 
---=========================
 -- UI
---=========================
+
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
@@ -121,7 +116,6 @@ spInput.TextScaled = true
 spInput.Text = "0"
 spInput.ClearTextOnFocus = false
 
--- SPEED BAR
 bar = Instance.new("Frame", frame)
 bar.Size = UDim2.new(1,-16,0,6)
 bar.Position = UDim2.new(0,8,0,84)
@@ -131,25 +125,12 @@ fill = Instance.new("Frame", bar)
 fill.Size = UDim2.new(0,0,1,0)
 fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
 
---=========================
--- FPS & PING (NEMPEL FRAME)
---=========================
-statLabel = Instance.new("TextLabel", frame)
-statLabel.Size = UDim2.new(1,-16,0,18)
-statLabel.Position = UDim2.new(0,8,0,96) -- ⬅ PAS
-statLabel.BackgroundTransparency = 1
-statLabel.Text = "FPS: -- | Ping: -- ms"
-statLabel.TextScaled = true
-statLabel.TextColor3 = Color3.fromRGB(255,255,255)
-statLabel.TextXAlignment = Enum.TextXAlignment.Center
-
 toggleBtn.MouseButton1Click:Connect(function()
     frame.Visible = not frame.Visible
 end)
 
---=========================
 -- SPEED SYSTEM
---=========================
+
 local function setSpeed(percent)
     percent = math.clamp(percent,0,100)
     speed = percent
@@ -173,17 +154,15 @@ spInput.FocusLost:Connect(function()
     setSpeed(tonumber(spInput.Text) or 0)
 end)
 
---=========================
 -- BUTTON
---=========================
+
 waterBtn.MouseButton1Click:Connect(function()
     walkOnWater = not walkOnWater
     waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
 end)
 
---=========================
--- LOOP (WALK ON WATER + SPEED)
---=========================
+-- LOOP
+
 RunService.RenderStepped:Connect(function()
     -- SPEED SMOOTH
     if hum then
@@ -199,7 +178,7 @@ RunService.RenderStepped:Connect(function()
 
         local result = workspace:Raycast(
             hrp.Position,
-            Vector3.new(0, -20, 0),
+            Vector3.new(0, -20, 0), 
             rayParams
         )
 
@@ -217,46 +196,4 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
---=========================
--- FPS & PING SYSTEM (REALISTIC)
---=========================
-local fps = 0
-local frames = 0
-local lastFpsTime = os.clock()
-local lastPingUpdate = 0
-
--- FPS COUNTER (REALTIME)
-RunService.RenderStepped:Connect(function()
-    frames += 1
-    local now = os.clock()
-
-    if now - lastFpsTime >= 1 then
-        fps = math.floor(frames / (now - lastFpsTime))
-        frames = 0
-        lastFpsTime = now
-    end
-end)
-
--- PING + UI UPDATE (2x per detik)
-RunService.RenderStepped:Connect(function()
-    if os.clock() - lastPingUpdate >= 0.5 then
-        lastPingUpdate = os.clock()
-
-        -- koreksi agar mendekati stats Roblox
-        local rawPing = player:GetNetworkPing() * 1000
-        local ping = math.floor(rawPing * 2)
-
-        statLabel.Text = "FPS: "..fps.." | Ping: "..ping.." ms"
-
-        if ping <= 80 then
-            statLabel.TextColor3 = Color3.fromRGB(0,255,0)
-        elseif ping <= 150 then
-            statLabel.TextColor3 = Color3.fromRGB(255,170,0)
-        else
-            statLabel.TextColor3 = Color3.fromRGB(255,60,60)
-        end
-    end
-end)
-
-print("Mikaa Dev Testing Loaded ✅")
-
+print("Mikaa Dev Testing Loaded")
