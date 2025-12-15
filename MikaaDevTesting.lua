@@ -214,9 +214,10 @@ waterBtn.MouseButton1Click:Connect(function()
 end)
 
 --=========================
--- LOOP (FIXED WATER)
+-- LOOP (FULL FIX WATER)
 --=========================
 RunService.RenderStepped:Connect(function()
+    -- SPEED & JUMP SMOOTH
     if hum then
         currentSpeed += (targetSpeed - currentSpeed) * SPEED_SMOOTH
         hum.WalkSpeed = currentSpeed
@@ -225,28 +226,53 @@ RunService.RenderStepped:Connect(function()
         hum.JumpPower = currentJump
     end
 
-    if walkOnWater and hrp and hum then
+    -- WALK ON WATER FIX
+    if walkOnWater and hrp and hum and waterPad and antiSinkForce then
         local rp = RaycastParams.new()
         rp.FilterDescendantsInstances = {char}
         rp.FilterType = Enum.RaycastFilterType.Blacklist
 
-        local r = workspace:Raycast(hrp.Position, Vector3.new(0,-60,0), rp)
-        if r and r.Material == Enum.Material.Water then
-            waterPad.Position = Vector3.new(hrp.Position.X, r.Position.Y+0.35, hrp.Position.Z)
-            antiSinkForce.Velocity = Vector3.new(0,45,0)
+        local r = workspace:Raycast(
+            hrp.Position,
+            Vector3.new(0, -35, 0), -- ⬅ cukup, jangan kepanjangan
+            rp
+        )
+
+        local vy = hrp.Velocity.Y
+
+        if r
+            and r.Material == Enum.Material.Water
+            and vy > -22 then -- ⬅ KUNCI: cegah terbang & jatuh brutal
+            waterPad.CanCollide = true
+            waterPad.Position = Vector3.new(
+                hrp.Position.X,
+                r.Position.Y + 0.18,
+                hrp.Position.Z
+            )
+
+            -- ANTI TENGGELAM HALUS (BUKAN TERBANG)
+            antiSinkForce.Velocity = Vector3.new(
+                0,
+                math.clamp(-vy, 0, 18),
+                0
+            )
 
             if hum:GetState() == Enum.HumanoidStateType.Swimming then
                 hum:ChangeState(Enum.HumanoidStateType.Running)
             end
         else
-            waterPad.Position = Vector3.new(0,-1000,0)
-            antiSinkForce.Velocity = Vector3.new(0,0,0)
+            waterPad.CanCollide = false
+            waterPad.Position = Vector3.new(0, -1000, 0)
+            antiSinkForce.Velocity = Vector3.zero
         end
     else
         if antiSinkForce then
-            antiSinkForce.Velocity = Vector3.new(0,0,0)
+            antiSinkForce.Velocity = Vector3.zero
+        end
+        if waterPad then
+            waterPad.CanCollide = false
+            waterPad.Position = Vector3.new(0, -1000, 0)
         end
     end
 end)
-
 print("Mikaa Dev Testing Loaded ✅")
