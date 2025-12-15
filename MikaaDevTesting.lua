@@ -1,5 +1,5 @@
 --==================================================
--- Mikaa Dev Testing | Walk On Water + Speed
+-- Mikaa Dev Testing 
 --==================================================
 
 local Players = game:GetService("Players")
