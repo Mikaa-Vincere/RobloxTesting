@@ -16,7 +16,7 @@ local walkOnWater = false
 --=========================
 -- CONFIG
 --=========================
-local MAX_WALK_SPEED = 500   -- ⬅ TOP SPEED PLAYER
+local MAX_WALK_SPEED = 800   -- ⬅ TOP SPEED PLAYER
 local SPEED_SMOOTH = 0.15
 
 local waterPad
