@@ -1,16 +1,17 @@
 --==================================================
--- Mikaa Dev Testing (FINAL - ALL IN ONE)
+-- Mikaa Dev Testing FINAL (ALL IN ONE)
 --==================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
-local char, hum, hrp
 
---=========================
--- VALUE
---=========================
+--==================================================
+-- CHARACTER SYSTEM
+--==================================================
+local char, hum, hrp
 local targetSpeed, currentSpeed = 16, 16
 local targetJump, currentJump = 50, 50
 
@@ -22,88 +23,42 @@ local MAX_JUMP_POWER = 250
 local SPEED_SMOOTH = 0.15
 
 local waterPad
-local lastSafeHealth = 0
 
---=========================
--- CHARACTER LOAD
---=========================
 local function loadChar(c)
 	char = c
 	hum = char:WaitForChild("Humanoid")
 	hrp = char:WaitForChild("HumanoidRootPart")
 
-	targetSpeed, currentSpeed = 16, 16
-	targetJump, currentJump = 50, 50
-
 	hum.WalkSpeed = 16
 	hum.JumpPower = 50
 
 	if waterPad then waterPad:Destroy() end
-	waterPad = Instance.new("Part")
+	waterPad = Instance.new("Part", workspace)
 	waterPad.Size = Vector3.new(8,1,8)
 	waterPad.Anchored = true
 	waterPad.CanCollide = false
 	waterPad.Transparency = 1
-	waterPad.Name = "WaterPad"
-	waterPad.Parent = workspace
-
-	lastSafeHealth = hum.Health
-
-	if spTxt then spTxt.Text = "SPEED : 0%" end
-	if spInput then spInput.Text = "0" end
-	if fill then fill.Size = UDim2.new(0,0,1,0) end
-
-	if jpTxt then jpTxt.Text = "JUMP : 0%" end
-	if jpInput then jpInput.Text = "0" end
-	if jpFill then jpFill.Size = UDim2.new(0,0,1,0) end
-
-	if waterBtn then waterBtn.Text = "WATER : OFF" end
-	if noFallBtn then noFallBtn.Text = "NO FALL : OFF" end
-
-	walkOnWater = false
-	noFallDamage = false
 end
 
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
 
---=========================
--- UI (ASLI TIDAK DIUBAH)
---=========================
+--==================================================
+-- UI BASE
+--==================================================
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
-local toggleBtn = Instance.new("ImageButton", gui)
-toggleBtn.Size = UDim2.new(0,40,0,40)
-toggleBtn.Position = UDim2.new(0,10,0.5,-20)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
-toggleBtn.BorderSizePixel = 0
-toggleBtn.Active = true
-toggleBtn.Draggable = true
-toggleBtn.Image = "rbxassetid://100166477433523"
-
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,200,0,200)
-frame.Position = UDim2.new(0.5,-100,0.3,0)
+frame.Size = UDim2.new(0,260,0,360)
+frame.Position = UDim2.new(0.5,-130,0.3,0)
 frame.BackgroundColor3 = Color3.fromRGB(22,22,22)
 frame.Active = true
 frame.Draggable = true
-frame.Visible = true
 
-toggleBtn.MouseButton1Click:Connect(function()
-	frame.Visible = not frame.Visible
-end)
-
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1,0,0,26)
-title.Text = "Mikaa Dev Testing"
-title.TextScaled = true
-title.TextColor3 = Color3.new(1,1,1)
-title.BackgroundColor3 = Color3.fromRGB(15,15,15)
-
-local function btn(txt,y)
+local function button(txt,y)
 	local b = Instance.new("TextButton", frame)
-	b.Size = UDim2.new(1,-16,0,30)
+	b.Size = UDim2.new(1,-16,0,28)
 	b.Position = UDim2.new(0,8,0,y)
 	b.BackgroundColor3 = Color3.fromRGB(40,40,40)
 	b.TextColor3 = Color3.new(1,1,1)
@@ -112,131 +67,112 @@ local function btn(txt,y)
 	return b
 end
 
-waterBtn = btn("WATER : OFF",28)
-noFallBtn = btn("NO FALL : OFF",60)
+local function label(txt,y)
+	local t = Instance.new("TextLabel", frame)
+	t.Size = UDim2.new(1,-16,0,18)
+	t.Position = UDim2.new(0,8,0,y)
+	t.BackgroundTransparency = 1
+	t.TextColor3 = Color3.new(1,1,1)
+	t.TextScaled = true
+	t.Text = txt
+	return t
+end
+
+--==================================================
+-- BASIC BUTTONS
+--==================================================
+local waterBtn = button("WATER : OFF",10)
+local fallBtn  = button("NO FALL : OFF",42)
 
 waterBtn.MouseButton1Click:Connect(function()
 	walkOnWater = not walkOnWater
 	waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
 end)
 
-noFallBtn.MouseButton1Click:Connect(function()
+fallBtn.MouseButton1Click:Connect(function()
 	noFallDamage = not noFallDamage
-	noFallBtn.Text = "NO FALL : "..(noFallDamage and "ON" or "OFF")
+	fallBtn.Text = "NO FALL : "..(noFallDamage and "ON" or "OFF")
 end)
 
---=========================
--- SPEED UI
---=========================
-spTxt = Instance.new("TextLabel", frame)
-spTxt.Size = UDim2.new(1,-16,0,18)
-spTxt.Position = UDim2.new(0,8,0,96)
-spTxt.BackgroundTransparency = 1
-spTxt.TextColor3 = Color3.new(1,1,1)
-spTxt.TextScaled = true
-spTxt.Text = "SPEED : 0%"
+--==================================================
+-- RUNNING NOTIF SYSTEM
+--==================================================
+label("RUNNING NOTIF",78)
 
-spInput = Instance.new("TextBox", frame)
-spInput.Size = UDim2.new(0,42,0,18)
-spInput.Position = UDim2.new(1,-50,0,96)
-spInput.BackgroundColor3 = Color3.fromRGB(35,35,35)
-spInput.TextColor3 = Color3.new(1,1,1)
-spInput.TextScaled = true
-spInput.Text = "0"
+local notifInput = Instance.new("TextBox", frame)
+notifInput.Size = UDim2.new(1,-16,0,26)
+notifInput.Position = UDim2.new(0,8,0,98)
+notifInput.BackgroundColor3 = Color3.fromRGB(35,35,35)
+notifInput.TextColor3 = Color3.new(1,1,1)
+notifInput.PlaceholderText = "Isi teks notif..."
 
-bar = Instance.new("Frame", frame)
-bar.Size = UDim2.new(1,-16,0,6)
-bar.Position = UDim2.new(0,8,0,116)
-bar.BackgroundColor3 = Color3.fromRGB(60,60,60)
+local sendBtn = button("KIRIM NOTIF",132)
+local dirBtn  = button("ARAH : KIRI",164)
 
-fill = Instance.new("Frame", bar)
-fill.Size = UDim2.new(0,0,1,0)
-fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
+local notifActive = false
+local notifSpeed = 3
+local notifDir = -1
+local notifY = 0.1
 
---=========================
--- JUMP UI
---=========================
-jpTxt = Instance.new("TextLabel", frame)
-jpTxt.Size = UDim2.new(1,-16,0,18)
-jpTxt.Position = UDim2.new(0,8,0,132)
-jpTxt.BackgroundTransparency = 1
-jpTxt.TextColor3 = Color3.new(1,1,1)
-jpTxt.TextScaled = true
-jpTxt.Text = "JUMP : 0%"
+local notifFrame = Instance.new("Frame", gui)
+notifFrame.Size = UDim2.new(1,0,0,28)
+notifFrame.Position = UDim2.new(0,0,notifY,0)
+notifFrame.BackgroundTransparency = 1
+notifFrame.Visible = false
 
-jpInput = Instance.new("TextBox", frame)
-jpInput.Size = UDim2.new(0,42,0,18)
-jpInput.Position = UDim2.new(1,-50,0,132)
-jpInput.BackgroundColor3 = Color3.fromRGB(35,35,35)
-jpInput.TextColor3 = Color3.new(1,1,1)
-jpInput.TextScaled = true
-jpInput.Text = "0"
+local notifText = Instance.new("TextLabel", notifFrame)
+notifText.Size = UDim2.new(0,1000,1,0)
+notifText.BackgroundTransparency = 1
+notifText.TextScaled = true
+notifText.TextXAlignment = Enum.TextXAlignment.Left
+notifText.TextColor3 = Color3.fromRGB(0,170,255)
 
-jpBar = Instance.new("Frame", frame)
-jpBar.Size = UDim2.new(1,-16,0,6)
-jpBar.Position = UDim2.new(0,8,0,152)
-jpBar.BackgroundColor3 = Color3.fromRGB(60,60,60)
+sendBtn.MouseButton1Click:Connect(function()
+	if notifInput.Text ~= "" then
+		notifText.Text = notifInput.Text.."   "
+		notifText.Position = notifDir == -1 and UDim2.new(1,0,0,0) or UDim2.new(-1,0,0,0)
+		notifFrame.Visible = true
+		notifActive = true
+	end
+end)
 
-jpFill = Instance.new("Frame", jpBar)
-jpFill.Size = UDim2.new(0,0,1,0)
-jpFill.BackgroundColor3 = Color3.fromRGB(255,140,0)
+dirBtn.MouseButton1Click:Connect(function()
+	notifDir *= -1
+	dirBtn.Text = notifDir == -1 and "ARAH : KIRI" or "ARAH : KANAN"
+end)
 
---=========================
--- SYSTEM FUNCTION
---=========================
-local function setSpeed(p)
-	p = math.clamp(p,0,100)
-	targetSpeed = 16 + (MAX_WALK_SPEED - 16) * (p/100)
-	fill.Size = UDim2.new(p/100,0,1,0)
-	spTxt.Text = "SPEED : "..p.."%"
-	spInput.Text = tostring(p)
-end
-
-local function setJump(p)
-	p = math.clamp(p,0,100)
-	targetJump = 50 + (MAX_JUMP_POWER - 50) * (p/100)
-	jpFill.Size = UDim2.new(p/100,0,1,0)
-	jpTxt.Text = "JUMP : "..p.."%"
-	jpInput.Text = tostring(p)
-end
-
-spInput.FocusLost:Connect(function() setSpeed(tonumber(spInput.Text) or 0) end)
-jpInput.FocusLost:Connect(function() setJump(tonumber(jpInput.Text) or 0) end)
-
---=========================
--- MAIN LOOP (ALL SYSTEM)
---=========================
+--==================================================
+-- LOOP
+--==================================================
 RunService.RenderStepped:Connect(function()
+	-- SPEED & JUMP
 	if hum then
 		currentSpeed += (targetSpeed - currentSpeed) * SPEED_SMOOTH
 		hum.WalkSpeed = currentSpeed
 
 		currentJump += (targetJump - currentJump) * SPEED_SMOOTH
 		hum.JumpPower = currentJump
-
-		if noFallDamage and hum.Health < lastSafeHealth then
-			hum.Health = lastSafeHealth
-		end
-		lastSafeHealth = hum.Health
 	end
 
-	if walkOnWater and hrp and waterPad then
-		local rp = RaycastParams.new()
-		rp.FilterDescendantsInstances = {char}
-		rp.FilterType = Enum.RaycastFilterType.Blacklist
-
-		local ray = workspace:Raycast(hrp.Position, Vector3.new(0,-100,0), rp)
+	-- WALK ON WATER
+	if walkOnWater and hrp then
+		local ray = workspace:Raycast(hrp.Position, Vector3.new(0,-100,0))
 		if ray and ray.Material == Enum.Material.Water then
-			waterPad.Position = Vector3.new(hrp.Position.X, ray.Position.Y - 0.5, hrp.Position.Z)
+			waterPad.Position = ray.Position - Vector3.new(0,0.5,0)
 			waterPad.CanCollide = true
-			if hum:GetState() == Enum.HumanoidStateType.Swimming then
-				hum:ChangeState(Enum.HumanoidStateType.Running)
-			end
 		else
 			waterPad.CanCollide = false
-			waterPad.Position = Vector3.new(0,-1000,0)
+		end
+	end
+
+	-- RUNNING NOTIF (STOP ONCE OUT)
+	if notifActive then
+		notifText.Position += UDim2.new(0.002 * notifSpeed * notifDir,0,0,0)
+		if notifText.Position.X.Scale < -1.2 or notifText.Position.X.Scale > 1.2 then
+			notifActive = false
+			notifFrame.Visible = false
 		end
 	end
 end)
 
-print("Mikaa Dev Testing FINAL Loaded ✅")
+print("Mikaa Dev FINAL ALL-IN-ONE Loaded ✅") 
