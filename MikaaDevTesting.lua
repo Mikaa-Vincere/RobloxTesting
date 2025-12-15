@@ -121,6 +121,7 @@ spInput.TextScaled = true
 spInput.Text = "0"
 spInput.ClearTextOnFocus = false
 
+-- SPEED BAR
 bar = Instance.new("Frame", frame)
 bar.Size = UDim2.new(1,-16,0,6)
 bar.Position = UDim2.new(0,8,0,84)
@@ -129,6 +130,18 @@ bar.BackgroundColor3 = Color3.fromRGB(60,60,60)
 fill = Instance.new("Frame", bar)
 fill.Size = UDim2.new(0,0,1,0)
 fill.BackgroundColor3 = Color3.fromRGB(0,170,255)
+
+--=========================
+-- FPS & PING (NEMPEL FRAME)
+--=========================
+statLabel = Instance.new("TextLabel", frame)
+statLabel.Size = UDim2.new(1,-16,0,18)
+statLabel.Position = UDim2.new(0,8,0,96) -- ⬅ PAS
+statLabel.BackgroundTransparency = 1
+statLabel.Text = "FPS: -- | Ping: -- ms"
+statLabel.TextScaled = true
+statLabel.TextColor3 = Color3.fromRGB(255,255,255)
+statLabel.TextXAlignment = Enum.TextXAlignment.Center
 
 toggleBtn.MouseButton1Click:Connect(function()
     frame.Visible = not frame.Visible
