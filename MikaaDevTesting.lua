@@ -24,7 +24,6 @@ local MAX_JUMP_POWER = 250
 local SPEED_SMOOTH = 0.15
 
 local waterPad
-local antiSinkForce
 
 --=========================
 -- CHARACTER LOAD
@@ -44,18 +43,12 @@ local function loadChar(c)
 
     if waterPad then waterPad:Destroy() end
     waterPad = Instance.new("Part")
-    waterPad.Size = Vector3.new(6,1,6)
+    waterPad.Size = Vector3.new(8,1,8)
     waterPad.Anchored = true
-    waterPad.CanCollide = true
+    waterPad.CanCollide = false
     waterPad.Transparency = 1
+    waterPad.Name = "WaterPad"
     waterPad.Parent = workspace
-
-    -- ANTI TENGGELAM FORCE
-    if antiSinkForce then antiSinkForce:Destroy() end
-    antiSinkForce = Instance.new("BodyVelocity")
-    antiSinkForce.MaxForce = Vector3.new(0, math.huge, 0)
-    antiSinkForce.Velocity = Vector3.new(0,0,0)
-    antiSinkForce.Parent = hrp
 
     if spTxt then spTxt.Text = "SPEED : 0%" end
     if spInput then spInput.Text = "0" end
@@ -86,6 +79,7 @@ toggleBtn.BorderSizePixel = 0
 toggleBtn.Active = true
 toggleBtn.Draggable = true
 toggleBtn.Image = "rbxassetid://100166477433523"
+toggleBtn.ScaleType = Enum.ScaleType.Fit
 
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0,200,0,170)
@@ -93,6 +87,7 @@ frame.Position = UDim2.new(0.5,-100,0.3,0)
 frame.BackgroundColor3 = Color3.fromRGB(22,22,22)
 frame.Active = true
 frame.Draggable = true
+frame.Visible = true
 
 toggleBtn.MouseButton1Click:Connect(function()
     frame.Visible = not frame.Visible
@@ -214,7 +209,7 @@ waterBtn.MouseButton1Click:Connect(function()
 end)
 
 --=========================
--- LOOP (WALK ON WATER FIX FINAL)
+-- LOOP (TRUE WALK ON WATER)
 --=========================
 RunService.RenderStepped:Connect(function()
     if hum then
@@ -225,36 +220,32 @@ RunService.RenderStepped:Connect(function()
         hum.JumpPower = currentJump
     end
 
-    if walkOnWater and hrp and hum and waterPad and antiSinkForce then
+    if walkOnWater and hrp and hum and waterPad then
         local rp = RaycastParams.new()
         rp.FilterDescendantsInstances = {char}
         rp.FilterType = Enum.RaycastFilterType.Blacklist
 
-        local ray = workspace:Raycast(
-            hrp.Position,
-            Vector3.new(0, -50, 0),
-            rp
-        )
+        local ray = workspace:Raycast(hrp.Position, Vector3.new(0,-100,0), rp)
 
         if ray and ray.Material == Enum.Material.Water then
-            -- POSISI PAD TEPAT DI PERMUKAAN AIR
-            local targetY = ray.Position.Y + 0.15
-            waterPad.Position = Vector3.new(hrp.Position.X, targetY, hrp.Position.Z)
+            waterPad.Position = Vector3.new(
+                hrp.Position.X,
+                ray.Position.Y - 0.5,
+                hrp.Position.Z
+            )
+            waterPad.CanCollide = true
 
-            -- TAHAN AGAR TIDAK TURUN (BUKAN DORONG)
-            antiSinkForce.Velocity = Vector3.new(0, math.max(0, -hrp.AssemblyLinearVelocity.Y), 0)
-
-            -- PAKSA HUMANOID KE STATE NORMAL
             if hum:GetState() == Enum.HumanoidStateType.Swimming then
                 hum:ChangeState(Enum.HumanoidStateType.Running)
             end
         else
-            waterPad.Position = Vector3.new(0, -1000, 0)
-            antiSinkForce.Velocity = Vector3.zero
+            waterPad.CanCollide = false
+            waterPad.Position = Vector3.new(0,-1000,0)
         end
     else
-        if antiSinkForce then
-            antiSinkForce.Velocity = Vector3.zero
+        if waterPad then
+            waterPad.CanCollide = false
+            waterPad.Position = Vector3.new(0,-1000,0)
         end
     end
 end)
