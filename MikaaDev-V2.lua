@@ -1,6 +1,5 @@
---==================================================
+
 -- Combat Assist Mobile
---==================================================
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -9,21 +8,19 @@ local VIM = game:GetService("VirtualInputManager")
 local player = Players.LocalPlayer
 local cam = workspace.CurrentCamera
 
---========================
--- CONFIG
---========================
+-- CONFIG SESTING
+
 local AUTO_RADIUS = 8
 local LOCK_RADIUS = 10
 
 local clickDelay = 0.06
-local LOCK_STRENGTH = 0.15 -- NORMAL DEFAULT
+local LOCK_STRENGTH = 0.15 -- DEFAULT
 local PREDICT_TIME = 0.14
 
 local camAssist = true
 
---========================
 -- UI
---========================
+
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
