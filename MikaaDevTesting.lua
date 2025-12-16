@@ -173,6 +173,50 @@ clipBtn.MouseButton1Click:Connect(function()
 	clipBtn.Text = "NOCLIP : "..(noclip and "ON" or "OFF")
 end)
 
+--================ WATER WALK PHYSICS =================
+local function updateWaterWalk()
+	if not walkOnWater or not hrp then
+		if waterPart then
+			waterPart:Destroy()
+			waterPart = nil
+		end
+		return
+	end
+
+	local rayParams = RaycastParams.new()
+	rayParams.FilterDescendantsInstances = {char}
+	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+	local ray = workspace:Raycast(
+		hrp.Position,
+		Vector3.new(0, -20, 0),
+		rayParams
+	)
+
+	if ray and ray.Material == Enum.Material.Water then
+		if not waterPart then
+			waterPart = Instance.new("Part")
+			waterPart.Anchored = true
+			waterPart.CanCollide = true
+			waterPart.Transparency = 1
+			waterPart.Size = Vector3.new(20, 1, 20)
+			waterPart.Name = "WaterWalkPart"
+			waterPart.Parent = workspace
+		end
+
+		waterPart.Position = Vector3.new(
+			hrp.Position.X,
+			ray.Position.Y + 1,
+			hrp.Position.Z
+		)
+	else
+		if waterPart then
+			waterPart:Destroy()
+			waterPart = nil
+		end
+	end
+end
+
 --================ UI HELPER (WAJIB ADA) =================
 local function makeBox(y,default)
 	local b = Instance.new("TextBox", frame)
@@ -317,6 +361,8 @@ RunService.RenderStepped:Connect(function()
 		for _,v in ipairs(char:GetDescendants()) do
 			if v:IsA("BasePart") then
 				v.CanCollide = false
+					-- WATER WALK
+                updateWaterWalk()
 			end
 		end
 	end
