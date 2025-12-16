@@ -96,6 +96,7 @@ local function loadChar(c)
 
 	hum.WalkSpeed = DEFAULT_SPEED
 	hum.JumpPower = DEFAULT_JUMP
+	hum.PlatformStand = false
 
 	-- RESET COLLISION (PENTING)
 	task.wait()
@@ -445,8 +446,8 @@ RunService.RenderStepped:Connect(function()
 	flyBox.Text=math.floor(flyPercent).."%"
 	jpBox.Text=math.floor(jumpPercent).."%"
 
-					-- FLY LOGIC
-if flyEnabled and bv and hrp then
+-- FLY LOGIC
+if flyEnabled and bv and bg and hrp then
 	local move = Vector3.zero
 
 	if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
