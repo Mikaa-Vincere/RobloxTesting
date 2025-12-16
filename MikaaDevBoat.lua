@@ -11,7 +11,7 @@ local char = player.Character or player.CharacterAdded:Wait()
 local hum = char:WaitForChild("Humanoid")
 
 --================ CONFIG =================
-local MAX_MULTIPLIER = 5 -- 100% = 5x speed
+local MAX_MULTIPLIER = 800 -- 100% = 5x speed
 
 --================ STATE =================
 local boostEnabled = false
