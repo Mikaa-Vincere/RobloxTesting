@@ -131,26 +131,27 @@ info.Font = Enum.Font.Gotham
 
 --================ BOOST LOGIC =================
 RunService.RenderStepped:Connect(function()
+	if not boostEnabled then return end
+
 	local boat = getBoat()
 	if not boat then return end
 
+	local root = boat.PrimaryPart or hum.SeatPart
+	if not root then return end
+
 	local mul = percentToMultiplier(boostPercent)
 
-	for _,v in ipairs(boat:GetDescendants()) do
-		if v:IsA("LinearVelocity") then
-			if not original[v] then
-				original[v] = v.VectorVelocity
-			end
-			v.VectorVelocity = boostEnabled and (original[v] * mul) or original[v]
-		end
+	-- arah maju kapal
+	local forward = root.CFrame.LookVector
 
-		if v:IsA("BodyVelocity") then
-			if not original[v] then
-				original[v] = v.Velocity
-			end
-			v.Velocity = boostEnabled and (original[v] * mul) or original[v]
-		end
+	-- kecepatan asli (simpan sekali)
+	if not original[root] then
+		original[root] = root.AssemblyLinearVelocity.Magnitude
 	end
+
+	-- boost velocity
+	root.AssemblyLinearVelocity =
+		forward * original[root] * mul
 end)
 
 print("Mikaa Dev Boat Boost Loaded 🚤")
