@@ -281,19 +281,19 @@ if dragJ then
 	jumpPercent = math.floor(percent(jpBar) * 100)
 	targetJump = DEFAULT_JUMP +
 		(MAX_JUMP_POWER - DEFAULT_JUMP) * (jumpPercent / 100)
-		end
+end
 
-	spFill.Size = UDim2.new(speedPercent/100, 0, 1, 0)
-		
-	jpFill.Size = UDim2.new(jumpPercent/100, 0, 1, 0)
+spFill.Size = UDim2.new(speedPercent/100, 0, 1, 0)
+jpFill.Size = UDim2.new(jumpPercent/100, 0, 1, 0)
 
-	if not isEditing(spBox) then
+if not isEditing(spBox) then
 	spBox.Text = math.floor(targetSpeed)
 end
 
 if not isEditing(jpBox) then
 	jpBox.Text = math.floor(targetJump)
 		end
+	
 
 		
 	if hum then
