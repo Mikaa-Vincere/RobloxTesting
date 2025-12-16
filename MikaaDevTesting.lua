@@ -48,22 +48,31 @@ local function loadChar(c)
 	hum.WalkSpeed = DEFAULT_SPEED
 	hum.JumpPower = DEFAULT_JUMP
 	
+	local function loadChar(c)
+	char = c
+	hum = c:WaitForChild("Humanoid")
+	hrp = c:WaitForChild("HumanoidRootPart")
+
+	hum.WalkSpeed = DEFAULT_SPEED
+	hum.JumpPower = DEFAULT_JUMP
+
+	-- RESET COLLISION (BENAR)
+	task.wait()
+	for _,v in ipairs(char:GetDescendants()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = true
+		end
+	end
+
 	if flyEnabled then
-	task.wait(0.2)
-	enableFly()
-end
+		task.wait(0.2)
+		enableFly()
+	end
+	end
 
 end
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
-
--- Reset collision on respawn
-task.wait()
-for _,v in ipairs(char:GetDescendants()) do
-	if v:IsA("BasePart") then
-		v.CanCollide = true
-	end
-end
 
 --==================================================
 -- HELPERS
@@ -398,14 +407,16 @@ end)
 --==================================================
 RunService.RenderStepped:Connect(function()
 
-		-- NOCLIP LOGIC
-if noclipEnabled and char then
+	
+if -- NOCLIP LOGIC (FIX)
+if char then
 	for _,v in ipairs(char:GetDescendants()) do
 		if v:IsA("BasePart") then
-			v.CanCollide = false
+			v.CanCollide = not noclipEnabled
 		end
 	end
-		end
+end
+
 
 	if drag=="speed" then speedPercent=mousePercent(spBar)*100 end
 	if drag=="fly" then flyPercent=mousePercent(flyBar)*100 end
