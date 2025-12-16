@@ -236,9 +236,18 @@ RunService.RenderStepped:Connect(function()
 	spFill.Size=UDim2.new((targetSpeed-DEFAULT_SPEED)/(MAX_WALK_SPEED-DEFAULT_SPEED),0,1,0)
 	jpFill.Size=UDim2.new((targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),0,1,0)
 
-	spBox.Text=math.floor(targetSpeed)
-	jpBox.Text=math.floor(targetJump)
+	if not isEditing(spBox) then
+	spBox.Text = math.floor(targetSpeed)
+end
 
+if not isEditing(jpBox) then
+	jpBox.Text = math.floor(targetJump)
+		end
+
+local function isEditing(box)
+	return box:IsFocused()
+		end
+		
 	if hum then
 		currentSpeed+=(targetSpeed-currentSpeed)*SPEED_SMOOTH
 		currentJump+=(targetJump-currentJump)*SPEED_SMOOTH
