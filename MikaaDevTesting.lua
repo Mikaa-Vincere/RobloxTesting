@@ -236,12 +236,20 @@ end)
 
 --================ MINI COLOR PICKER (HP) =================
 local currentColor = notif.TextColor3
+local savedColor = notif.TextColor3
 
 pickerModeBtn.MouseButton1Click:Connect(function()
 	colorMenu.Visible = false
 	pickerFrame.Visible = true
 	savedColor = notif.TextColor3
 	currentColor = savedColor
+end)
+
+presetModeBtn.MouseButton1Click:Connect(function()
+	colorMenu.Visible = false
+	colorIndex = colorIndex % #presetColors + 1
+	notif.TextColor3 = presetColors[colorIndex]
+	currentColor = notif.TextColor3
 end)
 
 local pickerFrame = Instance.new("Frame", gui)
@@ -300,13 +308,12 @@ end)
 okBtn.MouseButton1Click:Connect(function()
 	notif.TextColor3 = currentColor
 	pickerFrame.Visible = false
-	pickerOpen = false
+	
 end)
 
 cancelBtn.MouseButton1Click:Connect(function()
 	notif.TextColor3 = savedColor
 	pickerFrame.Visible = false
-	pickerOpen = false
 end)
 
 sendBtn.MouseButton1Click:Connect(function()
