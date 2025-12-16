@@ -226,6 +226,23 @@ local colors = {
 local colorIndex=1
 notif.TextColor3=colors[colorIndex]
 
+
+local notifSpeedLabel = Instance.new("TextLabel", frame)
+notifSpeedLabel.Size = UDim2.new(0.6,0,0,18)
+notifSpeedLabel.Position = UDim2.new(0.05,0,0,178)
+notifSpeedLabel.Text = "NOTIF SPEED"
+notifSpeedLabel.TextScaled = true
+notifSpeedLabel.BackgroundTransparency = 1
+notifSpeedLabel.TextColor3 = Color3.fromRGB(200,200,200)
+
+local notifSizeLabel = Instance.new("TextLabel", frame)
+notifSizeLabel.Size = UDim2.new(0.6,0,0,18)
+notifSizeLabel.Position = UDim2.new(0.05,0,0,206)
+notifSizeLabel.Text = "TEXT SIZE"
+notifSizeLabel.TextScaled = true
+notifSizeLabel.BackgroundTransparency = 1
+notifSizeLabel.TextColor3 = Color3.fromRGB(200,200,200)
+
 local runNotif=false
 local speedBox = makeBox(178,3)
 local sizeBox = makeBox(206,20)
