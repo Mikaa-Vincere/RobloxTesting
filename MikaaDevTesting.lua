@@ -1,6 +1,5 @@
 --==================================================
--- Mikaa Dev Testing (V1) + Mikaa Fly (MERGED)
--- SPEED TERPISAH | NO LOGIC REMOVED
+-- Mikaa Dev Testing (V1)
 --==================================================
 
 local Players = game:GetService("Players")
@@ -8,7 +7,6 @@ local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 local player = Players.LocalPlayer
-local cam = workspace.CurrentCamera
 local char, hum, hrp
 
 --================ CONFIG =================
@@ -17,21 +15,17 @@ local DEFAULT_JUMP = 50
 local MAX_WALK_SPEED = 800
 local MAX_JUMP_POWER = 250
 local SPEED_SMOOTH = 0.15
-local FLY_MAX_SPEED = 300
 
 --================ STATE =================
 local targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
 local targetJump, currentJump = DEFAULT_JUMP, DEFAULT_JUMP
-local speedEnabled, jumpEnabled = false, false
+local speedEnabled = false
+local jumpEnabled = false
 local walkOnWater = false
 local waterPart
 
--- FLY STATE
-local fly = false
-local noclip = false
-local flySpeed = 0
-local bg, bv
-
+local speedPercent = 0
+local jumpPercent = 0
 --================ CHARACTER =================
 local function resetStats()
 	targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
@@ -45,12 +39,6 @@ local function loadChar(c)
 	resetStats()
 	hum.WalkSpeed = DEFAULT_SPEED
 	hum.JumpPower = DEFAULT_JUMP
-
-	fly = false
-	noclip = false
-	flySpeed = 0
-	if bg then bg:Destroy() bg=nil end
-	if bv then bv:Destroy() bv=nil end
 end
 
 player.CharacterAdded:Connect(loadChar)
@@ -69,8 +57,8 @@ logo.BorderSizePixel = 0
 logo.Active, logo.Draggable = true, true
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,220,0,520)
-frame.Position = UDim2.new(0.6,0,0.15,0)
+frame.Size = UDim2.new(0,220,0,420)
+frame.Position = UDim2.new(0.6,0,0.2,0)
 frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
 frame.Active, frame.Draggable = true, true
 
@@ -99,7 +87,40 @@ waterBtn.MouseButton1Click:Connect(function()
 	waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
 end)
 
---================ SPEED & JUMP (ASLI) =================
+--================ FLY BUTTON =================
+local flyBtn = Instance.new("TextButton", frame)
+flyBtn.Size = UDim2.new(1,0,0,22)
+flyBtn.Position = UDim2.new(0,0,0,52) -- tepat di bawah WATER
+flyBtn.Text = "FLY : OFF"
+flyBtn.TextScaled = true
+flyBtn.BackgroundTransparency = 1
+flyBtn.TextColor3 = Color3.new(1,1,1)
+
+--================ NOCLIP BUTTON =================
+local noclipBtn = Instance.new("TextButton", frame)
+noclipBtn.Size = UDim2.new(1,0,0,22)
+noclipBtn.Position = UDim2.new(0,0,0,76) -- tepat di bawah FLY
+noclipBtn.Text = "NOCLIP : OFF"
+noclipBtn.TextScaled = true
+noclipBtn.BackgroundTransparency = 1
+noclipBtn.TextColor3 = Color3.new(1,1,1)
+
+flyBtn.MouseButton1Click:Connect(function()
+	flyEnabled = not flyEnabled
+	flyBtn.Text = "FLY : "..(flyEnabled and "ON" or "OFF")
+	if flyEnabled then
+		enableFly()
+	else
+		disableFly()
+	end
+end)
+
+noclipBtn.MouseButton1Click:Connect(function()
+	noclipEnabled = not noclipEnabled
+	noclipBtn.Text = "NOCLIP : "..(noclipEnabled and "ON" or "OFF")
+end)
+
+--================ SPEED & JUMP =================
 local function makeLabel(text,y)
 	local l = Instance.new("TextLabel", frame)
 	l.Size = UDim2.new(1,0,0,18)
@@ -113,6 +134,54 @@ end
 
 makeLabel("SPEED",52)
 makeLabel("JUMP",84)
+
+local speedPercentLabel = Instance.new("TextLabel", frame)
+speedPercentLabel.Size = UDim2.new(0.3,0,0,18)
+speedPercentLabel.Position = UDim2.new(0.65,0,0,52)
+speedPercentLabel.Text = "0%"
+speedPercentLabel.TextScaled = true
+speedPercentLabel.BackgroundTransparency = 1
+speedPercentLabel.TextColor3 = Color3.fromRGB(0,170,255)
+
+local jumpPercentLabel = Instance.new("TextLabel", frame)
+jumpPercentLabel.Size = UDim2.new(0.3,0,0,18)
+jumpPercentLabel.Position = UDim2.new(0.65,0,0,84)
+jumpPercentLabel.Text = "0%"
+jumpPercentLabel.TextScaled = true
+jumpPercentLabel.BackgroundTransparency = 1
+jumpPercentLabel.TextColor3 = Color3.fromRGB(255,140,0)
+
+local speedBtn = Instance.new("TextButton", frame)
+speedBtn.Size = UDim2.new(0.45,0,0,18)
+speedBtn.Position = UDim2.new(0.05,0,0,120)
+speedBtn.Text = "SPEED : OFF"
+speedBtn.TextScaled = true
+speedBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+speedBtn.TextColor3 = Color3.new(1,1,1)
+
+local jumpBtn = Instance.new("TextButton", frame)
+jumpBtn.Size = UDim2.new(0.45,0,0,18)
+jumpBtn.Position = UDim2.new(0.5,0,0,120)
+jumpBtn.Text = "JUMP : OFF"
+jumpBtn.TextScaled = true
+jumpBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+jumpBtn.TextColor3 = Color3.new(1,1,1)
+
+speedBtn.MouseButton1Click:Connect(function()
+	speedEnabled = not speedEnabled
+	speedBtn.Text = "SPEED : "..(speedEnabled and "ON" or "OFF")
+	speedBtn.BackgroundColor3 = speedEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+	jumpEnabled = not jumpEnabled
+	jumpBtn.Text = "JUMP : "..(jumpEnabled and "ON" or "OFF")
+	jumpBtn.BackgroundColor3 = jumpEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
 
 local function makeBar(y,color)
 	local bar = Instance.new("Frame", frame)
@@ -129,171 +198,6 @@ end
 local spBar, spFill = makeBar(72, Color3.fromRGB(0,170,255))
 local jpBar, jpFill = makeBar(104, Color3.fromRGB(255,140,0))
 
-local draggingSpeed = false
-local draggingJump = false
-
-spBar.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingSpeed = true
-	end
-end)
-
-jpBar.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingJump = true
-	end
-end)
-
-UIS.InputEnded:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingSpeed = false
-		draggingJump = false
-	end
-end)
-
-UIS.InputChanged:Connect(function(i)
-	if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
-
-	if draggingSpeed then
-		local x = math.clamp(
-			(i.Position.X - spBar.AbsolutePosition.X) / spBar.AbsoluteSize.X,
-			0,1
-		)
-		spFill.Size = UDim2.new(x,0,1,0)
-		targetSpeed = math.floor(DEFAULT_SPEED + (MAX_WALK_SPEED - DEFAULT_SPEED) * x)
-	end
-
-	if draggingJump then
-		local x = math.clamp(
-			(i.Position.X - jpBar.AbsolutePosition.X) / jpBar.AbsoluteSize.X,
-			0,1
-		)
-		jpFill.Size = UDim2.new(x,0,1,0)
-		targetJump = math.floor(DEFAULT_JUMP + (MAX_JUMP_POWER - DEFAULT_JUMP) * x)
-	end
-end)
-
--- AKTIFKAN DEFAULT
-speedEnabled = true
-jumpEnabled = true
-
---================ FLY UI (TERPISAH) =================
-makeLabel("FLY",320)
-
-local flyBtn = Instance.new("TextButton", frame)
-flyBtn.Size = UDim2.new(0.45,0,0,20)
-flyBtn.Position = UDim2.new(0.05,0,0,340)
-flyBtn.Text = "FLY : OFF"
-flyBtn.TextScaled = true
-flyBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
-flyBtn.TextColor3 = Color3.new(1,1,1)
-
-local clipBtn = Instance.new("TextButton", frame)
-clipBtn.Size = UDim2.new(0.45,0,0,20)
-clipBtn.Position = UDim2.new(0.5,0,0,340)
-clipBtn.Text = "NOCLIP : OFF"
-clipBtn.TextScaled = true
-clipBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
-clipBtn.TextColor3 = Color3.new(1,1,1)
-
-local flyBar, flyFill = makeBar(370, Color3.fromRGB(0,255,150))
-
-flySpeed = 80 -- default aman
-
-local draggingFly = false
-
-flyBar.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingFly = true
-	end
-end)
-
-UIS.InputEnded:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingFly = false
-	end
-end)
-
-UIS.InputChanged:Connect(function(i)
-	if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
-	if not draggingFly then return end
-
-	local x = math.clamp(
-		(i.Position.X - flyBar.AbsolutePosition.X) / flyBar.AbsoluteSize.X,
-		0,1
-	)
-	flyFill.Size = UDim2.new(x,0,1,0)
-	flySpeed = math.floor(FLY_MAX_SPEED * x)
-end)
-
-flyBtn.MouseButton1Click:Connect(function()
-	fly = not fly
-	flyBtn.Text = "FLY : "..(fly and "ON" or "OFF")
-	flyBtn.BackgroundColor3 = fly and Color3.fromRGB(40,120,40) or Color3.fromRGB(120,40,40)
-
-	if fly and hrp then
-		bg = Instance.new("BodyGyro", hrp)
-		bg.P = 9e4
-		bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
-
-		bv = Instance.new("BodyVelocity", hrp)
-		bv.MaxForce = Vector3.new(9e9,9e9,9e9)
-	else
-		if bg then bg:Destroy() bg=nil end
-		if bv then bv:Destroy() bv=nil end
-	end
-end)
-
-clipBtn.MouseButton1Click:Connect(function()
-	noclip = not noclip
-	clipBtn.Text = "NOCLIP : "..(noclip and "ON" or "OFF")
-end)
-
---================ WATER WALK PHYSICS =================
-local function updateWaterWalk()
-	if not walkOnWater or not hrp then
-		if waterPart then
-			waterPart:Destroy()
-			waterPart = nil
-		end
-		return
-	end
-
-	local rayParams = RaycastParams.new()
-	rayParams.FilterDescendantsInstances = {char}
-	rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-
-	local ray = workspace:Raycast(
-		hrp.Position,
-		Vector3.new(0, -20, 0),
-		rayParams
-	)
-
-	if ray and ray.Material == Enum.Material.Water then
-		if not waterPart then
-			waterPart = Instance.new("Part")
-			waterPart.Anchored = true
-			waterPart.CanCollide = true
-			waterPart.Transparency = 1
-			waterPart.Size = Vector3.new(20, 1, 20)
-			waterPart.Name = "WaterWalkPart"
-			waterPart.Parent = workspace
-		end
-
-		waterPart.Position = Vector3.new(
-			hrp.Position.X,
-			ray.Position.Y + 2.5,
-			hrp.Position.Z
-		)
-	else
-		if waterPart then
-			waterPart:Destroy()
-			waterPart = nil
-		end
-	end
-end
-
---================ UI HELPER (WAJIB ADA) =================
 local function makeBox(y,default)
 	local b = Instance.new("TextBox", frame)
 	b.Size = UDim2.new(0,50,0,18)
@@ -302,29 +206,48 @@ local function makeBox(y,default)
 	b.TextScaled = true
 	b.BackgroundColor3 = Color3.fromRGB(30,30,30)
 	b.TextColor3 = Color3.new(1,1,1)
-	b.ClearTextOnFocus = false
 	return b
 end
 
-local function btn(txt,y)
-	local b = Instance.new("TextButton", frame)
-	b.Size = UDim2.new(1,-20,0,22)
-	b.Position = UDim2.new(0,10,0,y)
-	b.Text = txt
-	b.TextScaled = true
-	b.BackgroundColor3 = Color3.fromRGB(40,40,40)
-	b.TextColor3 = Color3.new(1,1,1)
-	return b
+local spBox = makeBox(52, DEFAULT_SPEED)
+local jpBox = makeBox(84, DEFAULT_JUMP)
+
+local dragS, dragJ = false,false
+
+local function percent(bar)
+	return math.clamp((UIS:GetMouseLocation().X-bar.AbsolutePosition.X)/bar.AbsoluteSize.X,0,1)
 end
 
---================ NOTIFICATION (FINAL GABUNG) =================
+spBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragS=true end
+end)
+
+jpBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragJ=true end
+end)
+
+UIS.InputEnded:Connect(function()
+	dragS=false
+	dragJ=false
+end)
+
+spBox.FocusLost:Connect(function()
+	local v=tonumber(spBox.Text)
+	if v then targetSpeed=math.clamp(v,0,MAX_WALK_SPEED) end
+end)
+
+jpBox.FocusLost:Connect(function()
+	local v=tonumber(jpBox.Text)
+	if v then targetJump=math.clamp(v,0,MAX_JUMP_POWER) end
+end)
+
+--================ NOTIFICATION =================
 local notif = Instance.new("TextLabel", gui)
 notif.Size = UDim2.new(0,320,0,40)
-notif.Position = UDim2.new(0.5,-160,0.05,0) -- TENGAH ATAS
+notif.Position = UDim2.new(1,0,0.15,0)
 notif.BackgroundTransparency = 1
 notif.TextScaled = true
 notif.Visible = false
-notif.ZIndex = 50
 
 local colors = {
 	Color3.new(1,1,1),
@@ -333,12 +256,10 @@ local colors = {
 	Color3.fromRGB(0,255,127),
 	Color3.fromRGB(255,80,80)
 }
-local colorIndex = 1
-notif.TextColor3 = colors[colorIndex]
+local colorIndex=1
+notif.TextColor3=colors[colorIndex]
 
-local runNotif = false
 
--- UI CONTROL (ASLI, POSISI DIRAPIKAN)
 local notifSpeedLabel = Instance.new("TextLabel", frame)
 notifSpeedLabel.Size = UDim2.new(0.6,0,0,18)
 notifSpeedLabel.Position = UDim2.new(0.05,0,0,178)
@@ -355,28 +276,39 @@ notifSizeLabel.TextScaled = true
 notifSizeLabel.BackgroundTransparency = 1
 notifSizeLabel.TextColor3 = Color3.fromRGB(200,200,200)
 
+local runNotif=false
 local speedBox = makeBox(178,3)
-local sizeBox  = makeBox(206,20)
-
+local sizeBox = makeBox(206,20)
 local textBox = Instance.new("TextBox",frame)
-textBox.Size = UDim2.new(1,-20,0,22)
-textBox.Position = UDim2.new(0,10,0,156)
-textBox.TextScaled = true
-textBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
-textBox.TextColor3 = Color3.new(1,1,1)
+textBox.Size=UDim2.new(1,-20,0,22)
+textBox.Position=UDim2.new(0,10,0,156)
+textBox.TextScaled=true
+textBox.BackgroundColor3=Color3.fromRGB(30,30,30)
+textBox.TextColor3=Color3.new(1,1,1)
 
-local colorBtn = btn("GANTI WARNA",234)
-local sendBtn  = btn("KIRIM TEKS",260)
-local stopBtn  = btn("HAPUS TEKS",286)
+local btn=function(txt,y)
+	local b=Instance.new("TextButton",frame)
+	b.Size=UDim2.new(1,-20,0,22)
+	b.Position=UDim2.new(0,10,0,y)
+	b.Text=txt
+	b.TextScaled=true
+	b.BackgroundColor3=Color3.fromRGB(40,40,40)
+	b.TextColor3=Color3.new(1,1,1)
+	return b
+end
+
+local colorBtn=btn("GANTI WARNA",234)
+local sendBtn=btn("KIRIM TEKS",260)
+local stopBtn=btn("HAPUS TEKS",286)
 
 colorBtn.MouseButton1Click:Connect(function()
-	colorIndex = colorIndex % #colors + 1
-	notif.TextColor3 = colors[colorIndex]
+	colorIndex=colorIndex%#colors+1
+	notif.TextColor3=colors[colorIndex]
 end)
 
 stopBtn.MouseButton1Click:Connect(function()
-	runNotif = false
-	notif.Visible = false
+	runNotif=false
+	notif.Visible=false
 end)
 
 sendBtn.MouseButton1Click:Connect(function()
@@ -388,14 +320,15 @@ sendBtn.MouseButton1Click:Connect(function()
 	runNotif = true
 
 	local speed = tonumber(speedBox.Text) or 3
-	local guiWidth = gui.AbsoluteSize.X
+	local screenWidth = gui.AbsoluteSize.X
 	local notifWidth = notif.AbsoluteSize.X
 
 	task.spawn(function()
 		while runNotif do
-			-- mulai dari kanan layar
-			notif.Position = UDim2.new(0, guiWidth, notif.Position.Y.Scale, 0)
+			-- mulai dari luar kanan layar
+			notif.Position = UDim2.new(0, screenWidth + notifWidth, notif.Position.Y.Scale, 0)
 
+			-- jalan ke kiri sampai benar-benar keluar
 			while notif.Position.X.Offset > -notifWidth and runNotif do
 				notif.Position -= UDim2.new(0, speed, 0, 0)
 				RunService.RenderStepped:Wait()
@@ -406,43 +339,88 @@ sendBtn.MouseButton1Click:Connect(function()
 	end)
 end)
 
---================ LOOP (SEMUA DIGABUNG) =================
+--================ LOOP =================
+local function isEditing(box)
+	return box:IsFocused()
+end
+
 RunService.RenderStepped:Connect(function()
-	-- SPEED & JUMP
+
+	-- SLIDER ➜ VALUE
+	if dragS then
+		local p = percent(spBar)
+		targetSpeed = DEFAULT_SPEED +
+			(MAX_WALK_SPEED - DEFAULT_SPEED) * p
+	end
+
+	if dragJ then
+		local p = percent(jpBar)
+		targetJump = DEFAULT_JUMP +
+			(MAX_JUMP_POWER - DEFAULT_JUMP) * p
+	end
+
+	-- VALUE ➜ %
+	speedPercent = math.clamp(
+		((targetSpeed - DEFAULT_SPEED) /
+		(MAX_WALK_SPEED - DEFAULT_SPEED)) * 100,
+		0, 100
+	)
+
+	jumpPercent = math.clamp(
+		((targetJump - DEFAULT_JUMP) /
+		(MAX_JUMP_POWER - DEFAULT_JUMP)) * 100,
+		0, 100
+	)
+
+	-- UPDATE BAR
+	spFill.Size = UDim2.new(speedPercent / 100, 0, 1, 0)
+    jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
+
+speedPercentLabel.Text = math.floor(speedPercent) .. "%"
+jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
+		
+	-- UPDATE TEXTBOX
+	if not isEditing(spBox) then
+	spBox.Text = math.floor(speedPercent) .. "%"
+end
+
+if not isEditing(jpBox) then
+	jpBox.Text = math.floor(jumpPercent) .. "%"
+		end
+	
+
+		
 	if hum then
-		if speedEnabled then
-			currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
-			hum.WalkSpeed = currentSpeed
-		else
-			hum.WalkSpeed = DEFAULT_SPEED
-		end
-
-		if jumpEnabled then
-			currentJump += (targetJump-currentJump)*SPEED_SMOOTH
-			hum.JumpPower = currentJump
-		else
-			hum.JumpPower = DEFAULT_JUMP
-		end
+	if speedEnabled then
+		currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
+		hum.WalkSpeed = currentSpeed
+	else
+		hum.WalkSpeed = DEFAULT_SPEED
 	end
 
-	-- FLY
-	if fly and bg and bv and hum then
-		bg.CFrame = cam.CFrame
-		local dir = hum.MoveDirection
-		bv.Velocity = dir.Magnitude > 0 and (dir * flySpeed) or Vector3.zero
+	if jumpEnabled then
+		currentJump += (targetJump-currentJump)*SPEED_SMOOTH
+		hum.JumpPower = currentJump
+	else
+		hum.JumpPower = DEFAULT_JUMP
+	  end
 	end
 
-	-- NOCLIP
-	if noclip and char then
-		for _,v in ipairs(char:GetDescendants()) do
-			if v:IsA("BasePart") then
-				v.CanCollide = false
+	if walkOnWater and hrp then
+		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-6,0))
+		if ray and ray.Material==Enum.Material.Water then
+			if not waterPart then
+				waterPart=Instance.new("Part",workspace)
+				waterPart.Anchored=true
+				waterPart.Transparency=1
+				waterPart.Size=Vector3.new(6,1,6)
 			end
+			waterPart.Position=ray.Position+Vector3.new(0,1,0)
 		end
+	elseif waterPart then
+		waterPart:Destroy()
+		waterPart=nil
 	end
-
-	-- WATER WALK
-	updateWaterWalk()
 end)
 
-print("Mikaa Dev Testing + Fly MERGED FINAL ✅")
+print("Mikaa Dev Testing FINAL – LOCKED ✅")
