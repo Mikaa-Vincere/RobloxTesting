@@ -87,6 +87,12 @@ local function loadChar(c)
 		task.wait(0.2)
 		enableFly()
 	end
+
+-- RE-APPLY NOCLIP SAAT RESPAWN
+if noclipEnabled then
+	task.wait(0.1)
+	setNoclip(true)
+    end
 end
 
 player.CharacterAdded:Connect(loadChar)
