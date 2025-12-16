@@ -433,7 +433,7 @@ if not isEditing(jpBox) then
 	end
 
 	if walkOnWater and hrp then
-		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-6,0))
+		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-12,0))
 		if ray and ray.Material==Enum.Material.Water then
 			if not waterPart then
 				waterPart=Instance.new("Part",workspace)
