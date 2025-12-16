@@ -102,6 +102,22 @@ end
 makeLabel("SPEED",52)
 makeLabel("JUMP",84)
 
+local speedPercentLabel = Instance.new("TextLabel", frame)
+speedPercentLabel.Size = UDim2.new(0.3,0,0,18)
+speedPercentLabel.Position = UDim2.new(0.65,0,0,52)
+speedPercentLabel.Text = "0%"
+speedPercentLabel.TextScaled = true
+speedPercentLabel.BackgroundTransparency = 1
+speedPercentLabel.TextColor3 = Color3.fromRGB(0,170,255)
+
+local jumpPercentLabel = Instance.new("TextLabel", frame)
+jumpPercentLabel.Size = UDim2.new(0.3,0,0,18)
+jumpPercentLabel.Position = UDim2.new(0.65,0,0,84)
+jumpPercentLabel.Text = "0%"
+jumpPercentLabel.TextScaled = true
+jumpPercentLabel.BackgroundTransparency = 1
+jumpPercentLabel.TextColor3 = Color3.fromRGB(255,140,0)
+
 local speedBtn = Instance.new("TextButton", frame)
 speedBtn.Size = UDim2.new(0.45,0,0,18)
 speedBtn.Position = UDim2.new(0.05,0,0,120)
@@ -308,8 +324,11 @@ RunService.RenderStepped:Connect(function()
 
 	-- UPDATE BAR
 	spFill.Size = UDim2.new(speedPercent / 100, 0, 1, 0)
-	jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
+    jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
 
+speedPercentLabel.Text = math.floor(speedPercent) .. "%"
+jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
+		
 	-- UPDATE TEXTBOX
 	if not isEditing(spBox) then
 		spBox.Text = math.floor(targetSpeed)
