@@ -158,8 +158,8 @@ local function makeLabel(text,y)
 	return l
 end
 
-makeLabel("SPEED",52)
-makeLabel("JUMP",84)
+makeLabel("SPEED",110)
+makeLabel("JUMP",142)
 
 local speedPercentLabel = Instance.new("TextLabel", frame)
 speedPercentLabel.Size = UDim2.new(0.3,0,0,18)
@@ -221,8 +221,8 @@ local function makeBar(y,color)
 	return bar, fill
 end
 
-local spBar, spFill = makeBar(72, Color3.fromRGB(0,170,255))
-local jpBar, jpFill = makeBar(104, Color3.fromRGB(255,140,0))
+local spBar, spFill = makeBar(130, Color3.fromRGB(0,170,255))
+local jpBar, jpFill = makeBar(162, Color3.fromRGB(255,140,0))
 
 local function makeBox(y,default)
 	local b = Instance.new("TextBox", frame)
@@ -235,8 +235,8 @@ local function makeBox(y,default)
 	return b
 end
 
-local spBox = makeBox(52, DEFAULT_SPEED)
-local jpBox = makeBox(84, DEFAULT_JUMP)
+local spBox = makeBox(110, DEFAULT_SPEED)
+local jpBox = makeBox(142, DEFAULT_JUMP)
 
 local dragS, dragJ = false,false
 
