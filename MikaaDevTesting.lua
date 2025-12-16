@@ -50,6 +50,11 @@ end
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
 
+if flyEnabled then
+	task.wait(0.2)
+	enableFly()
+end
+
 --==================================================
 -- HELPERS
 --==================================================
@@ -142,21 +147,26 @@ local function makeRow(text,y,color,hasToggle)
 end
 
 local function enableFly()
-	if not hrp then return end
+	if not hrp or not hum then return end
+
+	hum.PlatformStand = true
 
 	bg = Instance.new("BodyGyro")
-	bg.P = 9e4
-	bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
+	bg.P = 100000
+	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
 	bg.CFrame = cam.CFrame
 	bg.Parent = hrp
 
 	bv = Instance.new("BodyVelocity")
-	bv.MaxForce = Vector3.new(9e9,9e9,9e9)
+	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
 	bv.Velocity = Vector3.zero
 	bv.Parent = hrp
 end
 
 local function disableFly()
+	if hum then
+		hum.PlatformStand = false
+	end
 	if bg then bg:Destroy() bg = nil end
 	if bv then bv:Destroy() bv = nil end
 end
@@ -373,24 +383,7 @@ RunService.RenderStepped:Connect(function()
 	flyBox.Text=math.floor(flyPercent).."%"
 	jpBox.Text=math.floor(jumpPercent).."%"
 
-	if hum then
-		if speedEnabled then
-			targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)
-			currentSpeed+=(targetSpeed-currentSpeed)*SMOOTH
-			hum.WalkSpeed=currentSpeed
-		else
-			hum.WalkSpeed=DEFAULT_SPEED
-		end
-
-		if jumpEnabled then
-			targetJump=percentToValue(jumpPercent,MAX_JUMP_POWER)
-			currentJump+=(targetJump-currentJump)*SMOOTH
-			hum.JumpPower=currentJump
-		else
-			hum.JumpPower=DEFAULT_JUMP
-		end
-
-			-- FLY LOGIC
+					-- FLY LOGIC
 if flyEnabled and bv and hrp then
 	local move = Vector3.zero
 
@@ -407,7 +400,24 @@ if flyEnabled and bv and hrp then
 
 	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
 	bg.CFrame = cam.CFrame
-			end
+		end
+
+	if hum then
+		if speedEnabled then
+			targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)
+			currentSpeed+=(targetSpeed-currentSpeed)*SMOOTH
+			hum.WalkSpeed=currentSpeed
+		else
+			hum.WalkSpeed=DEFAULT_SPEED
+		end
+
+		if jumpEnabled then
+			targetJump=percentToValue(jumpPercent,MAX_JUMP_POWER)
+			currentJump+=(targetJump-currentJump)*SMOOTH
+			hum.JumpPower=currentJump
+		else
+			hum.JumpPower=DEFAULT_JUMP
+		end
 	end
 end)
 
