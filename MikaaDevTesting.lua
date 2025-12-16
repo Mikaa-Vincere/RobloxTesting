@@ -129,6 +129,54 @@ end
 local spBar, spFill = makeBar(72, Color3.fromRGB(0,170,255))
 local jpBar, jpFill = makeBar(104, Color3.fromRGB(255,140,0))
 
+local draggingSpeed = false
+local draggingJump = false
+
+spBar.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingSpeed = true
+	end
+end)
+
+jpBar.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingJump = true
+	end
+end)
+
+UIS.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingSpeed = false
+		draggingJump = false
+	end
+end)
+
+UIS.InputChanged:Connect(function(i)
+	if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+
+	if draggingSpeed then
+		local x = math.clamp(
+			(i.Position.X - spBar.AbsolutePosition.X) / spBar.AbsoluteSize.X,
+			0,1
+		)
+		spFill.Size = UDim2.new(x,0,1,0)
+		targetSpeed = math.floor(DEFAULT_SPEED + (MAX_WALK_SPEED - DEFAULT_SPEED) * x)
+	end
+
+	if draggingJump then
+		local x = math.clamp(
+			(i.Position.X - jpBar.AbsolutePosition.X) / jpBar.AbsoluteSize.X,
+			0,1
+		)
+		jpFill.Size = UDim2.new(x,0,1,0)
+		targetJump = math.floor(DEFAULT_JUMP + (MAX_JUMP_POWER - DEFAULT_JUMP) * x)
+	end
+end)
+
+-- AKTIFKAN DEFAULT
+speedEnabled = true
+jumpEnabled = true
+
 --================ FLY UI (TERPISAH) =================
 makeLabel("FLY",320)
 
@@ -149,6 +197,34 @@ clipBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
 clipBtn.TextColor3 = Color3.new(1,1,1)
 
 local flyBar, flyFill = makeBar(370, Color3.fromRGB(0,255,150))
+
+flySpeed = 80 -- default aman
+
+local draggingFly = false
+
+flyBar.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingFly = true
+	end
+end)
+
+UIS.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingFly = false
+	end
+end)
+
+UIS.InputChanged:Connect(function(i)
+	if i.UserInputType ~= Enum.UserInputType.MouseMovement then return end
+	if not draggingFly then return end
+
+	local x = math.clamp(
+		(i.Position.X - flyBar.AbsolutePosition.X) / flyBar.AbsoluteSize.X,
+		0,1
+	)
+	flyFill.Size = UDim2.new(x,0,1,0)
+	flySpeed = math.floor(FLY_MAX_SPEED * x)
+end)
 
 flyBtn.MouseButton1Click:Connect(function()
 	fly = not fly
@@ -364,8 +440,8 @@ RunService.RenderStepped:Connect(function()
 			end
 		end
 end
-
-	-- WATER WALK
+		
+                -- WATER WALK
                 updateWaterWalk()
 end)
 
