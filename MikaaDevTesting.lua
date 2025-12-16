@@ -1,5 +1,5 @@
 --==================================================
--- Mikaa Dev Testing (FINAL FIX ALL FEATURE)
+-- Mikaa Dev Testing (FINAL – NO MORE CHANGES)
 --==================================================
 
 local Players = game:GetService("Players")
@@ -9,58 +9,59 @@ local UIS = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local char, hum, hrp
 
--- PLAYER STATS
-local targetSpeed, currentSpeed = 16,16
-local targetJump, currentJump = 50,50
-local walkOnWater = false
-
--- CONFIG
+--================ CONFIG =================
+local DEFAULT_SPEED = 16
+local DEFAULT_JUMP = 50
 local MAX_WALK_SPEED = 800
 local MAX_JUMP_POWER = 250
 local SPEED_SMOOTH = 0.15
 
---==================================================
--- CHARACTER LOAD
---==================================================
-local function loadChar(c)
-    char = c
-    hum = c:WaitForChild("Humanoid")
-    hrp = c:WaitForChild("HumanoidRootPart")
-    hum.WalkSpeed = 16
-    hum.JumpPower = 50
+--================ STATE =================
+local targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
+local targetJump, currentJump = DEFAULT_JUMP, DEFAULT_JUMP
+local walkOnWater = false
+local waterPart
+
+--================ CHARACTER =================
+local function resetStats()
+	targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
+	targetJump, currentJump = DEFAULT_JUMP, DEFAULT_JUMP
 end
+
+local function loadChar(c)
+	char = c
+	hum = c:WaitForChild("Humanoid")
+	hrp = c:WaitForChild("HumanoidRootPart")
+	resetStats()
+	hum.WalkSpeed = DEFAULT_SPEED
+	hum.JumpPower = DEFAULT_JUMP
+end
+
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
 
---==================================================
--- UI CORE
---==================================================
+--================ UI CORE =================
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
--- LOGO BUTTON
 local logo = Instance.new("ImageButton", gui)
 logo.Size = UDim2.new(0,40,0,40)
 logo.Position = UDim2.new(0,10,0.5,-20)
 logo.Image = "rbxassetid://100166477433523"
 logo.BackgroundColor3 = Color3.fromRGB(20,20,20)
 logo.BorderSizePixel = 0
-logo.Active = true
-logo.Draggable = true
+logo.Active, logo.Draggable = true, true
 
--- MAIN FRAME
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0,220,0,420)
 frame.Position = UDim2.new(0.6,0,0.2,0)
 frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
-frame.Active = true
-frame.Draggable = true
+frame.Active, frame.Draggable = true, true
 
 logo.MouseButton1Click:Connect(function()
-    frame.Visible = not frame.Visible
+	frame.Visible = not frame.Visible
 end)
 
--- TITLE
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(1,0,0,26)
 title.Text = "Mikaa Dev Testing"
@@ -68,231 +69,298 @@ title.TextScaled = true
 title.TextColor3 = Color3.new(1,1,1)
 title.BackgroundColor3 = Color3.fromRGB(20,20,20)
 
---==================================================
--- WATER TOGGLE
---==================================================
+--================ WATER =================
 local waterBtn = Instance.new("TextButton", frame)
 waterBtn.Size = UDim2.new(1,0,0,22)
 waterBtn.Position = UDim2.new(0,0,0,28)
 waterBtn.Text = "WATER : OFF"
 waterBtn.TextScaled = true
-waterBtn.TextColor3 = Color3.new(1,1,1)
 waterBtn.BackgroundTransparency = 1
+waterBtn.TextColor3 = Color3.new(1,1,1)
 
 waterBtn.MouseButton1Click:Connect(function()
-    walkOnWater = not walkOnWater
-    waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
+	walkOnWater = not walkOnWater
+	waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
 end)
 
---==================================================
--- SPEED SLIDER
---==================================================
-local spLabel = Instance.new("TextLabel", frame)
-spLabel.Size = UDim2.new(1,0,0,18)
-spLabel.Position = UDim2.new(0,0,0,52)
-spLabel.Text = "SPEED : 0%"
-spLabel.TextScaled = true
-spLabel.TextColor3 = Color3.new(1,1,1)
-spLabel.BackgroundTransparency = 1
-
-local spBar = Instance.new("Frame", frame)
-spBar.Size = UDim2.new(1,-20,0,6)
-spBar.Position = UDim2.new(0,10,0,72)
-spBar.BackgroundColor3 = Color3.fromRGB(60,60,60)
-
-local spFill = Instance.new("Frame", spBar)
-spFill.Size = UDim2.new(0,0,1,0)
-spFill.BackgroundColor3 = Color3.fromRGB(0,170,255)
-
-local dragSpeed = false
-spBar.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then dragSpeed=true end
-end)
-UIS.InputEnded:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then dragSpeed=false end
-end)
-
---==================================================
--- JUMP SLIDER
---==================================================
-local jpLabel = Instance.new("TextLabel", frame)
-jpLabel.Size = UDim2.new(1,0,0,18)
-jpLabel.Position = UDim2.new(0,0,0,84)
-jpLabel.Text = "JUMP : 0%"
-jpLabel.TextScaled = true
-jpLabel.TextColor3 = Color3.new(1,1,1)
-jpLabel.BackgroundTransparency = 1
-
-local jpBar = Instance.new("Frame", frame)
-jpBar.Size = UDim2.new(1,-20,0,6)
-jpBar.Position = UDim2.new(0,10,0,104)
-jpBar.BackgroundColor3 = Color3.fromRGB(60,60,60)
-
-local jpFill = Instance.new("Frame", jpBar)
-jpFill.Size = UDim2.new(0,0,1,0)
-jpFill.BackgroundColor3 = Color3.fromRGB(255,140,0)
-
-local dragJump = false
-jpBar.InputBegan:Connect(function(i)
-    if i.UserInputType==Enum.UserInputType.MouseButton1 then dragJump=true end
-end)
-
---==================================================
--- NOTIFICATION UI
---==================================================
-local yBase = 130
-
-local function makeLabel(txt,y)
-    local l = Instance.new("TextLabel", frame)
-    l.Size = UDim2.new(1,0,0,18)
-    l.Position = UDim2.new(0,0,0,y)
-    l.Text = txt
-    l.TextScaled = true
-    l.TextColor3 = Color3.new(1,1,1)
-    l.BackgroundTransparency = 1
-    return l
+--================ SPEED & JUMP =================
+local function makeLabel(text,y)
+	local l = Instance.new("TextLabel", frame)
+	l.Size = UDim2.new(1,0,0,18)
+	l.Position = UDim2.new(0,0,0,y)
+	l.Text = text
+	l.TextScaled = true
+	l.TextColor3 = Color3.new(1,1,1)
+	l.BackgroundTransparency = 1
+	return l
 end
 
-makeLabel("NOTIF TEXT",yBase)
+makeLabel("SPEED",52)
+makeLabel("JUMP",84)
 
-local notifBox = Instance.new("TextBox", frame)
-notifBox.Size = UDim2.new(1,-20,0,22)
-notifBox.Position = UDim2.new(0,10,0,yBase+20)
-notifBox.PlaceholderText = "Isi teks notif"
-notifBox.TextScaled = true
-notifBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
-notifBox.TextColor3 = Color3.new(1,1,1)
+local function makeBar(y,color)
+	local bar = Instance.new("Frame", frame)
+	bar.Size = UDim2.new(1,-20,0,6)
+	bar.Position = UDim2.new(0,10,0,y)
+	bar.BackgroundColor3 = Color3.fromRGB(60,60,60)
 
-makeLabel("SPEED NOTIF",yBase+48)
+	local fill = Instance.new("Frame", bar)
+	fill.Size = UDim2.new(0,0,1,0)
+	fill.BackgroundColor3 = color
+	return bar, fill
+end
 
-local notifSpeedBox = Instance.new("TextBox", frame)
-notifSpeedBox.Size = UDim2.new(0,50,0,22)
-notifSpeedBox.Position = UDim2.new(1,-60,0,yBase+48)
-notifSpeedBox.Text = "3"
-notifSpeedBox.TextScaled = true
-notifSpeedBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
-notifSpeedBox.TextColor3 = Color3.new(1,1,1)
+local spBar, spFill = makeBar(72, Color3.fromRGB(0,170,255))
+local jpBar, jpFill = makeBar(104, Color3.fromRGB(255,140,0))
 
-makeLabel("SIZE TEKS",yBase+76)
+local function makeBox(y,default)
+	local b = Instance.new("TextBox", frame)
+	b.Size = UDim2.new(0,50,0,18)
+	b.Position = UDim2.new(1,-60,0,y)
+	b.Text = tostring(default)
+	b.TextScaled = true
+	b.BackgroundColor3 = Color3.fromRGB(30,30,30)
+	b.TextColor3 = Color3.new(1,1,1)
+	return b
+end
 
-local notifSizeBox = Instance.new("TextBox", frame)
-notifSizeBox.Size = UDim2.new(0,50,0,22)
-notifSizeBox.Position = UDim2.new(1,-60,0,yBase+76)
-notifSizeBox.Text = "20"
-notifSizeBox.TextScaled = true
-notifSizeBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
-notifSizeBox.TextColor3 = Color3.new(1,1,1)
+local spBox = makeBox(52, DEFAULT_SPEED)
+local jpBox = makeBox(84, DEFAULT_JUMP)
 
-makeLabel("WARNA NOTIF",yBase+104)
+local dragS, dragJ = false,false
 
-local colorBtn = Instance.new("TextButton", frame)
-colorBtn.Size = UDim2.new(1,-20,0,22)
-colorBtn.Position = UDim2.new(0,10,0,yBase+124)
-colorBtn.Text = "GANTI WARNA"
-colorBtn.TextScaled = true
-colorBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-colorBtn.TextColor3 = Color3.new(1,1,1)
+local function percent(bar)
+	return math.clamp((UIS:GetMouseLocation().X-bar.AbsolutePosition.X)/bar.AbsoluteSize.X,0,1)
+end
 
-local sendNotif = Instance.new("TextButton", frame)
-sendNotif.Size = UDim2.new(1,-20,0,26)
-sendNotif.Position = UDim2.new(0,10,0,yBase+154)
-sendNotif.Text = "KIRIM NOTIF"
-sendNotif.TextScaled = true
-sendNotif.BackgroundColor3 = Color3.fromRGB(40,40,40)
-sendNotif.TextColor3 = Color3.new(1,1,1)
+spBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragS=true end
+end)
 
-local stopNotif = Instance.new("TextButton", frame)
-stopNotif.Size = UDim2.new(1,-20,0,26)
-stopNotif.Position = UDim2.new(0,10,0,yBase+184)
-stopNotif.Text = "HAPUS NOTIF"
-stopNotif.TextScaled = true
-stopNotif.BackgroundColor3 = Color3.fromRGB(70,30,30)
-stopNotif.TextColor3 = Color3.new(1,1,1)
+jpBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragJ=true end
+end)
 
---==================================================
--- NOTIF SYSTEM
---==================================================
-local colors = {
-    Color3.fromRGB(255,255,255),
-    Color3.fromRGB(0,170,255),
-    Color3.fromRGB(255,140,0),
-    Color3.fromRGB(0,255,127),
-    Color3.fromRGB(255,80,80)
-}
-local colorIndex = 1
+UIS.InputEnded:Connect(function()
+	dragS=false
+	dragJ=false
+end)
 
+spBox.FocusLost:Connect(function()
+	local v=tonumber(spBox.Text)
+	if v then targetSpeed=math.clamp(v,0,MAX_WALK_SPEED) end
+end)
+
+jpBox.FocusLost:Connect(function()
+	local v=tonumber(jpBox.Text)
+	if v then targetJump=math.clamp(v,0,MAX_JUMP_POWER) end
+end)
+
+--================ NOTIFICATION =================
 local notif = Instance.new("TextLabel", gui)
 notif.Size = UDim2.new(0,320,0,40)
 notif.Position = UDim2.new(1,0,0.15,0)
-notif.BackgroundColor3 = Color3.fromRGB(0,0,0)
-notif.TextColor3 = colors[colorIndex]
+notif.BackgroundTransparency = 1
 notif.TextScaled = true
 notif.Visible = false
-notif.Active = true
-notif.Draggable = true
 
-local notifRun = false
+local presetColors = {
+	Color3.fromRGB(255,255,255),
+	Color3.fromRGB(0,170,255),
+	Color3.fromRGB(255,140,0),
+	Color3.fromRGB(0,255,127),
+	Color3.fromRGB(255,80,80),
+	Color3.fromRGB(180,80,255),
+	Color3.fromRGB(255,220,0)
+}
+local colorIndex=1
+notif.TextColor3 = presetColors[colorIndex]
+
+local runNotif=false
+local speedBox = makeBox(178,3)
+local sizeBox = makeBox(206,20)
+local textBox = Instance.new("TextBox",frame)
+textBox.Size=UDim2.new(1,-20,0,22)
+textBox.Position=UDim2.new(0,10,0,156)
+textBox.TextScaled=true
+textBox.BackgroundColor3=Color3.fromRGB(30,30,30)
+textBox.TextColor3=Color3.new(1,1,1)
+
+local btn=function(txt,y)
+	local b=Instance.new("TextButton",frame)
+	b.Size=UDim2.new(1,-20,0,22)
+	b.Position=UDim2.new(0,10,0,y)
+	b.Text=txt
+	b.TextScaled=true
+	b.BackgroundColor3=Color3.fromRGB(40,40,40)
+	b.TextColor3=Color3.new(1,1,1)
+	return b
+end
+
+local colorBtn=btn("GANTI WARNA",234)
+
+--================ COLOR MODE MENU =================
+local colorMenu = Instance.new("Frame", gui)
+colorMenu.Size = UDim2.new(0,160,0,90)
+colorMenu.Position = UDim2.new(0.5,-80,0.5,-45)
+colorMenu.BackgroundColor3 = Color3.fromRGB(25,25,25)
+colorMenu.Visible = false
+colorMenu.Active = true
+colorMenu.Draggable = true
+
+local function menuBtn(txt,y)
+	local b = Instance.new("TextButton", colorMenu)
+	b.Size = UDim2.new(1,-10,0,30)
+	b.Position = UDim2.new(0,5,0,y)
+	b.Text = txt
+	b.TextScaled = true
+	b.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	b.TextColor3 = Color3.new(1,1,1)
+	return b
+end
+
+local pickerModeBtn = menuBtn("🎨 MINI PICKER",5)
+local presetModeBtn = menuBtn("🌈 PRESET WARNA",45)
+
+local sendBtn=btn("KIRIM TEKS",260)
+local stopBtn=btn("HAPUS TEKS",286)
 
 colorBtn.MouseButton1Click:Connect(function()
-    colorIndex = colorIndex % #colors + 1
-    notif.TextColor3 = colors[colorIndex]
+	colorMenu.Visible = not colorMenu.Visible
 end)
 
-stopNotif.MouseButton1Click:Connect(function()
-    notifRun = false
-    notif.Visible = false
+stopBtn.MouseButton1Click:Connect(function()
+	runNotif=false
+	notif.Visible=false
 end)
 
-sendNotif.MouseButton1Click:Connect(function()
-    if notifBox.Text=="" then return end
-    notif.Text = notifBox.Text
-    notif.TextSize = tonumber(notifSizeBox.Text) or 20
-    notif.Visible = true
-    notifRun = true
-    local speed = tonumber(notifSpeedBox.Text) or 3
+--================ MINI COLOR PICKER (HP) =================
+local currentColor = notif.TextColor3
 
-    task.spawn(function()
-        while notifRun do
-            notif.Position = UDim2.new(1,0,notif.Position.Y.Scale,0)
-            for i=1,900,speed do
-                if not notifRun then return end
-                notif.Position -= UDim2.new(0,speed,0,0)
-                RunService.RenderStepped:Wait()
-            end
-            notif.Position = UDim2.new(0,-320,notif.Position.Y.Scale,0)
-            for i=1,900,speed do
-                if not notifRun then return end
-                notif.Position += UDim2.new(0,speed,0,0)
-                RunService.RenderStepped:Wait()
-            end
-        end
-    end)
+pickerModeBtn.MouseButton1Click:Connect(function()
+	colorMenu.Visible = false
+	pickerFrame.Visible = true
+	savedColor = notif.TextColor3
+	currentColor = savedColor
 end)
 
---==================================================
--- SYSTEM LOOP
---==================================================
+local pickerFrame = Instance.new("Frame", gui)
+pickerFrame.Size = UDim2.new(0,160,0,180)
+pickerFrame.Position = UDim2.new(0.5,-80,0.5,-90)
+pickerFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+pickerFrame.Visible = false
+pickerFrame.Active = true
+pickerFrame.Draggable = true
+
+local wheel = Instance.new("ImageLabel", pickerFrame)
+wheel.Size = UDim2.new(1,-20,1,-60)
+wheel.Position = UDim2.new(0,10,0,10)
+wheel.Image = "rbxassetid://6020299385"
+wheel.BackgroundTransparency = 1
+
+local okBtn = Instance.new("TextButton", pickerFrame)
+okBtn.Size = UDim2.new(0.45,0,0,28)
+okBtn.Position = UDim2.new(0.05,0,1,-32)
+okBtn.Text = "OK"
+okBtn.BackgroundColor3 = Color3.fromRGB(50,150,50)
+okBtn.TextColor3 = Color3.new(1,1,1)
+
+local cancelBtn = Instance.new("TextButton", pickerFrame)
+cancelBtn.Size = UDim2.new(0.45,0,0,28)
+cancelBtn.Position = UDim2.new(0.5,0,1,-32)
+cancelBtn.Text = "BATAL"
+cancelBtn.BackgroundColor3 = Color3.fromRGB(150,50,50)
+cancelBtn.TextColor3 = Color3.new(1,1,1)
+
+local draggingColor = false
+
+wheel.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingColor = true
+	end
+end)
+
+UIS.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
+		draggingColor = false
+	end
+end)
+
 RunService.RenderStepped:Connect(function()
-    if dragSpeed then
-        local p = math.clamp((UIS:GetMouseLocation().X-spBar.AbsolutePosition.X)/spBar.AbsoluteSize.X,0,1)
-        spFill.Size = UDim2.new(p,0,1,0)
-        spLabel.Text = "SPEED : "..math.floor(p*100).."%"
-        targetSpeed = 16 + (MAX_WALK_SPEED-16)*p
-    end
+	if draggingColor then
+		local pos = UIS:GetMouseLocation()
+		local x = math.clamp((pos.X - wheel.AbsolutePosition.X) / wheel.AbsoluteSize.X, 0, 1)
+		local y = math.clamp((pos.Y - wheel.AbsolutePosition.Y) / wheel.AbsoluteSize.Y, 0, 1)
 
-    if dragJump then
-        local p = math.clamp((UIS:GetMouseLocation().X-jpBar.AbsolutePosition.X)/jpBar.AbsoluteSize.X,0,1)
-        jpFill.Size = UDim2.new(p,0,1,0)
-        jpLabel.Text = "JUMP : "..math.floor(p*100).."%"
-        targetJump = 50 + (MAX_JUMP_POWER-50)*p
-    end
-
-    if hum then
-        currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
-        currentJump += (targetJump-currentJump)*SPEED_SMOOTH
-        hum.WalkSpeed = currentSpeed
-        hum.JumpPower = currentJump
-    end
+		currentColor = Color3.fromHSV(x, 1, 1 - y)
+		notif.TextColor3 = currentColor
+	end
 end)
 
-print("Mikaa Dev Testing FINAL FIX Loaded ✅")
+okBtn.MouseButton1Click:Connect(function()
+	notif.TextColor3 = currentColor
+	pickerFrame.Visible = false
+	pickerOpen = false
+end)
+
+cancelBtn.MouseButton1Click:Connect(function()
+	notif.TextColor3 = savedColor
+	pickerFrame.Visible = false
+	pickerOpen = false
+end)
+
+sendBtn.MouseButton1Click:Connect(function()
+	if textBox.Text=="" then return end
+	notif.Text=textBox.Text
+	notif.TextSize=tonumber(sizeBox.Text) or 20
+	runNotif=true
+	notif.Visible=true
+	local spd=tonumber(speedBox.Text) or 3
+
+	task.spawn(function()
+		while runNotif do
+			notif.Position=UDim2.new(1,0,notif.Position.Y.Scale,0)
+			while notif.Position.X.Offset>-320 and runNotif do
+				notif.Position-=UDim2.new(0,spd,0,0)
+				RunService.RenderStepped:Wait()
+			end
+		end
+	end)
+end)
+
+--================ LOOP =================
+RunService.RenderStepped:Connect(function()
+	if dragS then targetSpeed=DEFAULT_SPEED+(MAX_WALK_SPEED-DEFAULT_SPEED)*percent(spBar) end
+	if dragJ then targetJump=DEFAULT_JUMP+(MAX_JUMP_POWER-DEFAULT_JUMP)*percent(jpBar) end
+
+	spFill.Size=UDim2.new((targetSpeed-DEFAULT_SPEED)/(MAX_WALK_SPEED-DEFAULT_SPEED),0,1,0)
+	jpFill.Size=UDim2.new((targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),0,1,0)
+
+	spBox.Text=math.floor(targetSpeed)
+	jpBox.Text=math.floor(targetJump)
+
+	if hum then
+		currentSpeed+=(targetSpeed-currentSpeed)*SPEED_SMOOTH
+		currentJump+=(targetJump-currentJump)*SPEED_SMOOTH
+		hum.WalkSpeed=currentSpeed
+		hum.JumpPower=currentJump
+	end
+
+	if walkOnWater and hrp then
+		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-6,0))
+		if ray and ray.Material==Enum.Material.Water then
+			if not waterPart then
+				waterPart=Instance.new("Part",workspace)
+				waterPart.Anchored=true
+				waterPart.Transparency=1
+				waterPart.Size=Vector3.new(6,1,6)
+			end
+			waterPart.Position=ray.Position+Vector3.new(0,1,0)
+		end
+	elseif waterPart then
+		waterPart:Destroy()
+		waterPart=nil
+	end
+end)
+
+print("Mikaa Dev Testing FINAL – LOCKED ✅")
