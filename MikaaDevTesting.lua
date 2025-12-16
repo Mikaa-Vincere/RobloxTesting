@@ -69,7 +69,7 @@ end
 local function setNoclip(state)
 	if not char then return end
 	for _,v in ipairs(char:GetDescendants()) do
-		if v:IsA("BasePart") then
+		if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
 			v.CanCollide = not state
 		end
 	end
