@@ -150,7 +150,7 @@ local spBar, spFill = makeBar(72, Color3.fromRGB(0,170,255))
 local jpBar, jpFill = makeBar(104, Color3.fromRGB(255,140,0))
 
 local function makeBox(y,default)
-	local b = Instance.new("TextButton", frame)
+	local b = Instance.new("TextBox", frame)
 	b.Size = UDim2.new(0,50,0,18)
 	b.Position = UDim2.new(1,-60,0,y)
 	b.Text = tostring(default)
