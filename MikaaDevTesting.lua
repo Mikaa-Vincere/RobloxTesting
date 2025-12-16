@@ -348,12 +348,12 @@ jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
 		
 	-- UPDATE TEXTBOX
 	if not isEditing(spBox) then
-		spBox.Text = math.floor(targetSpeed)
-	end
+	spBox.Text = math.floor(speedPercent) .. "%"
+end
 
-	if not isEditing(jpBox) then
-		jpBox.Text = math.floor(targetJump)
-	end
+if not isEditing(jpBox) then
+	jpBox.Text = math.floor(jumpPercent) .. "%"
+		end
 	
 
 		
