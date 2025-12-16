@@ -221,7 +221,7 @@ textBox.BackgroundColor3=Color3.fromRGB(30,30,30)
 textBox.TextColor3=Color3.new(1,1,1)
 
 local btn=function(txt,y)
-	local b=Instance.new("TextButton",frame)
+	local b=Instance.new("Text",frame)
 	b.Size=UDim2.new(1,-20,0,22)
 	b.Position=UDim2.new(0,10,0,y)
 	b.Text=txt
