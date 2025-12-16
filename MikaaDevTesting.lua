@@ -13,6 +13,7 @@ local char, hum, hrp
 local DEFAULT_SPEED = 16
 local DEFAULT_JUMP = 50
 local MAX_WALK_SPEED = 800
+local MAX_FLY_SPEED = 200
 local MAX_JUMP_POWER = 250
 local SPEED_SMOOTH = 0.15
 
@@ -90,6 +91,26 @@ waterBtn.MouseButton1Click:Connect(function()
 	waterBtn.Text = "WATER : "..(walkOnWater and "ON" or "OFF")
 end)
 
+local function percentToValue(percent, max)
+	percent = math.clamp(percent,0,100)
+	return (percent/100)*max
+end
+
+local function valueToPercent(value, max)
+	return math.clamp((value/max)*100,0,100)
+end
+
+local function section(titleText,y)
+	local t=Instance.new("TextLabel",frame)
+	t.Size=UDim2.new(1,-20,0,20)
+	t.Position=UDim2.new(0,10,0,y)
+	t.Text=titleText
+	t.TextScaled=true
+	t.TextColor3=Color3.fromRGB(0,170,255)
+	t.BackgroundTransparency=1
+	return y+22
+end
+
 --================ FLY BUTTON =================
 local flyBtn = Instance.new("TextButton", frame)
 flyBtn.Size = UDim2.new(1,0,0,22)
@@ -107,6 +128,25 @@ noclipBtn.Text = "NOCLIP : OFF"
 noclipBtn.TextScaled = true
 noclipBtn.BackgroundTransparency = 1
 noclipBtn.TextColor3 = Color3.new(1,1,1)
+
+--================ MOVEMENT UI =================
+local y = 110
+y = section("🧪 Movement",y)
+
+makeLabel("Speed Player",y)
+local spBar, spFill = makeBar(y+18,Color3.fromRGB(0,170,255))
+local spBox = makeBox(y,0)
+y += 40
+
+makeLabel("Speed Fly",y)
+local flyBar, flyFill = makeBar(y+18,Color3.fromRGB(0,255,127))
+local flyBox = makeBox(y,0)
+y += 40
+
+makeLabel("Jump Power",y)
+local jpBar, jpFill = makeBar(y+18,Color3.fromRGB(255,140,0))
+local jpBox = makeBox(y,0)
+y += 40
 
 --================ FLY LOGIC =================
 local cam = workspace.CurrentCamera
@@ -371,66 +411,85 @@ local function isEditing(box)
 end
 
 RunService.RenderStepped:Connect(function()
+		
+	--================ MOVEMENT LOGIC =================
+local dragSP, dragFLY, dragJP = false, false, false
+local flySpeedPercent = 0
 
-	-- SLIDER ➜ VALUE
-	if dragS then
-		local p = percent(spBar)
-		targetSpeed = DEFAULT_SPEED +
-			(MAX_WALK_SPEED - DEFAULT_SPEED) * p
+spBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 then dragSP=true end
+end)
+flyBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 then dragFLY=true end
+end)
+jpBar.InputBegan:Connect(function(i)
+	if i.UserInputType==Enum.UserInputType.MouseButton1 then dragJP=true end
+end)
+
+UIS.InputEnded:Connect(function()
+	dragSP=false
+	dragFLY=false
+	dragJP=false
+end)
+
+spBox.FocusLost:Connect(function()
+	local v=tonumber(spBox.Text)
+	if v then
+		speedPercent=math.clamp(v,0,100)
+		targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)
+	end
+end)
+
+flyBox.FocusLost:Connect(function()
+	local v=tonumber(flyBox.Text)
+	if v then flySpeedPercent=math.clamp(v,0,100) end
+end)
+
+jpBox.FocusLost:Connect(function()
+	local v=tonumber(jpBox.Text)
+	if v then
+		jumpPercent=math.clamp(v,0,100)
+		targetJump=percentToValue(jumpPercent,MAX_JUMP_POWER)
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+
+	if dragSP then
+		speedPercent=percent(spBar)*100
+		targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)
 	end
 
-	if dragJ then
-		local p = percent(jpBar)
-		targetJump = DEFAULT_JUMP +
-			(MAX_JUMP_POWER - DEFAULT_JUMP) * p
+	if dragFLY then
+		flySpeedPercent=percent(flyBar)*100
 	end
 
-	-- VALUE ➜ %
-	speedPercent = math.clamp(
-		((targetSpeed - DEFAULT_SPEED) /
-		(MAX_WALK_SPEED - DEFAULT_SPEED)) * 100,
-		0, 100
-	)
+	if dragJP then
+		jumpPercent=percent(jpBar)*100
+		targetJump=percentToValue(jumpPercent,MAX_JUMP_POWER)
+	end
 
-	jumpPercent = math.clamp(
-		((targetJump - DEFAULT_JUMP) /
-		(MAX_JUMP_POWER - DEFAULT_JUMP)) * 100,
-		0, 100
-	)
+	spFill.Size=UDim2.new(speedPercent/100,0,1,0)
+	flyFill.Size=UDim2.new(flySpeedPercent/100,0,1,0)
+	jpFill.Size=UDim2.new(jumpPercent/100,0,1,0)
 
-	-- UPDATE BAR
-	spFill.Size = UDim2.new(speedPercent / 100, 0, 1, 0)
-    jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
+	if not isEditing(spBox) then spBox.Text=math.floor(speedPercent).."%"
+	end
+	if not isEditing(flyBox) then flyBox.Text=math.floor(flySpeedPercent).."%"
+	end
+	if not isEditing(jpBox) then jpBox.Text=math.floor(jumpPercent).."%"
+	end
 
-speedPercentLabel.Text = math.floor(speedPercent) .. "%"
-jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
-		
-	-- UPDATE TEXTBOX
-	if not isEditing(spBox) then
-	spBox.Text = math.floor(speedPercent) .. "%"
-end
-
-if not isEditing(jpBox) then
-	jpBox.Text = math.floor(jumpPercent) .. "%"
-		end
-	
-
-		
 	if hum then
-	if speedEnabled then
-		currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
-		hum.WalkSpeed = currentSpeed
-	else
-		hum.WalkSpeed = DEFAULT_SPEED
+		hum.WalkSpeed = speedEnabled and targetSpeed or DEFAULT_SPEED
+		hum.JumpPower = jumpEnabled and targetJump or DEFAULT_JUMP
 	end
 
-	if jumpEnabled then
-		currentJump += (targetJump-currentJump)*SPEED_SMOOTH
-		hum.JumpPower = currentJump
-	else
-		hum.JumpPower = DEFAULT_JUMP
-	  end
+	if flyEnabled and bv then
+		bv.Velocity = cam.CFrame.LookVector *
+			percentToValue(flySpeedPercent,MAX_FLY_SPEED)
 	end
+end)
 
 	if walkOnWater and hrp then
 		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-12,0))
