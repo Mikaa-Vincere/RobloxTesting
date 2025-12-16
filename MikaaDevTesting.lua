@@ -46,14 +46,15 @@ local function loadChar(c)
 	hrp = c:WaitForChild("HumanoidRootPart")
 	hum.WalkSpeed = DEFAULT_SPEED
 	hum.JumpPower = DEFAULT_JUMP
-end
-player.CharacterAdded:Connect(loadChar)
-if player.Character then loadChar(player.Character) end
-
-if flyEnabled then
+	
+	if flyEnabled then
 	task.wait(0.2)
 	enableFly()
 end
+
+end
+player.CharacterAdded:Connect(loadChar)
+if player.Character then loadChar(player.Character) end
 
 --==================================================
 -- HELPERS
