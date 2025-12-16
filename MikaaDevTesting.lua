@@ -279,29 +279,46 @@ local function isEditing(box)
 end
 
 RunService.RenderStepped:Connect(function()
-		
+
+	-- SLIDER ➜ VALUE
 	if dragS then
-	speedPercent = math.floor(percent(spBar) * 100)
-	targetSpeed = DEFAULT_SPEED +
-		(MAX_WALK_SPEED - DEFAULT_SPEED) * (speedPercent / 100)
-end
+		local p = percent(spBar)
+		targetSpeed = DEFAULT_SPEED +
+			(MAX_WALK_SPEED - DEFAULT_SPEED) * p
+	end
 
-if dragJ then
-	jumpPercent = math.floor(percent(jpBar) * 100)
-	targetJump = DEFAULT_JUMP +
-		(MAX_JUMP_POWER - DEFAULT_JUMP) * (jumpPercent / 100)
-end
+	if dragJ then
+		local p = percent(jpBar)
+		targetJump = DEFAULT_JUMP +
+			(MAX_JUMP_POWER - DEFAULT_JUMP) * p
+	end
 
-spFill.Size = UDim2.new(speedPercent/100, 0, 1, 0)
-jpFill.Size = UDim2.new(jumpPercent/100, 0, 1, 0)
+	-- VALUE ➜ %
+	speedPercent = math.clamp(
+		((targetSpeed - DEFAULT_SPEED) /
+		(MAX_WALK_SPEED - DEFAULT_SPEED)) * 100,
+		0, 100
+	)
 
-if not isEditing(spBox) then
-	spBox.Text = math.floor(targetSpeed)
-end
+	jumpPercent = math.clamp(
+		((targetJump - DEFAULT_JUMP) /
+		(MAX_JUMP_POWER - DEFAULT_JUMP)) * 100,
+		0, 100
+	)
 
-if not isEditing(jpBox) then
-	jpBox.Text = math.floor(targetJump)
-		end
+	-- UPDATE BAR
+	spFill.Size = UDim2.new(speedPercent / 100, 0, 1, 0)
+	jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
+
+	-- UPDATE TEXTBOX
+	if not isEditing(spBox) then
+		spBox.Text = math.floor(targetSpeed)
+	end
+
+	if not isEditing(jpBox) then
+		jpBox.Text = math.floor(targetJump)
+	end
+end)
 	
 
 		
