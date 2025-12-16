@@ -264,10 +264,20 @@ end)
 
 --================ LOOP =================
 RunService.RenderStepped:Connect(function()
+
+local function isEditing(box)
+	return box:IsFocused()
+		end
+		
 	if dragS then targetSpeed=DEFAULT_SPEED+(MAX_WALK_SPEED-DEFAULT_SPEED)*percent(spBar) end
 	if dragJ then targetJump=DEFAULT_JUMP+(MAX_JUMP_POWER-DEFAULT_JUMP)*percent(jpBar) end
 
-	spFill.Size=UDim2.new((targetSpeed-DEFAULT_SPEED)/(MAX_WALK_SPEED-DEFAULT_SPEED),0,1,0)
+	local spPercent = math.clamp(
+	(targetSpeed-DEFAULT_SPEED)/(MAX_WALK_SPEED-DEFAULT_SPEED),
+	0,1
+)
+spFill.Size = UDim2.new(spPercent,0,1,0)
+		
 	jpFill.Size=UDim2.new((targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),0,1,0)
 
 	if not isEditing(spBox) then
@@ -278,9 +288,6 @@ if not isEditing(jpBox) then
 	jpBox.Text = math.floor(targetJump)
 		end
 
-local function isEditing(box)
-	return box:IsFocused()
-		end
 		
 	if hum then
 	if speedEnabled then
