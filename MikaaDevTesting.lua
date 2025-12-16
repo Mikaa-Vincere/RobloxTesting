@@ -24,6 +24,8 @@ local jumpEnabled = false
 local walkOnWater = false
 local waterPart
 
+local speedPercent = 0
+local jumpPercent = 0
 --================ CHARACTER =================
 local function resetStats()
 	targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
@@ -269,20 +271,21 @@ end
 
 RunService.RenderStepped:Connect(function()
 		
-	if dragS then targetSpeed=DEFAULT_SPEED+(MAX_WALK_SPEED-DEFAULT_SPEED)*percent(spBar) end
-	if dragJ then targetJump=DEFAULT_JUMP+(MAX_JUMP_POWER-DEFAULT_JUMP)*percent(jpBar) end
+	if dragS then
+	speedPercent = math.floor(percent(spBar) * 100)
+	targetSpeed = DEFAULT_SPEED +
+		(MAX_WALK_SPEED - DEFAULT_SPEED) * (speedPercent / 100)
+end
 
-	local spPercent = math.clamp(
-	(targetSpeed-DEFAULT_SPEED)/(MAX_WALK_SPEED-DEFAULT_SPEED),
-	0,1
-)
-spFill.Size = UDim2.new(spPercent,0,1,0)
+if dragJ then
+	jumpPercent = math.floor(percent(jpBar) * 100)
+	targetJump = DEFAULT_JUMP +
+		(MAX_JUMP_POWER - DEFAULT_JUMP) * (jumpPercent / 100)
+		end
+
+	spFill.Size = UDim2.new(speedPercent/100, 0, 1, 0)
 		
-	local jpPercent = math.clamp(
-	(targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),
-	0,1
-)
-jpFill.Size = UDim2.new(jpPercent,0,1,0)
+	jpFill.Size = UDim2.new(jumpPercent/100, 0, 1, 0)
 
 	if not isEditing(spBox) then
 	spBox.Text = math.floor(targetSpeed)
