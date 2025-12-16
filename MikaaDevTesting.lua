@@ -246,20 +246,29 @@ stopBtn.MouseButton1Click:Connect(function()
 end)
 
 sendBtn.MouseButton1Click:Connect(function()
-	if textBox.Text=="" then return end
-	notif.Text=textBox.Text
-	notif.TextSize=tonumber(sizeBox.Text) or 20
-	runNotif=true
-	notif.Visible=true
-	local spd=tonumber(speedBox.Text) or 3
+	if textBox.Text == "" then return end
+
+	notif.Text = textBox.Text
+	notif.TextSize = tonumber(sizeBox.Text) or 20
+	notif.Visible = true
+	runNotif = true
+
+	local speed = tonumber(speedBox.Text) or 3
+	local screenWidth = gui.AbsoluteSize.X
+	local notifWidth = notif.AbsoluteSize.X
 
 	task.spawn(function()
 		while runNotif do
-			notif.Position=UDim2.new(1,0,notif.Position.Y.Scale,0)
-			while notif.Position.X.Offset>-320 and runNotif do
-				notif.Position-=UDim2.new(0,spd,0,0)
+			-- mulai dari luar kanan layar
+			notif.Position = UDim2.new(0, screenWidth + notifWidth, notif.Position.Y.Scale, 0)
+
+			-- jalan ke kiri sampai benar-benar keluar
+			while notif.Position.X.Offset > -notifWidth and runNotif do
+				notif.Position -= UDim2.new(0, speed, 0, 0)
 				RunService.RenderStepped:Wait()
 			end
+
+			RunService.RenderStepped:Wait()
 		end
 	end)
 end)
