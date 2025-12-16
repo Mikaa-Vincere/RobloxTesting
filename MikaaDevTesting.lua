@@ -263,11 +263,11 @@ sendBtn.MouseButton1Click:Connect(function()
 end)
 
 --================ LOOP =================
-RunService.RenderStepped:Connect(function()
-
 local function isEditing(box)
 	return box:IsFocused()
-		end
+end
+
+RunService.RenderStepped:Connect(function()
 		
 	if dragS then targetSpeed=DEFAULT_SPEED+(MAX_WALK_SPEED-DEFAULT_SPEED)*percent(spBar) end
 	if dragJ then targetJump=DEFAULT_JUMP+(MAX_JUMP_POWER-DEFAULT_JUMP)*percent(jpBar) end
@@ -278,7 +278,11 @@ local function isEditing(box)
 )
 spFill.Size = UDim2.new(spPercent,0,1,0)
 		
-	jpFill.Size=UDim2.new((targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),0,1,0)
+	local jpPercent = math.clamp(
+	(targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),
+	0,1
+)
+jpFill.Size = UDim2.new(jpPercent,0,1,0)
 
 	if not isEditing(spBox) then
 	spBox.Text = math.floor(targetSpeed)
