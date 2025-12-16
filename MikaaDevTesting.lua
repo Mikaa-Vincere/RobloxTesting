@@ -24,6 +24,7 @@ local SMOOTH = 0.15
 local speedEnabled = false
 local jumpEnabled = false
 local flyEnabled = false
+local noclipEnabled = false
 local walkOnWater = false
 
 local speedPercent = 0
@@ -55,6 +56,14 @@ end
 end
 player.CharacterAdded:Connect(loadChar)
 if player.Character then loadChar(player.Character) end
+
+-- Reset collision on respawn
+task.wait()
+for _,v in ipairs(char:GetDescendants()) do
+	if v:IsA("BasePart") then
+		v.CanCollide = true
+	end
+end
 
 --==================================================
 -- HELPERS
@@ -220,6 +229,23 @@ flyBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
+-- NOCLIP TOGGLE
+local noclipBtn = Instance.new("TextButton", frame)
+noclipBtn.Size = UDim2.new(1,-20,0,22)
+noclipBtn.Position = UDim2.new(0,10,0,165)
+noclipBtn.Text = "NOCLIP : OFF"
+noclipBtn.TextScaled = true
+noclipBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+noclipBtn.TextColor3 = Color3.new(1,1,1)
+
+noclipBtn.MouseButton1Click:Connect(function()
+	noclipEnabled = not noclipEnabled
+	noclipBtn.Text = noclipEnabled and "NOCLIP : ON" or "NOCLIP : OFF"
+	noclipBtn.BackgroundColor3 = noclipEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
+
 ----==================================================
 -- NOTIFICATION UI
 --==================================================
@@ -371,6 +397,15 @@ end)
 -- LOOP
 --==================================================
 RunService.RenderStepped:Connect(function()
+
+		-- NOCLIP LOGIC
+if noclipEnabled and char then
+	for _,v in ipairs(char:GetDescendants()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = false
+		end
+	end
+		end
 
 	if drag=="speed" then speedPercent=mousePercent(spBar)*100 end
 	if drag=="fly" then flyPercent=mousePercent(flyBar)*100 end
