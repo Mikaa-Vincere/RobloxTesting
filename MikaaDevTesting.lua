@@ -38,6 +38,31 @@ local currentJump = DEFAULT_JUMP
 
 local bg, bv, waterPart
 
+local function enableFly()
+	if not hrp or not hum then return end
+
+	hum.PlatformStand = true
+
+	bg = Instance.new("BodyGyro")
+	bg.P = 100000
+	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+	bg.CFrame = cam.CFrame
+	bg.Parent = hrp
+
+	bv = Instance.new("BodyVelocity")
+	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+	bv.Velocity = Vector3.zero
+	bv.Parent = hrp
+end
+
+local function disableFly()
+	if hum then
+		hum.PlatformStand = false
+	end
+	if bg then bg:Destroy() bg = nil end
+	if bv then bv:Destroy() bv = nil end
+end
+
 --==================================================
 -- CHARACTER
 --==================================================
@@ -45,18 +70,11 @@ local function loadChar(c)
 	char = c
 	hum = c:WaitForChild("Humanoid")
 	hrp = c:WaitForChild("HumanoidRootPart")
-	hum.WalkSpeed = DEFAULT_SPEED
-	hum.JumpPower = DEFAULT_JUMP
-	
-	local function loadChar(c)
-	char = c
-	hum = c:WaitForChild("Humanoid")
-	hrp = c:WaitForChild("HumanoidRootPart")
 
 	hum.WalkSpeed = DEFAULT_SPEED
 	hum.JumpPower = DEFAULT_JUMP
 
-	-- RESET COLLISION (BENAR)
+	-- RESET COLLISION (PENTING)
 	task.wait()
 	for _,v in ipairs(char:GetDescendants()) do
 		if v:IsA("BasePart") then
@@ -64,15 +82,17 @@ local function loadChar(c)
 		end
 	end
 
+	-- AUTO RE-FLY SAAT RESPAWN
 	if flyEnabled then
 		task.wait(0.2)
 		enableFly()
 	end
-	end
-
 end
+
 player.CharacterAdded:Connect(loadChar)
-if player.Character then loadChar(player.Character) end
+if player.Character then
+	loadChar(player.Character)
+end
 
 --==================================================
 -- HELPERS
@@ -163,31 +183,6 @@ local function makeRow(text,y,color,hasToggle)
 	fill.BackgroundColor3=color
 
 	return toggle,box,bar,fill
-end
-
-local function enableFly()
-	if not hrp or not hum then return end
-
-	hum.PlatformStand = true
-
-	bg = Instance.new("BodyGyro")
-	bg.P = 100000
-	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-	bg.CFrame = cam.CFrame
-	bg.Parent = hrp
-
-	bv = Instance.new("BodyVelocity")
-	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-	bv.Velocity = Vector3.zero
-	bv.Parent = hrp
-end
-
-local function disableFly()
-	if hum then
-		hum.PlatformStand = false
-	end
-	if bg then bg:Destroy() bg = nil end
-	if bv then bv:Destroy() bv = nil end
 end
 
 --==================================================
@@ -407,8 +402,7 @@ end)
 --==================================================
 RunService.RenderStepped:Connect(function()
 
-	
-if -- NOCLIP LOGIC (FIX)
+-- NOCLIP LOGIC (FIX)
 if char then
 	for _,v in ipairs(char:GetDescendants()) do
 		if v:IsA("BasePart") then
