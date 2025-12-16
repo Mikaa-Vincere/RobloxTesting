@@ -164,17 +164,15 @@ notif.BackgroundTransparency = 1
 notif.TextScaled = true
 notif.Visible = false
 
-local presetColors = {
-	Color3.fromRGB(255,255,255),
+local colors = {
+	Color3.new(1,1,1),
 	Color3.fromRGB(0,170,255),
 	Color3.fromRGB(255,140,0),
 	Color3.fromRGB(0,255,127),
-	Color3.fromRGB(255,80,80),
-	Color3.fromRGB(180,80,255),
-	Color3.fromRGB(255,220,0)
+	Color3.fromRGB(255,80,80)
 }
 local colorIndex=1
-notif.TextColor3 = presetColors[colorIndex]
+notif.TextColor3=colors[colorIndex]
 
 local runNotif=false
 local speedBox = makeBox(178,3)
@@ -198,122 +196,17 @@ local btn=function(txt,y)
 end
 
 local colorBtn=btn("GANTI WARNA",234)
-
---================ COLOR MODE MENU =================
-local colorMenu = Instance.new("Frame", gui)
-colorMenu.Size = UDim2.new(0,160,0,90)
-colorMenu.Position = UDim2.new(0.5,-80,0.5,-45)
-colorMenu.BackgroundColor3 = Color3.fromRGB(25,25,25)
-colorMenu.Visible = false
-colorMenu.Active = true
-colorMenu.Draggable = true
-
-local function menuBtn(txt,y)
-	local b = Instance.new("TextButton", colorMenu)
-	b.Size = UDim2.new(1,-10,0,30)
-	b.Position = UDim2.new(0,5,0,y)
-	b.Text = txt
-	b.TextScaled = true
-	b.BackgroundColor3 = Color3.fromRGB(40,40,40)
-	b.TextColor3 = Color3.new(1,1,1)
-	return b
-end
-
-local pickerModeBtn = menuBtn("🎨 MINI PICKER",5)
-local presetModeBtn = menuBtn("🌈 PRESET WARNA",45)
-
 local sendBtn=btn("KIRIM TEKS",260)
 local stopBtn=btn("HAPUS TEKS",286)
 
 colorBtn.MouseButton1Click:Connect(function()
-	colorMenu.Visible = not colorMenu.Visible
+	colorIndex=colorIndex%#colors+1
+	notif.TextColor3=colors[colorIndex]
 end)
 
 stopBtn.MouseButton1Click:Connect(function()
 	runNotif=false
 	notif.Visible=false
-end)
-
---================ MINI COLOR PICKER (HP) =================
-local currentColor = notif.TextColor3
-local savedColor = notif.TextColor3
-
-pickerModeBtn.MouseButton1Click:Connect(function()
-	colorMenu.Visible = false
-	pickerFrame.Visible = true
-	savedColor = notif.TextColor3
-	currentColor = savedColor
-end)
-
-presetModeBtn.MouseButton1Click:Connect(function()
-	colorMenu.Visible = false
-	colorIndex = colorIndex % #presetColors + 1
-	notif.TextColor3 = presetColors[colorIndex]
-	currentColor = notif.TextColor3
-end)
-
-local pickerFrame = Instance.new("Frame", gui)
-pickerFrame.Size = UDim2.new(0,160,0,180)
-pickerFrame.Position = UDim2.new(0.5,-80,0.5,-90)
-pickerFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
-pickerFrame.Visible = false
-pickerFrame.Active = true
-pickerFrame.Draggable = true
-
-local wheel = Instance.new("ImageLabel", pickerFrame)
-wheel.Size = UDim2.new(1,-20,1,-60)
-wheel.Position = UDim2.new(0,10,0,10)
-wheel.Image = "rbxassetid://6020299385"
-wheel.BackgroundTransparency = 1
-
-local okBtn = Instance.new("TextButton", pickerFrame)
-okBtn.Size = UDim2.new(0.45,0,0,28)
-okBtn.Position = UDim2.new(0.05,0,1,-32)
-okBtn.Text = "OK"
-okBtn.BackgroundColor3 = Color3.fromRGB(50,150,50)
-okBtn.TextColor3 = Color3.new(1,1,1)
-
-local cancelBtn = Instance.new("TextButton", pickerFrame)
-cancelBtn.Size = UDim2.new(0.45,0,0,28)
-cancelBtn.Position = UDim2.new(0.5,0,1,-32)
-cancelBtn.Text = "BATAL"
-cancelBtn.BackgroundColor3 = Color3.fromRGB(150,50,50)
-cancelBtn.TextColor3 = Color3.new(1,1,1)
-
-local draggingColor = false
-
-wheel.InputBegan:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingColor = true
-	end
-end)
-
-UIS.InputEnded:Connect(function(i)
-	if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
-		draggingColor = false
-	end
-end)
-
-RunService.RenderStepped:Connect(function()
-	if draggingColor then
-		local pos = UIS:GetMouseLocation()
-		local x = math.clamp((pos.X - wheel.AbsolutePosition.X) / wheel.AbsoluteSize.X, 0, 1)
-		local y = math.clamp((pos.Y - wheel.AbsolutePosition.Y) / wheel.AbsoluteSize.Y, 0, 1)
-
-		currentColor = Color3.fromHSV(x, 1, 1 - y)
-		notif.TextColor3 = currentColor
-	end
-end)
-
-okBtn.MouseButton1Click:Connect(function()
-	notif.TextColor3 = currentColor
-	pickerFrame.Visible = false
-	
-end)
-
-cancelBtn.MouseButton1Click:Connect(function()
-	notif.TextColor3 = savedColor
-	pickerFrame.Visible = false
 end)
 
 sendBtn.MouseButton1Click:Connect(function()
