@@ -19,6 +19,8 @@ local SPEED_SMOOTH = 0.15
 --================ STATE =================
 local targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
 local targetJump, currentJump = DEFAULT_JUMP, DEFAULT_JUMP
+local speedEnabled = false
+local jumpEnabled = false
 local walkOnWater = false
 local waterPart
 
@@ -97,6 +99,38 @@ end
 
 makeLabel("SPEED",52)
 makeLabel("JUMP",84)
+
+local speedBtn = Instance.new("TextButton", frame)
+speedBtn.Size = UDim2.new(0.45,0,0,18)
+speedBtn.Position = UDim2.new(0.05,0,0,120)
+speedBtn.Text = "SPEED : OFF"
+speedBtn.TextScaled = true
+speedBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+speedBtn.TextColor3 = Color3.new(1,1,1)
+
+local jumpBtn = Instance.new("TextButton", frame)
+jumpBtn.Size = UDim2.new(0.45,0,0,18)
+jumpBtn.Position = UDim2.new(0.5,0,0,120)
+jumpBtn.Text = "JUMP : OFF"
+jumpBtn.TextScaled = true
+jumpBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+jumpBtn.TextColor3 = Color3.new(1,1,1)
+
+speedBtn.MouseButton1Click:Connect(function()
+	speedEnabled = not speedEnabled
+	speedBtn.Text = "SPEED : "..(speedEnabled and "ON" or "OFF")
+	speedBtn.BackgroundColor3 = speedEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+	jumpEnabled = not jumpEnabled
+	jumpBtn.Text = "JUMP : "..(jumpEnabled and "ON" or "OFF")
+	jumpBtn.BackgroundColor3 = jumpEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
 
 local function makeBar(y,color)
 	local bar = Instance.new("Frame", frame)
@@ -249,11 +283,20 @@ local function isEditing(box)
 		end
 		
 	if hum then
-		currentSpeed+=(targetSpeed-currentSpeed)*SPEED_SMOOTH
-		currentJump+=(targetJump-currentJump)*SPEED_SMOOTH
-		hum.WalkSpeed=currentSpeed
-		hum.JumpPower=currentJump
+	if speedEnabled then
+		currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
+		hum.WalkSpeed = currentSpeed
+	else
+		hum.WalkSpeed = DEFAULT_SPEED
 	end
+
+	if jumpEnabled then
+		currentJump += (targetJump-currentJump)*SPEED_SMOOTH
+		hum.JumpPower = currentJump
+	else
+		hum.JumpPower = DEFAULT_JUMP
+	end
+		end
 
 	if walkOnWater and hrp then
 		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-6,0))
