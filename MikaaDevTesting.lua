@@ -361,11 +361,13 @@ RunService.RenderStepped:Connect(function()
 		for _,v in ipairs(char:GetDescendants()) do
 			if v:IsA("BasePart") then
 				v.CanCollide = false
-					-- WATER WALK
-                updateWaterWalk()
 			end
 		end
 	end
+end
+
+	-- WATER WALK
+                updateWaterWalk()
 end)
 
 print("Mikaa Dev Testing + Fly MERGED FINAL ✅")
