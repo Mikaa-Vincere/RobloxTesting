@@ -363,7 +363,6 @@ RunService.RenderStepped:Connect(function()
 				v.CanCollide = false
 			end
 		end
-	end
 end
 
 	-- WATER WALK
