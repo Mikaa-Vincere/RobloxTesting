@@ -41,6 +41,7 @@ local bg, bv, waterPart
 local function enableFly()
 	if not hrp or not hum then return end
 
+	-- KUNCI KARAKTER (BUKAN PHYSICS)
 	hum.PlatformStand = true
 
 	bg = Instance.new("BodyGyro")
@@ -56,9 +57,19 @@ local function enableFly()
 end
 
 local function disableFly()
-	if hum then
-		hum.PlatformStand = false
+	if not hum then return end
+
+	-- BALIKIN KONTROL
+	hum.PlatformStand = false
+
+	-- PAKSA STATE NORMAL
+	local state = hum:GetState()
+	if state == Enum.HumanoidStateType.Physics
+	or state == Enum.HumanoidStateType.FallingDown
+	or state == Enum.HumanoidStateType.Ragdoll then
+		hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 	end
+
 	if bg then bg:Destroy() bg = nil end
 	if bv then bv:Destroy() bv = nil end
 end
