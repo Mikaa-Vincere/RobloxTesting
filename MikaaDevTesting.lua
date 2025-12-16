@@ -1,4 +1,4 @@
---==================================================
+i--==================================================
 -- Mikaa Dev Testing (FINAL FIXED)
 --==================================================
 
@@ -141,6 +141,26 @@ local function makeRow(text,y,color,hasToggle)
 	return toggle,box,bar,fill
 end
 
+local function enableFly()
+	if not hrp then return end
+
+	bg = Instance.new("BodyGyro")
+	bg.P = 9e4
+	bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
+	bg.CFrame = cam.CFrame
+	bg.Parent = hrp
+
+	bv = Instance.new("BodyVelocity")
+	bv.MaxForce = Vector3.new(9e9,9e9,9e9)
+	bv.Velocity = Vector3.zero
+	bv.Parent = hrp
+end
+
+local function disableFly()
+	if bg then bg:Destroy() bg = nil end
+	if bv then bv:Destroy() bv = nil end
+end
+
 --==================================================
 -- MOVEMENT UI
 --==================================================
@@ -164,6 +184,29 @@ jumpToggle.MouseButton1Click:Connect(function()
 	jumpEnabled=not jumpEnabled
 	jumpToggle.Text=jumpEnabled and "ON" or "OFF"
 	jumpToggle.BackgroundColor3=jumpEnabled and Color3.fromRGB(40,120,40) or Color3.fromRGB(120,40,40)
+end)
+
+-- FLY TOGGLE
+local flyBtn = Instance.new("TextButton", frame)
+flyBtn.Size = UDim2.new(1,-20,0,22)
+flyBtn.Position = UDim2.new(0,10,0,140)
+flyBtn.Text = "FLY : OFF"
+flyBtn.TextScaled = true
+flyBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+flyBtn.TextColor3 = Color3.new(1,1,1)
+
+flyBtn.MouseButton1Click:Connect(function()
+	flyEnabled = not flyEnabled
+	flyBtn.Text = flyEnabled and "FLY : ON" or "FLY : OFF"
+	flyBtn.BackgroundColor3 = flyEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+
+	if flyEnabled then
+		enableFly()
+	else
+		disableFly()
+	end
 end)
 
 ----==================================================
@@ -346,6 +389,25 @@ RunService.RenderStepped:Connect(function()
 		else
 			hum.JumpPower=DEFAULT_JUMP
 		end
+
+			-- FLY LOGIC
+if flyEnabled and bv and hrp then
+	local move = Vector3.zero
+
+	if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end
+	if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end
+	if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end
+	if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end
+	if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end
+	if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move -= cam.CFrame.UpVector end
+
+	if move.Magnitude > 0 then
+		move = move.Unit
+	end
+
+	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
+	bg.CFrame = cam.CFrame
+			end
 	end
 end)
 
