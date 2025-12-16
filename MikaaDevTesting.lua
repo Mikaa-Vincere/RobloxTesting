@@ -21,6 +21,9 @@ local targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
 local targetJump, currentJump = DEFAULT_JUMP, DEFAULT_JUMP
 local speedEnabled = false
 local jumpEnabled = false
+local flyEnabled = false
+local noclipEnabled = false
+local bg, bv
 local walkOnWater = false
 local waterPart
 
@@ -104,6 +107,29 @@ noclipBtn.Text = "NOCLIP : OFF"
 noclipBtn.TextScaled = true
 noclipBtn.BackgroundTransparency = 1
 noclipBtn.TextColor3 = Color3.new(1,1,1)
+
+--================ FLY LOGIC =================
+local cam = workspace.CurrentCamera
+
+local function enableFly()
+	if not hrp then return end
+
+	bg = Instance.new("BodyGyro")
+	bg.P = 9e4
+	bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
+	bg.CFrame = cam.CFrame
+	bg.Parent = hrp
+
+	bv = Instance.new("BodyVelocity")
+	bv.MaxForce = Vector3.new(9e9,9e9,9e9)
+	bv.Velocity = Vector3.zero
+	bv.Parent = hrp
+end
+
+local function disableFly()
+	if bg then bg:Destroy() bg = nil end
+	if bv then bv:Destroy() bv = nil end
+end
 
 flyBtn.MouseButton1Click:Connect(function()
 	flyEnabled = not flyEnabled
