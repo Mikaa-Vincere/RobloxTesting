@@ -1,4 +1,4 @@
-i--==================================================
+--==================================================
 -- Mikaa Dev Testing (FINAL FIXED)
 --==================================================
 
@@ -242,12 +242,23 @@ noclipBtn.TextScaled = true
 noclipBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
 noclipBtn.TextColor3 = Color3.new(1,1,1)
 
+local function setNoclip(state)
+	if not char then return end
+	for _,v in ipairs(char:GetDescendants()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = not state
+		end
+	end
+end
+
 noclipBtn.MouseButton1Click:Connect(function()
 	noclipEnabled = not noclipEnabled
 	noclipBtn.Text = noclipEnabled and "NOCLIP : ON" or "NOCLIP : OFF"
 	noclipBtn.BackgroundColor3 = noclipEnabled
 		and Color3.fromRGB(40,120,40)
 		or Color3.fromRGB(120,40,40)
+
+	setNoclip(noclipEnabled)
 end)
 
 ----==================================================
@@ -401,16 +412,6 @@ end)
 -- LOOP
 --==================================================
 RunService.RenderStepped:Connect(function()
-
--- NOCLIP LOGIC (FIX)
-if char then
-	for _,v in ipairs(char:GetDescendants()) do
-		if v:IsA("BasePart") then
-			v.CanCollide = not noclipEnabled
-		end
-	end
-end
-
 
 	if drag=="speed" then speedPercent=mousePercent(spBar)*100 end
 	if drag=="fly" then flyPercent=mousePercent(flyBar)*100 end
