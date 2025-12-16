@@ -354,7 +354,6 @@ jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
 	if not isEditing(jpBox) then
 		jpBox.Text = math.floor(targetJump)
 	end
-end)
 	
 
 		
@@ -371,8 +370,8 @@ end)
 		hum.JumpPower = currentJump
 	else
 		hum.JumpPower = DEFAULT_JUMP
+	  end
 	end
-		end
 
 	if walkOnWater and hrp then
 		local ray=workspace:Raycast(hrp.Position,Vector3.new(0,-6,0))
