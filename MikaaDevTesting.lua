@@ -150,7 +150,7 @@ local spBar, spFill = makeBar(72, Color3.fromRGB(0,170,255))
 local jpBar, jpFill = makeBar(104, Color3.fromRGB(255,140,0))
 
 local function makeBox(y,default)
-	local b = Instance.new("TextBox", frame)
+	local b = Instance.new("TextButton", frame)
 	b.Size = UDim2.new(0,50,0,18)
 	b.Position = UDim2.new(1,-60,0,y)
 	b.Text = tostring(default)
@@ -213,7 +213,7 @@ notif.TextColor3=colors[colorIndex]
 local runNotif=false
 local speedBox = makeBox(178,3)
 local sizeBox = makeBox(206,20)
-local textBox = Instance.new("TextBox",frame)
+local textBox = Instance.new("TextButton",frame)
 textBox.Size=UDim2.new(1,-20,0,22)
 textBox.Position=UDim2.new(0,10,0,156)
 textBox.TextScaled=true
@@ -221,7 +221,7 @@ textBox.BackgroundColor3=Color3.fromRGB(30,30,30)
 textBox.TextColor3=Color3.new(1,1,1)
 
 local btn=function(txt,y)
-	local b=Instance.new("Text",frame)
+	local b=Instance.new("TextButtton",frame)
 	b.Size=UDim2.new(1,-20,0,22)
 	b.Position=UDim2.new(0,10,0,y)
 	b.Text=txt
