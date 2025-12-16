@@ -282,7 +282,7 @@ local function updateWaterWalk()
 
 		waterPart.Position = Vector3.new(
 			hrp.Position.X,
-			ray.Position.Y + 1,
+			ray.Position.Y + 2.5,
 			hrp.Position.Z
 		)
 	else
@@ -408,7 +408,7 @@ end)
 
 --================ LOOP (SEMUA DIGABUNG) =================
 RunService.RenderStepped:Connect(function()
-	-- SPEED & JUMP ASLI
+	-- SPEED & JUMP
 	if hum then
 		if speedEnabled then
 			currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
@@ -425,7 +425,7 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 
-	-- FLY CORE
+	-- FLY
 	if fly and bg and bv and hum then
 		bg.CFrame = cam.CFrame
 		local dir = hum.MoveDirection
@@ -439,10 +439,10 @@ RunService.RenderStepped:Connect(function()
 				v.CanCollide = false
 			end
 		end
-end
-		
-                -- WATER WALK
-                updateWaterWalk()
+	end
+
+	-- WATER WALK
+	updateWaterWalk()
 end)
 
 print("Mikaa Dev Testing + Fly MERGED FINAL ✅")
