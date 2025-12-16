@@ -1,6 +1,6 @@
---==================================================
--- Mikaa Dev Testing (FINAL FIXED)
---==================================================
+
+-- Mikaa Dev Testing Labubu
+-- OWN : Mikaa
 
 -- SERVICES
 local Players = game:GetService("Players")
@@ -64,6 +64,18 @@ local function disableFly()
 end
 
 --==================================================
+-- NOCLIP FUNCTION (HARUS DI ATAS)
+--==================================================
+local function setNoclip(state)
+	if not char then return end
+	for _,v in ipairs(char:GetDescendants()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = not state
+		end
+	end
+end
+
+--==================================================
 -- CHARACTER
 --==================================================
 local function loadChar(c)
@@ -114,12 +126,12 @@ local function mousePercent(bar)
 end
 
 --==================================================
--- UI CORE
+-- UI SCREEN
 --==================================================
 local gui = Instance.new("ScreenGui", player.PlayerGui)
 gui.ResetOnSpawn = false
 
--- LOGO
+-- LOGO UI
 local logo = Instance.new("ImageButton", gui)
 logo.Size = UDim2.new(0,40,0,40)
 logo.Position = UDim2.new(0,10,0.5,-20)
@@ -247,15 +259,6 @@ noclipBtn.Text = "NOCLIP : OFF"
 noclipBtn.TextScaled = true
 noclipBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
 noclipBtn.TextColor3 = Color3.new(1,1,1)
-
-local function setNoclip(state)
-	if not char then return end
-	for _,v in ipairs(char:GetDescendants()) do
-		if v:IsA("BasePart") then
-			v.CanCollide = not state
-		end
-	end
-end
 
 noclipBtn.MouseButton1Click:Connect(function()
 	noclipEnabled = not noclipEnabled
