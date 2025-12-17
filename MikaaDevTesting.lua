@@ -430,6 +430,31 @@ UIS.InputEnded:Connect(function()
 end)
 
 --==================================================
+-- TEXTBOX INPUT FIX (WAJIB DI LUAR LOOP)
+--==================================================
+
+spBox.FocusLost:Connect(function()
+	local n = tonumber(spBox.Text)
+	if n then
+		speedPercent = math.clamp(n, 0, 100)
+	end
+end)
+
+flyBox.FocusLost:Connect(function()
+	local n = tonumber(flyBox.Text)
+	if n then
+		flyPercent = math.clamp(n, 0, 100)
+	end
+end)
+
+jpBox.FocusLost:Connect(function()
+	local n = tonumber(jpBox.Text)
+	if n then
+		jumpPercent = math.clamp(n, 0, 100)
+	end
+end)
+
+--==================================================
 -- LOOP
 --==================================================
 RunService.RenderStepped:Connect(function()
@@ -442,27 +467,10 @@ RunService.RenderStepped:Connect(function()
 	flyFill.Size=UDim2.new(flyPercent/100,0,1,0)
 	jpFill.Size=UDim2.new(jumpPercent/100,0,1,0)
 
-	spBox.FocusLost:Connect(function()
-	local n = tonumber(spBox.Text)
-	if n then
-		speedPercent = math.clamp(n,0,100)
-	end
-end)
+spBox.Text = math.floor(speedPercent)
+flyBox.Text = math.floor(flyPercent)
+jpBox.Text = math.floor(jumpPercent)
 		
-	flyBox.FocusLost:Connect(function()
-	local n = tonumber(flyBox.Text)
-	if n then
-		flyPercent = math.clamp(n,0,100)
-	end
-end)
-		
-	jpBox.FocusLost:Connect(function()
-	local n = tonumber(jpBox.Text)
-	if n then
-		jumpPercent = math.clamp(n,0,100)
-	end
-end)
-
 -- FLY LOGIC
 if flyEnabled and bv and bg and hrp then
 	local move = Vector3.zero
