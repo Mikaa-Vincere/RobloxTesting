@@ -50,8 +50,6 @@ Main.Size = UDim2.new(0,360,0,520)
 Main.Position = UDim2.new(0.6,0,0.15,0)
 Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
 Main.BorderSizePixel = 0
-Main.Active = true
-Main.Draggable = true
 
 Instance.new("UICorner", Main).CornerRadius = UDim.new(0,12)
 
@@ -75,6 +73,36 @@ Header.BackgroundColor3 = Color3.fromRGB(30,30,30)
 Header.BorderSizePixel = 0
 
 Instance.new("UICorner", Header).CornerRadius = UDim.new(0,12)
+
+do
+    local dragging, dragStart, startPos
+
+    Main.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = Main.Position
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - dragStart
+            Main.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    UIS.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+end
 
 -- Header Logo
 local HeaderLogo = Instance.new("ImageLabel", Header)
