@@ -459,10 +459,39 @@ jumpPercent = math.clamp(n, 0, 100)
 end
 end)
 
+local wasInWater = false
+
 --==================================================
 -- LOOP
 --==================================================
 RunService.RenderStepped:Connect(function()
+
+		-- ================= WATER CHECK =================
+if hum and hrp then
+	local state = hum:GetState()
+	local inWater = (state == Enum.HumanoidStateType.Swimming)
+
+	if inWater and not wasInWater then
+		-- MASUK AIR
+		wasInWater = true
+
+		if flyEnabled then
+			disableFly()
+		end
+
+	elseif not inWater and wasInWater then
+		-- KELUAR AIR
+		wasInWater = false
+
+		if flyEnabled then
+			task.delay(0.1, function()
+				if flyEnabled and not wasInWater then
+					enableFly()
+				end
+			end)
+		end
+	end
+		end
 
 if drag=="speed" then speedPercent=mousePercent(spBar)*100 end  
 if drag=="fly" then flyPercent=mousePercent(flyBar)*100 end  
@@ -484,17 +513,16 @@ if not jpBox:IsFocused() then
 jpBox.Text = tostring(math.floor(jumpPercent))
 end
 
--- FLY LOGIC
-if flyEnabled and bv and bg and hrp and hum then
+-- FLY LOGIC (TIDAK AKTIF SAAT DI AIR)
+if flyEnabled and not wasInWater and bv and bg and hrp and hum then
 	local dir = hum.MoveDirection
 
-	-- arah kamera
 	local camCF = cam.CFrame
 	local move =
 		(camCF.RightVector * dir.X) +
 		(camCF.LookVector * dir.Z)
 
-	-- naik turun (HP + PC)
+	-- naik turun (PC / HP keyboard)
 	if UIS:IsKeyDown(Enum.KeyCode.Space) then
 		move += Vector3.new(0,1,0)
 	elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
@@ -507,8 +535,8 @@ if flyEnabled and bv and bg and hrp and hum then
 
 	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
 	bg.CFrame = camCF
-end
-
+		end
+		
 if hum then  
 	if speedEnabled then  
 		targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)  
