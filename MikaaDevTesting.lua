@@ -138,7 +138,7 @@ local function CreateSliderWithInput(label, yPos, min, max, default, onChange)
     Text.Size = UDim2.new(1,-70,0,18)
     Text.Position = UDim2.new(0,8,0,4)
     Text.BackgroundTransparency = 1
-    Text.TextXAlignment = Left
+    Text.TextXAlignment = Enum.TextXAlignment.Left
     Text.Font = Enum.Font.Gotham
     Text.TextSize = 12
     Text.TextColor3 = Color3.new(1,1,1)
