@@ -186,6 +186,7 @@ local function CreateSlider(label, yPos, min, max, default, onChange)
         if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = false
         end
+    end)
 
 -- SPEED PLAYER
 local defaultSpeed = humanoid.WalkSpeed
