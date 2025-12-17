@@ -56,23 +56,30 @@ bv.Parent = hrp
 
 end
 
+local function enableFly()
+	if not hrp or not hum then return end
+
+	hum:ChangeState(Enum.HumanoidStateType.Physics)
+
+	bg = Instance.new("BodyGyro")
+	bg.P = 120000
+	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+	bg.CFrame = cam.CFrame
+	bg.Parent = hrp
+
+	bv = Instance.new("BodyVelocity")
+	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+	bv.Velocity = Vector3.zero
+	bv.Parent = hrp
+end
+
 local function disableFly()
-if not hum then return end
+	if not hum then return end
 
--- BALIKIN KONTROL  
-hum.PlatformStand = false  
+	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 
--- PAKSA STATE NORMAL  
-local state = hum:GetState()  
-if state == Enum.HumanoidStateType.Physics  
-or state == Enum.HumanoidStateType.FallingDown  
-or state == Enum.HumanoidStateType.Ragdoll then  
-	hum:ChangeState(Enum.HumanoidStateType.GettingUp)  
-end  
-
-if bg then bg:Destroy() bg = nil end  
-if bv then bv:Destroy() bv = nil end
-
+	if bg then bg:Destroy() bg = nil end
+	if bv then bv:Destroy() bv = nil end
 end
 
 --==================================================
@@ -468,28 +475,25 @@ RunService.RenderStepped:Connect(function()
 
 		-- ================= WATER CHECK =================
 if hum and hrp then
-	local state = hum:GetState()
-	local inWater = (state == Enum.HumanoidStateType.Swimming)
+	local inWater = hum:GetState() == Enum.HumanoidStateType.Swimming
 
 	if inWater and not wasInWater then
-		-- MASUK AIR
 		wasInWater = true
+		waterLock = true
 
 		if flyEnabled then
 			disableFly()
 		end
 
 	elseif not inWater and wasInWater then
-		-- KELUAR AIR
 		wasInWater = false
 
-		if flyEnabled then
-			task.delay(0.1, function()
-				if flyEnabled and not wasInWater then
-					enableFly()
-				end
-			end)
-		end
+		task.delay(0.15, function()
+			waterLock = false
+			if flyEnabled then
+				enableFly()
+			end
+		end)
 	end
 		end
 
@@ -514,7 +518,7 @@ jpBox.Text = tostring(math.floor(jumpPercent))
 end
 
 -- FLY LOGIC (TIDAK AKTIF SAAT DI AIR)
-if flyEnabled and not wasInWater and bv and bg and hrp and hum then
+if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp and hum then
 	local dir = hum.MoveDirection
 
 	local camCF = cam.CFrame
