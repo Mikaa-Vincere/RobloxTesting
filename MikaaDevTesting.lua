@@ -457,15 +457,30 @@ local wasInWater = false
 RunService.RenderStepped:Connect(function()
 
 		-- ================= WATER CHECK =================
-local inWater = hum:GetState() == Enum.HumanoidStateType.Swimming
+local inWater =
+    hum:GetState() == Enum.HumanoidStateType.Swimming
     or hum.FloorMaterial == Enum.Material.Water
 
+-- MASUK AIR
 if inWater and not wasInWater then
     wasInWater = true
     waterLock = true
 
     disableFly()
     hum:ChangeState(Enum.HumanoidStateType.Swimming)
+
+-- KELUAR AIR
+elseif not inWater and wasInWater then
+    wasInWater = false
+
+    task.delay(0.15, function()
+        waterLock = false
+        hum:ChangeState(Enum.HumanoidStateType.Running)
+
+        if flyEnabled then
+            enableFly()
+        end
+    end)
 		end
 
 if drag=="speed" then speedPercent=mousePercent(spBar)*100 end  
