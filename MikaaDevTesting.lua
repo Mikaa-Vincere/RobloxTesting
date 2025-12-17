@@ -26,6 +26,8 @@ local flyEnabled = false
 local noclipEnabled = false
 local walkOnWater = false
 
+local waterLock = false
+
 local speedPercent = 0
 local jumpPercent = 0
 local flyPercent = 0
@@ -36,25 +38,6 @@ local targetJump = DEFAULT_JUMP
 local currentJump = DEFAULT_JUMP
 
 local bg, bv, waterPart
-
-local function enableFly()
-if not hrp or not hum then return end
-
--- KUNCI KARAKTER (BUKAN PHYSICS)  
-hum.PlatformStand = true  
-
-bg = Instance.new("BodyGyro")  
-bg.P = 100000  
-bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)  
-bg.CFrame = cam.CFrame  
-bg.Parent = hrp  
-
-bv = Instance.new("BodyVelocity")  
-bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)  
-bv.Velocity = Vector3.zero  
-bv.Parent = hrp
-
-end
 
 local function enableFly()
 	if not hrp or not hum then return end
@@ -103,8 +86,7 @@ hum = c:WaitForChild("Humanoid")
 hrp = c:WaitForChild("HumanoidRootPart")
 
 hum.WalkSpeed = DEFAULT_SPEED  
-hum.JumpPower = DEFAULT_JUMP  
-hum.PlatformStand = false  
+hum.JumpPower = DEFAULT_JUMP 
 
 -- RESET COLLISION (PENTING)  
 task.wait()  
