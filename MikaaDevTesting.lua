@@ -44,9 +44,6 @@ local function enableFly()
 	-- PAKSA KELUAR DARI AIR
     hum:ChangeState(Enum.HumanoidStateType.Physics)
 
-	-- KUNCI KARAKTER (BUKAN PHYSICS)
-	hum.PlatformStand = true
-
 	bg = Instance.new("BodyGyro")
 	bg.P = 100000
 	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
@@ -62,8 +59,7 @@ end
 local function disableFly()
 	if not hum then return end
 
-	-- BALIKIN KONTROL
-	hum.PlatformStand = false
+	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 
 	-- PAKSA STATE NORMAL
 	local state = hum:GetState()
@@ -505,6 +501,9 @@ if flyEnabled and bv and bg and hrp then
 
 	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
 	bg.CFrame = cam.CFrame
+			-- ANTI NEMPEL AIR
+if flyEnabled and hrp then
+	hrp.AssemblyLinearVelocity = bv.Velocity
 		end
 
 	if hum then
