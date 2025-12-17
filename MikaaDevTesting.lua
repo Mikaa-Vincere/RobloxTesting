@@ -187,6 +187,7 @@ local function CreateSlider(label, yPos, min, max, default, onChange)
             dragging = false
         end
     end)
+end
 
 -- SPEED PLAYER
 local defaultSpeed = humanoid.WalkSpeed
