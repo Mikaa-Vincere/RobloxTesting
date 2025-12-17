@@ -1,4 +1,4 @@
--- Testing 
+-- Testing
 -- Mikaa Dev Testing Labubu
 -- OWN : Mikaa
 
@@ -41,32 +41,31 @@ local currentJump = DEFAULT_JUMP
 local bg, bv, waterPart
 
 local function enableFly()
-	if not hrp or not hum then return end
+if not hrp or not hum then return end
 
-	-- MATIKAN KONTROL HUMANOID (INI KUNCI)
-	hum.PlatformStand = true
+hum:ChangeState(Enum.HumanoidStateType.Physics)  
 
-	bg = Instance.new("BodyGyro")
-	bg.P = 120000
-	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
-	bg.CFrame = cam.CFrame
-	bg.Parent = hrp
+bg = Instance.new("BodyGyro")  
+bg.P = 120000  
+bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)  
+bg.CFrame = cam.CFrame  
+bg.Parent = hrp  
 
-	bv = Instance.new("BodyVelocity")
-	bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-	bv.Velocity = Vector3.zero
-	bv.Parent = hrp
+bv = Instance.new("BodyVelocity")  
+bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)  
+bv.Velocity = Vector3.zero  
+bv.Parent = hrp
+
 end
 
 local function disableFly()
-	if not hum then return end
+if not hum then return end
 
-	-- BALIKIN KONTROL HUMANOID
-	hum.PlatformStand = false
-	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+hum:ChangeState(Enum.HumanoidStateType.GettingUp)  
 
-	if bg then bg:Destroy() bg = nil end
-	if bv then bv:Destroy() bv = nil end
+if bg then bg:Destroy() bg = nil end  
+if bv then bv:Destroy() bv = nil end
+
 end
 
 --==================================================
@@ -89,21 +88,21 @@ char = c
 hum = c:WaitForChild("Humanoid")
 hrp = c:WaitForChild("HumanoidRootPart")
 
-hum.WalkSpeed = DEFAULT_SPEED  
-hum.JumpPower = DEFAULT_JUMP 
+hum.WalkSpeed = DEFAULT_SPEED
+hum.JumpPower = DEFAULT_JUMP
 
--- RESET COLLISION (PENTING)  
-task.wait()  
-for _,v in ipairs(char:GetDescendants()) do  
-	if v:IsA("BasePart") then  
-		v.CanCollide = true  
-	end  
-end  
+-- RESET COLLISION (PENTING)
+task.wait()
+for _,v in ipairs(char:GetDescendants()) do
+if v:IsA("BasePart") then
+v.CanCollide = true
+end
+end
 
--- AUTO RE-FLY SAAT RESPAWN  
-if flyEnabled then  
-	task.wait(0.2)  
-	enableFly()  
+-- AUTO RE-FLY SAAT RESPAWN
+if flyEnabled then
+task.wait(0.2)
+enableFly()
 end
 
 -- RE-APPLY NOCLIP SAAT RESPAWN
@@ -178,33 +177,33 @@ label.BackgroundTransparency=1
 label.TextScaled=true
 label.TextColor3=Color3.new(1,1,1)
 
-local toggle  
-if hasToggle then  
-	toggle=Instance.new("TextButton",frame)  
-	toggle.Size=UDim2.new(0,42,0,18)  
-	toggle.Position=UDim2.new(1,-120,0,y)  
-	toggle.Text="OFF"  
-	toggle.TextScaled=true  
-	toggle.BackgroundColor3=Color3.fromRGB(120,40,40)  
-	toggle.TextColor3=Color3.new(1,1,1)  
-end  
+local toggle
+if hasToggle then
+toggle=Instance.new("TextButton",frame)
+toggle.Size=UDim2.new(0,42,0,18)
+toggle.Position=UDim2.new(1,-120,0,y)
+toggle.Text="OFF"
+toggle.TextScaled=true
+toggle.BackgroundColor3=Color3.fromRGB(120,40,40)
+toggle.TextColor3=Color3.new(1,1,1)
+end
 
-local box=Instance.new("TextBox",frame)  
-box.Size=UDim2.new(0,50,0,18)  
-box.Position=UDim2.new(1,-60,0,y)  
-box.Text="0"  
-box.TextScaled=true  
-box.BackgroundColor3=Color3.fromRGB(30,30,30)  
-box.TextColor3=Color3.new(1,1,1)  
+local box=Instance.new("TextBox",frame)
+box.Size=UDim2.new(0,50,0,18)
+box.Position=UDim2.new(1,-60,0,y)
+box.Text="0"
+box.TextScaled=true
+box.BackgroundColor3=Color3.fromRGB(30,30,30)
+box.TextColor3=Color3.new(1,1,1)
 
-local bar=Instance.new("Frame",frame)  
-bar.Size=UDim2.new(1,-20,0,6)  
-bar.Position=UDim2.new(0,10,0,y+22)  
-bar.BackgroundColor3=Color3.fromRGB(60,60,60)  
+local bar=Instance.new("Frame",frame)
+bar.Size=UDim2.new(1,-20,0,6)
+bar.Position=UDim2.new(0,10,0,y+22)
+bar.BackgroundColor3=Color3.fromRGB(60,60,60)
 
-local fill=Instance.new("Frame",bar)  
-fill.Size=UDim2.new(0,0,1,0)  
-fill.BackgroundColor3=color  
+local fill=Instance.new("Frame",bar)
+fill.Size=UDim2.new(0,0,1,0)
+fill.BackgroundColor3=color
 
 return toggle,box,bar,fill
 
@@ -251,10 +250,10 @@ flyBtn.BackgroundColor3 = flyEnabled
 and Color3.fromRGB(40,120,40)
 or Color3.fromRGB(120,40,40)
 
-if flyEnabled then  
-	enableFly()  
-else  
-	disableFly()  
+if flyEnabled then
+enableFly()
+else
+disableFly()
 end
 
 end)
@@ -380,29 +379,30 @@ end)
 sendBtn.MouseButton1Click:Connect(function()
 if textBox.Text == "" then return end
 
-runNotif = false  
-task.wait()  
+runNotif = false
+task.wait()
 
-notif.Text = textBox.Text  
-notif.TextSize = tonumber(sizeBox.Text) or 22  
-notif.Visible = true  
-runNotif = true  
+notif.Text = textBox.Text
+notif.TextSize = tonumber(sizeBox.Text) or 22
+notif.Visible = true
+runNotif = true
 
-local speed = tonumber(speedBox.Text) or 3  
-local screenWidth = cam.ViewportSize.X  
-local notifWidth = notif.AbsoluteSize.X  
+local speed = tonumber(speedBox.Text) or 3
+local screenWidth = cam.ViewportSize.X
+local notifWidth = notif.AbsoluteSize.X
 
-task.spawn(function()  
-	while runNotif do  
-		notif.Position = UDim2.new(0, screenWidth + notifWidth, 0.15, 0)  
+task.spawn(function()
+while runNotif do
+notif.Position = UDim2.new(0, screenWidth + notifWidth, 0.15, 0)
 
-		while notif.Position.X.Offset > -notifWidth and runNotif do  
-			notif.Position -= UDim2.new(0, speed, 0, 0)  
-			RunService.RenderStepped:Wait()  
-		end  
+while notif.Position.X.Offset > -notifWidth and runNotif do    
+		notif.Position -= UDim2.new(0, speed, 0, 0)    
+		RunService.RenderStepped:Wait()    
+	end    
 
-		RunService.RenderStepped:Wait()  
-	end  
+	RunService.RenderStepped:Wait()    
+end
+
 end)
 
 end)
@@ -460,34 +460,39 @@ local wasInWater = false
 RunService.RenderStepped:Connect(function()
 
 -- ================= WATER CHECK =================
+
 local inWater =
-	hum.FloorMaterial == Enum.Material.Water
-	or hum:GetState() == Enum.HumanoidStateType.Swimming
+hum:GetState() == Enum.HumanoidStateType.Swimming
+or hum.FloorMaterial == Enum.Material.Water
 
 -- MASUK AIR
 if inWater and not wasInWater then
-	wasInWater = true
-	waterLock = true
-	disableFly()
-end
+wasInWater = true
+waterLock = true
+
+disableFly()  
+hum:ChangeState(Enum.HumanoidStateType.Swimming)
 
 -- KELUAR AIR
-if not inWater and wasInWater then
-	wasInWater = false
-	task.delay(0.2, function()
-		waterLock = false
-		if flyEnabled then
-			enableFly()
-		end
-	end)
-		end
+elseif not inWater and wasInWater then
+wasInWater = false
 
-if drag=="speed" then speedPercent=mousePercent(spBar)*100 end  
-if drag=="fly" then flyPercent=mousePercent(flyBar)*100 end  
-if drag=="jump" then jumpPercent=mousePercent(jpBar)*100 end  
+task.delay(0.15, function()  
+    waterLock = false  
+    hum:ChangeState(Enum.HumanoidStateType.Running)  
 
-spFill.Size=UDim2.new(speedPercent/100,0,1,0)  
-flyFill.Size=UDim2.new(flyPercent/100,0,1,0)  
+    if flyEnabled then  
+        enableFly()  
+    end  
+end)  
+	end
+
+if drag=="speed" then speedPercent=mousePercent(spBar)*100 end
+if drag=="fly" then flyPercent=mousePercent(flyBar)*100 end
+if drag=="jump" then jumpPercent=mousePercent(jpBar)*100 end
+
+spFill.Size=UDim2.new(speedPercent/100,0,1,0)
+flyFill.Size=UDim2.new(flyPercent/100,0,1,0)
 jpFill.Size=UDim2.new(jumpPercent/100,0,1,0)
 
 if not spBox:IsFocused() then
@@ -502,42 +507,41 @@ if not jpBox:IsFocused() then
 jpBox.Text = tostring(math.floor(jumpPercent))
 end
 
--- FLY LOGIC (MOBILE ONLY)
-if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp then
-	local camCF = cam.CFrame
-	local dir = hum.MoveDirection
+-- FLY LOGIC (TIDAK AKTIF SAAT DI AIR)
+if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp and hum then
+local move = hum.MoveDirection
 
-	local move =
-		(camCF.RightVector * dir.X) +
-		(camCF.LookVector * dir.Z)
+if UIS:IsKeyDown(Enum.KeyCode.Space) then  
+    move += Vector3.new(0,1,0)  
+elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then  
+    move -= Vector3.new(0,1,0)  
+end  
 
-	local pitch = camCF.LookVector.Y
-	move += Vector3.new(0, pitch, 0)
+if move.Magnitude > 0 then  
+    move = move.Unit  
+end  
 
-	if move.Magnitude > 0 then
-		move = move.Unit
+bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)  
+bg.CFrame = cam.CFrame  
 	end
 
-	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
-	bg.CFrame = camCF
-		end
-		
-if hum then  
-	if speedEnabled then  
-		targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)  
-		currentSpeed+=(targetSpeed-currentSpeed)*SMOOTH  
-		hum.WalkSpeed=currentSpeed  
-	else  
-		hum.WalkSpeed=DEFAULT_SPEED  
-	end  
+if hum then
+if speedEnabled then
+targetSpeed=percentToValue(speedPercent,MAX_WALK_SPEED)
+currentSpeed+=(targetSpeed-currentSpeed)*SMOOTH
+hum.WalkSpeed=currentSpeed
+else
+hum.WalkSpeed=DEFAULT_SPEED
+end
 
-	if jumpEnabled then  
-		targetJump=percentToValue(jumpPercent,MAX_JUMP_POWER)  
-		currentJump+=(targetJump-currentJump)*SMOOTH  
-		hum.JumpPower=currentJump  
-	else  
-		hum.JumpPower=DEFAULT_JUMP  
-	end  
+if jumpEnabled then    
+	targetJump=percentToValue(jumpPercent,MAX_JUMP_POWER)    
+	currentJump+=(targetJump-currentJump)*SMOOTH    
+	hum.JumpPower=currentJump    
+else    
+	hum.JumpPower=DEFAULT_JUMP    
+end
+
 end
 
 end)
