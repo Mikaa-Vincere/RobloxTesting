@@ -457,27 +457,15 @@ local wasInWater = false
 RunService.RenderStepped:Connect(function()
 
 		-- ================= WATER CHECK =================
-if hum and hrp then
-	local inWater = hum:GetState() == Enum.HumanoidStateType.Swimming
+local inWater = hum:GetState() == Enum.HumanoidStateType.Swimming
+    or hum.FloorMaterial == Enum.Material.Water
 
-	if inWater and not wasInWater then
-		wasInWater = true
-		waterLock = true
+if inWater and not wasInWater then
+    wasInWater = true
+    waterLock = true
 
-		if flyEnabled then
-			disableFly()
-		end
-
-	elseif not inWater and wasInWater then
-		wasInWater = false
-
-		task.delay(0.15, function()
-			waterLock = false
-			if flyEnabled then
-				enableFly()
-			end
-		end)
-	end
+    disableFly()
+    hum:ChangeState(Enum.HumanoidStateType.Swimming)
 		end
 
 if drag=="speed" then speedPercent=mousePercent(spBar)*100 end  
@@ -502,26 +490,20 @@ end
 
 -- FLY LOGIC (TIDAK AKTIF SAAT DI AIR)
 if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp and hum then
-	local dir = hum.MoveDirection
+    local move = hum.MoveDirection
 
-	local camCF = cam.CFrame
-	local move =
-		(camCF.RightVector * dir.X) +
-		(camCF.LookVector * dir.Z)
+    if UIS:IsKeyDown(Enum.KeyCode.Space) then
+        move += Vector3.new(0,1,0)
+    elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
+        move -= Vector3.new(0,1,0)
+    end
 
-	-- naik turun (PC / HP keyboard)
-	if UIS:IsKeyDown(Enum.KeyCode.Space) then
-		move += Vector3.new(0,1,0)
-	elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
-		move -= Vector3.new(0,1,0)
-	end
+    if move.Magnitude > 0 then
+        move = move.Unit
+    end
 
-	if move.Magnitude > 0 then
-		move = move.Unit
-	end
-
-	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
-	bg.CFrame = camCF
+    bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
+    bg.CFrame = cam.CFrame
 		end
 		
 if hum then  
