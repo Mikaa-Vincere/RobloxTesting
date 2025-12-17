@@ -41,6 +41,9 @@ local bg, bv, waterPart
 local function enableFly()
 	if not hrp or not hum then return end
 
+	-- PAKSA KELUAR DARI AIR
+    hum:ChangeState(Enum.HumanoidStateType.Physics)
+
 	-- KUNCI KARAKTER (BUKAN PHYSICS)
 	hum.PlatformStand = true
 
@@ -477,6 +480,12 @@ end
 
 if not jpBox:IsFocused() then
 	jpBox.Text = tostring(math.floor(jumpPercent))
+		end
+
+if flyEnabled and hum then
+	if hum:GetState() == Enum.HumanoidStateType.Swimming then
+		hum:ChangeState(Enum.HumanoidStateType.Physics)
+	end
 		end
 		
 -- FLY LOGIC
