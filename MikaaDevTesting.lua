@@ -485,23 +485,29 @@ jpBox.Text = tostring(math.floor(jumpPercent))
 end
 
 -- FLY LOGIC
-if flyEnabled and bv and bg and hrp then
-local move = Vector3.zero
+if flyEnabled and bv and bg and hrp and hum then
+	local dir = hum.MoveDirection
 
-if UIS:IsKeyDown(Enum.KeyCode.W) then move += cam.CFrame.LookVector end  
-if UIS:IsKeyDown(Enum.KeyCode.S) then move -= cam.CFrame.LookVector end  
-if UIS:IsKeyDown(Enum.KeyCode.A) then move -= cam.CFrame.RightVector end  
-if UIS:IsKeyDown(Enum.KeyCode.D) then move += cam.CFrame.RightVector end  
-if UIS:IsKeyDown(Enum.KeyCode.Space) then move += cam.CFrame.UpVector end  
-if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then move -= cam.CFrame.UpVector end  
+	-- arah kamera
+	local camCF = cam.CFrame
+	local move =
+		(camCF.RightVector * dir.X) +
+		(camCF.LookVector * dir.Z)
 
-if move.Magnitude > 0 then  
-	move = move.Unit  
-end  
+	-- naik turun (HP + PC)
+	if UIS:IsKeyDown(Enum.KeyCode.Space) then
+		move += Vector3.new(0,1,0)
+	elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
+		move -= Vector3.new(0,1,0)
+	end
 
-bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)  
-bg.CFrame = cam.CFrame  
-	end  
+	if move.Magnitude > 0 then
+		move = move.Unit
+	end
+
+	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
+	bg.CFrame = camCF
+end
 
 if hum then  
 	if speedEnabled then  
