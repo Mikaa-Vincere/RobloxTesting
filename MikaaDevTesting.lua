@@ -221,6 +221,12 @@ local function CreateSliderWithInput(label, yPos, min, max, default, onChange)
     return update
 end
 
+Bar.InputChanged:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.Touch then
+        update(min + (max-min)*((i.Position.X-Bar.AbsolutePosition.X)/Bar.AbsoluteSize.X))
+    end
+end)
+
 -- ===============================
 -- PLAYER FEATURES
 -- ===============================
