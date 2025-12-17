@@ -404,6 +404,8 @@ DownBtn.MouseButton1Click:Connect(function()
     notifY = math.clamp(notifY + 0.05, 0.05, 0.9)
 end)
 
+local activeTween = nil
+
 SendBtn.MouseButton1Click:Connect(function()
     if InputText.Text == "" then return end
     Float.Text = InputText.Text
@@ -413,14 +415,18 @@ SendBtn.MouseButton1Click:Connect(function()
     Float.Position = UDim2.new(1, 10, notifY, 0)
     Float.Size = UDim2.new(0, 400, 0, 50)
 
-    if tween then tween:Cancel() end
+    if activeTween then
+        activeTween:Cancel()
+        activeTween = nil
+    end
+
     local function play()
         Float.Position = UDim2.new(1, 10, notifY, 0)
-        tween = TweenService:Create(Float, TweenInfo.new(notifSpeed, Enum.EasingStyle.Linear), {
+        activeTween = TweenService:Create(Float, TweenInfo.new(notifSpeed, Enum.EasingStyle.Linear), {
             Position = UDim2.new(-0.5, 0, notifY, 0)
         })
-        tween:Play()
-        tween.Completed:Wait()
+        activeTween:Play()
+        activeTween.Completed:Wait()
         play()
     end
     task.spawn(play)
