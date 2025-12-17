@@ -1,6 +1,5 @@
 --// Mikaa Style UI Base
 --// Owner / Creator: Mikaa Dev (UI only)
---// Logo: rbxassetid://100166477433523
 
 -- Services
 local Players = game:GetService("Players")
@@ -187,10 +186,6 @@ local function CreateSlider(label, yPos, min, max, default, onChange)
         if i.UserInputType == Enum.UserInputType.Touch or i.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = false
         end
-    end)
-end
-    end)
-end
 
 -- SPEED PLAYER
 local defaultSpeed = humanoid.WalkSpeed
