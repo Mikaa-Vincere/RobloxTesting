@@ -1,4 +1,4 @@
--- Test Asek
+-- Test 
 -- Mikaa Dev Testing Labubu
 -- OWN : Mikaa
 
@@ -41,8 +41,9 @@ local bg, bv, waterPart
 local function enableFly()
 	if not hrp or not hum then return end
 
-	-- PAKSA KELUAR DARI AIR
-    hum:ChangeState(Enum.HumanoidStateType.Physics)
+	-- KUNCI HUMANOID (INI WAJIB)
+	hum.PlatformStand = true
+	hum:ChangeState(Enum.HumanoidStateType.Physics)
 
 	bg = Instance.new("BodyGyro")
 	bg.P = 100000
@@ -61,17 +62,15 @@ local function disableFly()
 
 	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 
-	-- PAKSA STATE NORMAL
-	local state = hum:GetState()
-	if state == Enum.HumanoidStateType.Physics
-	or state == Enum.HumanoidStateType.FallingDown
-	or state == Enum.HumanoidStateType.Ragdoll then
-		hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-	end
+	local function disableFly()
+	if not hum then return end
+
+	hum.PlatformStand = false
+	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 
 	if bg then bg:Destroy() bg = nil end
 	if bv then bv:Destroy() bv = nil end
-end
+	end
 
 --==================================================
 -- NOCLIP FUNCTION (HARUS DI ATAS)
@@ -501,8 +500,8 @@ if flyEnabled and bv and bg and hrp then
 
 	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
 	bg.CFrame = cam.CFrame
-			-- ANTI NEMPEL AIR
-if flyEnabled and hrp then
+
+	--  ANTI NEMPEL AIR (FINAL)
 	hrp.AssemblyLinearVelocity = bv.Velocity
 		end
 
