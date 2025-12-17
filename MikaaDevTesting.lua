@@ -43,8 +43,6 @@ local bg, bv, waterPart
 local function enableFly()
 	if not hrp or not hum then return end
 
-	hum:ChangeState(Enum.HumanoidStateType.Physics)
-
 	bg = Instance.new("BodyGyro")
 	bg.P = 120000
 	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
@@ -499,21 +497,19 @@ if not jpBox:IsFocused() then
 jpBox.Text = tostring(math.floor(jumpPercent))
 end
 
--- FLY LOGIC (KAMERA BASED)
+-- FLY LOGIC (MOBILE ONLY)
 if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp then
 	local camCF = cam.CFrame
-	local move = Vector3.zero
+	local dir = hum.MoveDirection
 
-	-- arah kamera (maju, mundur, kiri, kanan)
-	move += camCF.LookVector * hum.MoveDirection.Z
-	move += camCF.RightVector * hum.MoveDirection.X
+	-- arah horizontal mengikuti kamera + analog
+	local move =
+		(camCF.RightVector * dir.X) +
+		(camCF.LookVector * dir.Z)
 
-	-- naik / turun
-	if UIS:IsKeyDown(Enum.KeyCode.Space) then
-		move += camCF.UpVector
-	elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
-		move -= camCF.UpVector
-	end
+	-- vertikal ikut arah kamera (pitch)
+	local pitch = camCF.LookVector.Y
+	move += Vector3.new(0, pitch, 0)
 
 	if move.Magnitude > 0 then
 		move = move.Unit
