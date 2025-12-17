@@ -101,7 +101,6 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
 -- Toggle builder with callback
-local function CreateToggle(text, yPos, callback)
     local Btn = Instance.new("TextButton", Content)
     Btn.Size = UDim2.new(1, -20, 0, 36)
     Btn.Position = UDim2.new(0, 10, 0, yPos)
