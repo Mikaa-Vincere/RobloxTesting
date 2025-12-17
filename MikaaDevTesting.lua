@@ -467,9 +467,17 @@ RunService.RenderStepped:Connect(function()
 	flyFill.Size=UDim2.new(flyPercent/100,0,1,0)
 	jpFill.Size=UDim2.new(jumpPercent/100,0,1,0)
 
-spBox.Text = math.floor(speedPercent)
-flyBox.Text = math.floor(flyPercent)
-jpBox.Text = math.floor(jumpPercent)
+if not spBox:IsFocused() then
+	spBox.Text = tostring(math.floor(speedPercent))
+end
+
+if not flyBox:IsFocused() then
+	flyBox.Text = tostring(math.floor(flyPercent))
+end
+
+if not jpBox:IsFocused() then
+	jpBox.Text = tostring(math.floor(jumpPercent))
+		end
 		
 -- FLY LOGIC
 if flyEnabled and bv and bg and hrp then
