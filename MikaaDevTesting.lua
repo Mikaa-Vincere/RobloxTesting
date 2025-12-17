@@ -74,33 +74,12 @@ Content.Position = UDim2.new(0, 0, 0, 50)
 Content.Size = UDim2.new(1, 0, 1, -74)
 Content.BackgroundTransparency = 1
 
--- Example Toggle
-local function CreateToggle(text, yPos)
-    local Btn = Instance.new("TextButton", Content)
-    Btn.Size = UDim2.new(1, -20, 0, 36)
-    Btn.Position = UDim2.new(0, 10, 0, yPos)
-    Btn.Text = text .. " : OFF"
-    Btn.Font = Enum.Font.Gotham
-    Btn.TextSize = 13
-    Btn.TextColor3 = Color3.fromRGB(255,255,255)
-    Btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-    Btn.BorderSizePixel = 0
-
-    local c = Instance.new("UICorner", Btn)
-    c.CornerRadius = UDim.new(0,8)
-
-    local state = false
-    Btn.MouseButton1Click:Connect(function()
-        state = not state
-        Btn.Text = text .. (state and " : ON" or " : OFF")
-    end)
-end
-
 -- Player refs
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
 -- Toggle builder with callback
+    local function CreateToggle(text, yPos, callback)
     local Btn = Instance.new("TextButton", Content)
     Btn.Size = UDim2.new(1, -20, 0, 36)
     Btn.Position = UDim2.new(0, 10, 0, yPos)
