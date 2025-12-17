@@ -456,31 +456,27 @@ local wasInWater = false
 --==================================================
 RunService.RenderStepped:Connect(function()
 
-		-- ================= WATER CHECK =================
+-- ================= WATER CHECK =================
 local inWater =
-    hum:GetState() == Enum.HumanoidStateType.Swimming
-    or hum.FloorMaterial == Enum.Material.Water
+	hum.FloorMaterial == Enum.Material.Water
+	or hum:GetState() == Enum.HumanoidStateType.Swimming
 
 -- MASUK AIR
 if inWater and not wasInWater then
-    wasInWater = true
-    waterLock = true
-
-    disableFly()
-    hum:ChangeState(Enum.HumanoidStateType.Swimming)
+	wasInWater = true
+	waterLock = true
+	disableFly()
+end
 
 -- KELUAR AIR
-elseif not inWater and wasInWater then
-    wasInWater = false
-
-    task.delay(0.15, function()
-        waterLock = false
-        hum:ChangeState(Enum.HumanoidStateType.Running)
-
-        if flyEnabled then
-            enableFly()
-        end
-    end)
+if not inWater and wasInWater then
+	wasInWater = false
+	task.delay(0.2, function()
+		waterLock = false
+		if flyEnabled then
+			enableFly()
+		end
+	end)
 		end
 
 if drag=="speed" then speedPercent=mousePercent(spBar)*100 end  
@@ -503,22 +499,28 @@ if not jpBox:IsFocused() then
 jpBox.Text = tostring(math.floor(jumpPercent))
 end
 
--- FLY LOGIC (TIDAK AKTIF SAAT DI AIR)
-if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp and hum then
-    local move = hum.MoveDirection
+-- FLY LOGIC (KAMERA BASED)
+if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp then
+	local camCF = cam.CFrame
+	local move = Vector3.zero
 
-    if UIS:IsKeyDown(Enum.KeyCode.Space) then
-        move += Vector3.new(0,1,0)
-    elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
-        move -= Vector3.new(0,1,0)
-    end
+	-- arah kamera (maju, mundur, kiri, kanan)
+	move += camCF.LookVector * hum.MoveDirection.Z
+	move += camCF.RightVector * hum.MoveDirection.X
 
-    if move.Magnitude > 0 then
-        move = move.Unit
-    end
+	-- naik / turun
+	if UIS:IsKeyDown(Enum.KeyCode.Space) then
+		move += camCF.UpVector
+	elseif UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
+		move -= camCF.UpVector
+	end
 
-    bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
-    bg.CFrame = cam.CFrame
+	if move.Magnitude > 0 then
+		move = move.Unit
+	end
+
+	bv.Velocity = move * percentToValue(flyPercent, MAX_FLY_SPEED)
+	bg.CFrame = camCF
 		end
 		
 if hum then  
