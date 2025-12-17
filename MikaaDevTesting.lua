@@ -243,7 +243,7 @@ end)
 -- FLY TOGGLE
 local flyBtn = Instance.new("TextButton", frame)
 flyBtn.Size = UDim2.new(1,-20,0,22)
-flyBtn.Position = UDim2.new(0,10,0,140)
+flyBtn.Position = UDim2.new(0,10,0,155)
 flyBtn.Text = "FLY : OFF"
 flyBtn.TextScaled = true
 flyBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
@@ -266,7 +266,7 @@ end)
 -- NOCLIP TOGGLE
 local noclipBtn = Instance.new("TextButton", frame)
 noclipBtn.Size = UDim2.new(1,-20,0,22)
-noclipBtn.Position = UDim2.new(0,10,0,165)
+noclipBtn.Position = UDim2.new(0,10,0,180)
 noclipBtn.Text = "NOCLIP : OFF"
 noclipBtn.TextScaled = true
 noclipBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
@@ -442,9 +442,26 @@ RunService.RenderStepped:Connect(function()
 	flyFill.Size=UDim2.new(flyPercent/100,0,1,0)
 	jpFill.Size=UDim2.new(jumpPercent/100,0,1,0)
 
-	spBox.Text=math.floor(speedPercent).."%"
-	flyBox.Text=math.floor(flyPercent).."%"
-	jpBox.Text=math.floor(jumpPercent).."%"
+	spBox.FocusLost:Connect(function()
+	local n = tonumber(spBox.Text)
+	if n then
+		speedPercent = math.clamp(n,0,100)
+	end
+end)
+		
+	flyBox.FocusLost:Connect(function()
+	local n = tonumber(flyBox.Text)
+	if n then
+		flyPercent = math.clamp(n,0,100)
+	end
+end)
+		
+	jpBox.FocusLost:Connect(function()
+	local n = tonumber(jpBox.Text)
+	if n then
+		jumpPercent = math.clamp(n,0,100)
+	end
+end)
 
 -- FLY LOGIC
 if flyEnabled and bv and bg and hrp then
