@@ -43,6 +43,9 @@ local bg, bv, waterPart
 local function enableFly()
 	if not hrp or not hum then return end
 
+	-- MATIKAN KONTROL HUMANOID (INI KUNCI)
+	hum.PlatformStand = true
+
 	bg = Instance.new("BodyGyro")
 	bg.P = 120000
 	bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
@@ -58,6 +61,8 @@ end
 local function disableFly()
 	if not hum then return end
 
+	-- BALIKIN KONTROL HUMANOID
+	hum.PlatformStand = false
 	hum:ChangeState(Enum.HumanoidStateType.GettingUp)
 
 	if bg then bg:Destroy() bg = nil end
@@ -502,12 +507,10 @@ if flyEnabled and not wasInWater and not waterLock and bv and bg and hrp then
 	local camCF = cam.CFrame
 	local dir = hum.MoveDirection
 
-	-- arah horizontal mengikuti kamera + analog
 	local move =
 		(camCF.RightVector * dir.X) +
 		(camCF.LookVector * dir.Z)
 
-	-- vertikal ikut arah kamera (pitch)
 	local pitch = camCF.LookVector.Y
 	move += Vector3.new(0, pitch, 0)
 
