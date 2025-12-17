@@ -137,7 +137,7 @@ local function CreateSlider(label, yPos, min, max, default, onChange)
     Text.Font = Enum.Font.Gotham
     Text.TextSize = 12
     Text.TextColor3 = Color3.fromRGB(220,220,220)
-    Text.TextXAlignment = Left
+    Text.TextXAlignment = Enum.TextXAlignment.Left
 
     local Bar = Instance.new("Frame", Holder)
     Bar.Size = UDim2.new(1, -12, 0, 8)
