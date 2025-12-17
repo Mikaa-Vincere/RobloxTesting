@@ -26,9 +26,27 @@ Main.BorderSizePixel = 0
 Main.Active = true
 Main.Draggable = true
 
--- Corner
-local UICorner = Instance.new("UICorner", Main)
-UICorner.CornerRadius = UDim.new(0, 12)
+-- Logo Toggle Button (small)
+local LogoBtn = Instance.new("TextButton")
+LogoBtn.Size = UDim2.new(0, 36, 0, 36)
+LogoBtn.Position = UDim2.new(0, 10, 0, 50)
+LogoBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+LogoBtn.Text = ""
+LogoBtn.Parent = ScreenGui
+
+local lc = Instance.new("UICorner", LogoBtn)
+lc.CornerRadius = UDim.new(0,6)
+
+local smallLogo = Instance.new("ImageLabel", LogoBtn)
+smallLogo.Size = UDim2.new(1, -4, 1, -4)
+smallLogo.Position = UDim2.new(0, 2, 0, 2)
+smallLogo.BackgroundTransparency = 1
+smallLogo.Image = "rbxassetid://100166477433523"
+
+-- Toggle Main visibility
+LogoBtn.MouseButton1Click:Connect(function()
+    Main.Visible = not Main.Visible
+end)
 
 -- Header
 local Header = Instance.new("Frame", Main)
