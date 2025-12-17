@@ -73,7 +73,7 @@ Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 44, 0, 0)
 Title.Size = UDim2.new(1, -44, 1, 0)
-Title.TextXAlignment = Left
+Title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Owner (small)
 local Owner = Instance.new("TextLabel", Main)
@@ -84,7 +84,7 @@ Owner.TextColor3 = Color3.fromRGB(130,130,130)
 Owner.BackgroundTransparency = 1
 Owner.Position = UDim2.new(0, 10, 1, -16)
 Owner.Size = UDim2.new(1, -20, 0, 12)
-Owner.TextXAlignment = Left
+Owner.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Content
 local Content = Instance.new("Frame", Main)
@@ -266,7 +266,7 @@ NTitle.Text = "NOTIF PESAN"
 NTitle.Font = Enum.Font.GothamBold
 NTitle.TextSize = 12
 NTitle.TextColor3 = Color3.fromRGB(255,255,255)
-NTitle.TextXAlignment = Left
+NTitle.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Input Pesan
 local InputText = Instance.new("TextBox", NotifPanel)
@@ -291,7 +291,7 @@ SpeedLabel.Text = "Speed Notif"
 SpeedLabel.Font = Enum.Font.Gotham
 SpeedLabel.TextSize = 11
 SpeedLabel.TextColor3 = Color3.fromRGB(200,200,200)
-SpeedLabel.TextXAlignment = Left
+SpeedLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Size Label
 local SizeLabel = Instance.new("TextLabel", NotifPanel)
@@ -302,7 +302,7 @@ SizeLabel.Text = "Size Pesan"
 SizeLabel.Font = Enum.Font.Gotham
 SizeLabel.TextSize = 11
 SizeLabel.TextColor3 = Color3.fromRGB(200,200,200)
-SizeLabel.TextXAlignment = Left
+SizeLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Default notif values
 local notifSpeed = 2
@@ -364,8 +364,8 @@ Float.BackgroundTransparency = 1
 Float.Font = Enum.Font.GothamBold
 Float.TextColor3 = notifColor
 Float.TextSize = notifSize
-Float.TextXAlignment = Center
-Float.TextYAlignment = Center
+Float.TextXAlignment = Enum.TextXAlignment.Center
+Float.TextYAlignment = Enum.TextYAlignment.Center
 
 -- Posisi vertikal notif (0 = atas, 0.5 = tengah, 0.8 = bawah)
 local notifY = 0.2
