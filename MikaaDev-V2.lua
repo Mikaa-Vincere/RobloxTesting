@@ -1,6 +1,6 @@
 -- ============================================
--- ADVANCED MOBILE HACK UI WITH TOGGLE
--- Android Optimized + Toggle System
+-- EXTREME SERVER BYPASS MOBILE HACK
+-- Direct Game Manipulation - Android Optimized
 -- ============================================
 
 local Players = game:GetService("Players")
@@ -10,195 +10,461 @@ local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 -- Hapus UI lama
-if CoreGui:FindFirstChild("SmartHackUI") then
-    CoreGui.SmartHackUI:Destroy()
+if CoreGui:FindFirstChild("ExtremeHack") then
+    CoreGui.ExtremeHack:Destroy()
 end
 
 -- ============================================
--- MINIMALIST TOGGLE BUTTON (UI Logo Kecil)
+-- MINIMALIST TOGGLE UI
 -- ============================================
-local ToggleUI = Instance.new("ScreenGui")
-ToggleUI.Name = "SmartHackUI"
-ToggleUI.Parent = CoreGui
+local MainUI = Instance.new("ScreenGui")
+MainUI.Name = "ExtremeHack"
+MainUI.Parent = CoreGui
 
--- Logo UI Kecil (Toggle Button)
-local ToggleButton = Instance.new("TextButton")
-ToggleButton.Size = UDim2.new(0, 60, 0, 60)
-ToggleButton.Position = UDim2.new(1, -70, 0.5, -30)
-ToggleButton.Text = "⚡"
-ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-ToggleButton.BorderSizePixel = 0
-ToggleButton.Font = Enum.Font.GothamBlack
-ToggleButton.TextSize = 30
-ToggleButton.ZIndex = 100
-ToggleButton.Parent = ToggleUI
+-- Toggle Button (Logo Kecil)
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 65, 0, 65)
+ToggleBtn.Position = UDim2.new(1, -75, 0.5, -32.5)
+ToggleBtn.Text = "⚔️"
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+ToggleBtn.BackgroundTransparency = 0.2
+ToggleBtn.Font = Enum.Font.GothamBlack
+ToggleBtn.TextSize = 32
+ToggleBtn.ZIndex = 100
+ToggleBtn.Parent = MainUI
 
 local ToggleCorner = Instance.new("UICorner")
-ToggleCorner.CornerRadius = UDim.new(0, 30)
-ToggleCorner.Parent = ToggleButton
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleBtn
 
-local ToggleShadow = Instance.new("ImageLabel")
-ToggleShadow.Size = UDim2.new(1, 10, 1, 10)
-ToggleShadow.Position = UDim2.new(0, -5, 0, -5)
-ToggleShadow.BackgroundTransparency = 1
-ToggleShadow.Image = "rbxassetid://7333966035"
-ToggleShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-ToggleShadow.ImageTransparency = 0.8
-ToggleShadow.ScaleType = Enum.ScaleType.Slice
-ToggleShadow.SliceCenter = Rect.new(10, 10, 118, 118)
-ToggleShadow.Parent = ToggleButton
-
--- ============================================
--- MAIN UI PANEL (Tersembunyi Awalnya)
--- ============================================
+-- Main Panel (Hidden Initially)
 local MainPanel = Instance.new("Frame")
-MainPanel.Size = UDim2.new(0, 340, 0, 420)
-MainPanel.Position = UDim2.new(0.5, -170, 0.5, -210)
-MainPanel.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+MainPanel.Size = UDim2.new(0, 320, 0, 400)
+MainPanel.Position = UDim2.new(0.5, -160, 0.5, -200)
+MainPanel.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
 MainPanel.BackgroundTransparency = 0.05
-MainPanel.BorderSizePixel = 0
 MainPanel.Visible = false
-MainPanel.Parent = ToggleUI
+MainPanel.Parent = MainUI
 
 local PanelCorner = Instance.new("UICorner")
-PanelCorner.CornerRadius = UDim.new(0, 15)
+PanelCorner.CornerRadius = UDim.new(0, 12)
 PanelCorner.Parent = MainPanel
 
-local PanelShadow = Instance.new("ImageLabel")
-PanelShadow.Size = UDim2.new(1, 20, 1, 20)
-PanelShadow.Position = UDim2.new(0, -10, 0, -10)
-PanelShadow.BackgroundTransparency = 1
-PanelShadow.Image = "rbxassetid://7333966035"
-PanelShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
-PanelShadow.ImageTransparency = 0.7
-PanelShadow.ScaleType = Enum.ScaleType.Slice
-PanelShadow.SliceCenter = Rect.new(10, 10, 118, 118)
-PanelShadow.Parent = MainPanel
-
--- Header dengan tombol close
+-- Header
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 50)
-Header.Position = UDim2.new(0, 0, 0, 0)
-Header.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-Header.BorderSizePixel = 0
+Header.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 Header.Parent = MainPanel
 
 local HeaderCorner = Instance.new("UICorner")
-HeaderCorner.CornerRadius = UDim.new(0, 15, 0, 0)
+HeaderCorner.CornerRadius = UDim.new(0, 12, 0, 0)
 HeaderCorner.Parent = Header
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0.7, 0, 1, 0)
 Title.Position = UDim2.new(0, 15, 0, 0)
-Title.Text = "🎮 ADVANCED HACK MENU"
-Title.TextColor3 = Color3.fromRGB(255, 150, 50)
+Title.Text = "💀 EXTREME HACK"
+Title.TextColor3 = Color3.fromRGB(255, 100, 100)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
 Title.TextXAlignment = Enum.TextXAlignment.Left
 Title.Parent = Header
 
-local CloseButton = Instance.new("TextButton")
-CloseButton.Size = UDim2.new(0, 40, 0, 40)
-CloseButton.Position = UDim2.new(1, -45, 0, 5)
-CloseButton.Text = "✕"
-CloseButton.TextColor3 = Color3.fromRGB(255, 100, 100)
-CloseButton.BackgroundTransparency = 1
-CloseButton.Font = Enum.Font.GothamBlack
-CloseButton.TextSize = 24
-CloseButton.Parent = Header
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 40, 0, 40)
+CloseBtn.Position = UDim2.new(1, -45, 0, 5)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Font = Enum.Font.GothamBlack
+CloseBtn.TextSize = 24
+CloseBtn.Parent = Header
 
--- Status Bar
-local StatusBar = Instance.new("Frame")
-StatusBar.Size = UDim2.new(1, -20, 0, 40)
-StatusBar.Position = UDim2.new(0, 10, 0, 60)
-StatusBar.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-StatusBar.BorderSizePixel = 0
-StatusBar.Parent = MainPanel
+-- Status
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, -20, 0, 30)
+Status.Position = UDim2.new(0, 10, 0, 60)
+Status.Text = "🟢 READY"
+Status.TextColor3 = Color3.fromRGB(0, 255, 100)
+Status.BackgroundTransparency = 1
+Status.Font = Enum.Font.GothamBold
+Status.TextSize = 16
+Status.Parent = MainPanel
 
-local StatusCorner = Instance.new("UICorner")
-StatusCorner.CornerRadius = UDim.new(0, 8)
-StatusCorner.Parent = StatusBar
-
-local StatusLabel = Instance.new("TextLabel")
-StatusLabel.Size = UDim2.new(1, 0, 1, 0)
-StatusLabel.Position = UDim2.new(0, 0, 0, 0)
-StatusLabel.Text = "🟢 SYSTEM READY"
-StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-StatusLabel.BackgroundTransparency = 1
-StatusLabel.Font = Enum.Font.GothamBold
-StatusLabel.TextSize = 16
-StatusLabel.Parent = StatusBar
-
--- Container untuk fitur
-local FeaturesContainer = Instance.new("ScrollingFrame")
-FeaturesContainer.Size = UDim2.new(1, -20, 0, 280)
-FeaturesContainer.Position = UDim2.new(0, 10, 0, 110)
-FeaturesContainer.BackgroundTransparency = 1
-FeaturesContainer.BorderSizePixel = 0
-FeaturesContainer.ScrollBarThickness = 4
-FeaturesContainer.CanvasSize = UDim2.new(0, 0, 0, 450)
-FeaturesContainer.Parent = MainPanel
+-- Features Container
+local FeaturesFrame = Instance.new("ScrollingFrame")
+FeaturesFrame.Size = UDim2.new(1, -20, 0, 290)
+FeaturesFrame.Position = UDim2.new(0, 10, 0, 100)
+FeaturesFrame.BackgroundTransparency = 1
+FeaturesFrame.ScrollBarThickness = 4
+FeaturesFrame.CanvasSize = UDim2.new(0, 0, 0, 350)
+FeaturesFrame.Parent = MainPanel
 
 -- ============================================
--- SYSTEM VARIABLES
+-- HACK VARIABLES
 -- ============================================
-local Hacks = {
-    Damage = {
-        Active = false,
-        Multiplier = 100,
-        Connection = nil
+local ActiveHacks = {}
+local HackConnections = {}
+
+local function UpdateStatus()
+    local count = 0
+    for _, active in pairs(ActiveHacks) do
+        if active then count = count + 1 end
+    end
+    
+    if count == 0 then
+        Status.Text = "🟢 READY"
+        Status.TextColor3 = Color3.fromRGB(0, 255, 100)
+    else
+        Status.Text = "⚡ " .. count .. " HACKS ACTIVE"
+        Status.TextColor3 = Color3.fromRGB(255, 200, 0)
+    end
+end
+
+-- ============================================
+-- EXTREME DAMAGE HACK (DIRECT SERVER ATTACK)
+-- ============================================
+local function EnableDamageHack()
+    ActiveHacks.Damage = true
+    
+    -- METHOD 1: REMOTE EVENT HIJACKING
+    for _, remote in pairs(game:GetDescendants()) do
+        if remote:IsA("RemoteEvent") then
+            local name = remote.Name:lower()
+            if name:find("damage") or name:find("hit") or name:find("attack") or name:find("punch") then
+                local old = remote.FireServer
+                
+                remote.FireServer = function(self, ...)
+                    local args = {...}
+                    
+                    -- Ubah semua angka menjadi 999999
+                    for i, arg in pairs(args) do
+                        if type(arg) == "number" and arg > 0 then
+                            args[i] = 999999
+                        elseif type(arg) == "table" then
+                            -- Jika ada table dengan damage value
+                            for k, v in pairs(arg) do
+                                if type(v) == "number" and v > 0 then
+                                    arg[k] = 999999
+                                end
+                            end
+                        end
+                    end
+                    
+                    -- Tambahkan damage argument jika tidak ada
+                    if #args == 0 then
+                        table.insert(args, 999999)
+                    end
+                    
+                    return old(self, unpack(args))
+                end
+            end
+        end
+    end
+    
+    -- METHOD 2: DIRECT PLAYER DAMAGE
+    HackConnections.DamageLoop = RunService.Heartbeat:Connect(function()
+        pcall(function()
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    local humanoid = player.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        -- Force damage langsung
+                        humanoid:TakeDamage(999999)
+                        
+                        -- Kirim damage packet ke semua remote
+                        for _, remote in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do
+                            if remote:IsA("RemoteEvent") then
+                                pcall(function()
+                                    remote:FireServer(player.Character, 999999)
+                                    remote:FireServer("Damage", player.Character, 999999)
+                                    remote:FireServer("Head", 999999, player.Character)
+                                end)
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end)
+    
+    -- METHOD 3: MEMORY OVERWRITE
+    spawn(function()
+        while ActiveHacks.Damage do
+            wait(0.5)
+            pcall(function()
+                -- Overwrite semua nilai damage di game
+                for _, obj in pairs(game:GetDescendants()) do
+                    if obj:IsA("NumberValue") then
+                        local name = obj.Name:lower()
+                        if name:find("damage") or name:find("attack") or name:find("power") or name:find("strength") then
+                            obj.Value = 999999
+                        end
+                    end
+                end
+                
+                -- Ubah script damage
+                for _, script in pairs(game:GetDescendants()) do
+                    if script:IsA("Script") and script.Name:lower():find("damage") then
+                        pcall(function()
+                            script.Source = "return 999999"
+                        end)
+                    end
+                end
+            end)
+        end
+    end)
+    
+    UpdateStatus()
+end
+
+local function DisableDamageHack()
+    ActiveHacks.Damage = false
+    if HackConnections.DamageLoop then
+        HackConnections.DamageLoop:Disconnect()
+        HackConnections.DamageLoop = nil
+    end
+    UpdateStatus()
+end
+
+-- ============================================
+-- EXTREME ATTACK SPEED HACK (INSTANT ATTACKS)
+-- ============================================
+local function EnableAttackSpeedHack()
+    ActiveHacks.AttackSpeed = true
+    
+    -- METHOD 1: REMOVE ANIMATION DELAYS
+    HackConnections.AttackSpeedLoop = RunService.Heartbeat:Connect(function()
+        pcall(function()
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    -- Hapus semua cooldown animation tracks
+                    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+                        if track.Name:lower():find("attack") or track.Name:lower():find("cooldown") then
+                            track:Stop()
+                        end
+                    end
+                    
+                    -- Set animasi speed maksimal
+                    humanoid:SetAttribute("AttackSpeed", 999)
+                end
+            end
+        end)
+    end)
+    
+    -- METHOD 2: SPAM ATTACK PACKETS
+    spawn(function()
+        while ActiveHacks.AttackSpeed do
+            wait(0.01) -- 100x per second
+            pcall(function()
+                -- Temukan semua attack remote
+                local attackRemotes = {}
+                for _, remote in pairs(game:GetDescendants()) do
+                    if remote:IsA("RemoteEvent") then
+                        local name = remote.Name:lower()
+                        if name:find("attack") or name:find("punch") or name:find("hit") or name:find("strike") then
+                            table.insert(attackRemotes, remote)
+                        end
+                    end
+                end
+                
+                -- Spam ke semua remote
+                for _, remote in pairs(attackRemotes) do
+                    for i = 1, 5 do
+                        pcall(function()
+                            remote:FireServer()
+                            remote:FireServer(LocalPlayer.Character)
+                            remote:FireServer("Attack")
+                        end)
+                    end
+                end
+                
+                -- Force input attack
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 1)
+                game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 1)
+            end)
+        end
+    end)
+    
+    -- METHOD 3: MODIFY COOLDOWNS
+    spawn(function()
+        while ActiveHacks.AttackSpeed do
+            wait(0.1)
+            pcall(function()
+                -- Set semua cooldown ke 0
+                for _, obj in pairs(game:GetDescendants()) do
+                    if obj:IsA("NumberValue") then
+                        if obj.Name:lower():find("cooldown") or obj.Name:lower():find("delay") or obj.Name:lower():find("timer") then
+                            obj.Value = 0
+                        end
+                    end
+                end
+            end)
+        end
+    end)
+    
+    UpdateStatus()
+end
+
+local function DisableAttackSpeedHack()
+    ActiveHacks.AttackSpeed = false
+    if HackConnections.AttackSpeedLoop then
+        HackConnections.AttackSpeedLoop:Disconnect()
+        HackConnections.AttackSpeedLoop = nil
+    end
+    UpdateStatus()
+end
+
+-- ============================================
+-- SPEED HACK (INSTANT MOVEMENT)
+-- ============================================
+local function EnableSpeedHack()
+    ActiveHacks.Speed = true
+    
+    HackConnections.SpeedLoop = RunService.Heartbeat:Connect(function()
+        pcall(function()
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    -- Set extreme speed
+                    humanoid.WalkSpeed = 999
+                    humanoid.JumpPower = 150
+                    
+                    -- NoClip
+                    for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                    
+                    -- Anti-stun
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Stunned, false)
+                end
+            end
+        end)
+    end)
+    
+    UpdateStatus()
+end
+
+local function DisableSpeedHack()
+    ActiveHacks.Speed = false
+    if HackConnections.SpeedLoop then
+        HackConnections.SpeedLoop:Disconnect()
+        HackConnections.SpeedLoop = nil
+    end
+    
+    -- Reset speed
+    if LocalPlayer.Character then
+        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = 16
+            humanoid.JumpPower = 50
+        end
+    end
+    
+    UpdateStatus()
+end
+
+-- ============================================
+-- GOD MODE (INVINCIBLE)
+-- ============================================
+local function EnableGodMode()
+    ActiveHacks.GodMode = true
+    
+    HackConnections.GodLoop = RunService.Heartbeat:Connect(function()
+        pcall(function()
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    -- Infinite health
+                    humanoid.MaxHealth = math.huge
+                    humanoid.Health = math.huge
+                    
+                    -- Block damage events
+                    humanoid:SetAttribute("GodMode", true)
+                end
+            end
+        end)
+    end)
+    
+    -- Hook damage taken
+    LocalPlayer.CharacterAdded:Connect(function(char)
+        wait(0.5)
+        local humanoid = char:WaitForChild("Humanoid")
+        humanoid.MaxHealth = math.huge
+        humanoid.Health = math.huge
+    end)
+    
+    UpdateStatus()
+end
+
+local function DisableGodMode()
+    ActiveHacks.GodMode = false
+    if HackConnections.GodLoop then
+        HackConnections.GodLoop:Disconnect()
+        HackConnections.GodLoop = nil
+    end
+    
+    if LocalPlayer.Character then
+        local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+        if humanoid then
+            humanoid.MaxHealth = 100
+            humanoid.Health = 100
+        end
+    end
+    
+    UpdateStatus()
+end
+
+-- ============================================
+-- CREATE FEATURE BUTTONS
+-- ============================================
+local features = {
+    {
+        Name = "💀 EXTREME DAMAGE",
+        Desc = "999999 Damage | One-Hit Kill",
+        Color = Color3.fromRGB(255, 50, 50),
+        EnableFunc = EnableDamageHack,
+        DisableFunc = DisableDamageHack
     },
-    Speed = {
-        Active = false,
-        Value = 16,
-        Connection = nil
+    {
+        Name = "⚡ MAX ATTACK SPEED",
+        Desc = "Instant Attacks | No Cooldowns",
+        Color = Color3.fromRGB(255, 150, 0),
+        EnableFunc = EnableAttackSpeedHack,
+        DisableFunc = DisableAttackSpeedHack
     },
-    AttackSpeed = {
-        Active = false,
-        Connection = nil
+    {
+        Name = "🚀 SPEED 999 + NOCLIP",
+        Desc = "Super Speed | NoClip | Anti-Stun",
+        Color = Color3.fromRGB(50, 150, 255),
+        EnableFunc = EnableSpeedHack,
+        DisableFunc = DisableSpeedHack
     },
-    GodMode = {
-        Active = false,
-        Connection = nil
+    {
+        Name = "🛡️ GOD MODE",
+        Desc = "Invincible | Infinite Health",
+        Color = Color3.fromRGB(0, 200, 100),
+        EnableFunc = EnableGodMode,
+        DisableFunc = DisableGodMode
     }
 }
 
-local Logs = {}
+local buttonInstances = {}
 
--- ============================================
--- UI FUNCTIONS
--- ============================================
-local function UpdateStatus()
-    local activeCount = 0
-    for hack, data in pairs(Hacks) do
-        if data.Active then activeCount = activeCount + 1 end
-    end
-    
-    if activeCount == 0 then
-        StatusLabel.Text = "🟢 SYSTEM READY"
-        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-    else
-        StatusLabel.Text = "⚡ " .. activeCount .. " HACK(S) ACTIVE"
-        StatusLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
-    end
-end
-
-local function AddLog(message)
-    table.insert(Logs, "[" .. os.date("%H:%M:%S") .. "] " .. message)
-    if #Logs > 10 then table.remove(Logs, 1) end
-    print("[HACK]", message)
-end
-
-local function CreateFeatureCard(name, description, color, toggleFunc, statusFunc)
+for i, feature in ipairs(features) do
     local card = Instance.new("Frame")
     card.Size = UDim2.new(1, 0, 0, 80)
-    card.Position = UDim2.new(0, 0, 0, #FeaturesContainer:GetChildren() * 85)
-    card.BackgroundColor3 = color
-    card.BackgroundTransparency = 0.2
-    card.BorderSizePixel = 0
-    card.Parent = FeaturesContainer
+    card.Position = UDim2.new(0, 0, 0, (i-1)*85)
+    card.BackgroundColor3 = feature.Color
+    card.BackgroundTransparency = 0.3
+    card.Parent = FeaturesFrame
     
     local cardCorner = Instance.new("UICorner")
     cardCorner.CornerRadius = UDim.new(0, 10)
@@ -207,7 +473,7 @@ local function CreateFeatureCard(name, description, color, toggleFunc, statusFun
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(0.7, 0, 0, 30)
     title.Position = UDim2.new(0, 10, 0, 10)
-    title.Text = name
+    title.Text = feature.Name
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.BackgroundTransparency = 1
     title.Font = Enum.Font.GothamBold
@@ -218,8 +484,8 @@ local function CreateFeatureCard(name, description, color, toggleFunc, statusFun
     local desc = Instance.new("TextLabel")
     desc.Size = UDim2.new(0.7, 0, 0, 40)
     desc.Position = UDim2.new(0, 10, 0, 35)
-    desc.Text = description
-    desc.TextColor3 = Color3.fromRGB(200, 200, 200)
+    desc.Text = feature.Desc
+    desc.TextColor3 = Color3.fromRGB(220, 220, 220)
     desc.BackgroundTransparency = 1
     desc.Font = Enum.Font.Gotham
     desc.TextSize = 12
@@ -230,6 +496,7 @@ local function CreateFeatureCard(name, description, color, toggleFunc, statusFun
     local toggleBtn = Instance.new("TextButton")
     toggleBtn.Size = UDim2.new(0, 80, 0, 30)
     toggleBtn.Position = UDim2.new(1, -90, 0, 25)
+    toggleBtn.Name = feature.Name
     toggleBtn.Text = "OFF"
     toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
     toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -241,356 +508,129 @@ local function CreateFeatureCard(name, description, color, toggleFunc, statusFun
     btnCorner.CornerRadius = UDim.new(0, 6)
     btnCorner.Parent = toggleBtn
     
-    local statusLabel = Instance.new("TextLabel")
-    statusLabel.Size = UDim2.new(0, 80, 0, 20)
-    statusLabel.Position = UDim2.new(1, -90, 0, 5)
-    statusLabel.Text = "INACTIVE"
-    statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-    statusLabel.BackgroundTransparency = 1
-    statusLabel.Font = Enum.Font.Gotham
-    statusLabel.TextSize = 12
-    statusLabel.Parent = card
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(0, 80, 0, 20)
+    status.Position = UDim2.new(1, -90, 0, 5)
+    status.Text = "INACTIVE"
+    status.TextColor3 = Color3.fromRGB(255, 100, 100)
+    status.BackgroundTransparency = 1
+    status.Font = Enum.Font.Gotham
+    status.TextSize = 12
+    status.Parent = card
     
     toggleBtn.MouseButton1Click:Connect(function()
-        local newState = not Hacks[name].Active
-        Hacks[name].Active = newState
+        local hackName = feature.Name
+        local isActive = ActiveHacks[hackName] or false
         
-        if newState then
+        if not isActive then
+            -- Aktifkan hack
+            feature.EnableFunc()
             toggleBtn.Text = "ON"
             toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 50)
-            statusLabel.Text = "ACTIVE"
-            statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-            AddLog(name .. " ACTIVATED")
+            status.Text = "ACTIVE"
+            status.TextColor3 = Color3.fromRGB(0, 255, 100)
+            
+            -- Feedback
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "HACK ACTIVATED",
+                Text = hackName,
+                Duration = 2
+            })
         else
+            -- Nonaktifkan hack
+            feature.DisableFunc()
             toggleBtn.Text = "OFF"
             toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-            statusLabel.Text = "INACTIVE"
-            statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            AddLog(name .. " DEACTIVATED")
+            status.Text = "INACTIVE"
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
         end
         
-        toggleFunc(newState)
-        UpdateStatus()
-        
-        -- Animasi klik
+        -- Animasi tombol
         toggleBtn.Size = UDim2.new(0, 75, 0, 28)
-        wait(0.1)
+        wait(0.08)
         toggleBtn.Size = UDim2.new(0, 80, 0, 30)
     end)
     
-    FeaturesContainer.CanvasSize = UDim2.new(0, 0, 0, #FeaturesContainer:GetChildren() * 85)
+    buttonInstances[feature.Name] = {Button = toggleBtn, Status = status}
 end
 
--- ============================================
--- HACK FUNCTIONS
--- ============================================
-local function ToggleDamage(enable)
-    if enable then
-        AddLog("Activating DAMAGE 999x...")
-        
-        Hacks.Damage.Connection = RunService.Heartbeat:Connect(function()
-            pcall(function()
-                -- Hook semua RemoteEvent damage
-                for _, remote in pairs(game:GetDescendants()) do
-                    if remote:IsA("RemoteEvent") then
-                        local name = remote.Name:lower()
-                        if name:find("damage") or name:find("hit") or name:find("attack") then
-                            local old = remote.FireServer
-                            if not getmetatable(remote).__hooked then
-                                remote.FireServer = function(self, ...)
-                                    local args = {...}
-                                    for i, arg in pairs(args) do
-                                        if type(arg) == "number" and arg > 0 then
-                                            args[i] = arg * 999
-                                        end
-                                    end
-                                    return old(self, unpack(args))
-                                end
-                                getmetatable(remote).__hooked = true
-                            end
-                        end
-                    end
-                end
-                
-                -- Force damage ke musuh
-                for _, player in pairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer and player.Character then
-                        local humanoid = player.Character:FindFirstChild("Humanoid")
-                        if humanoid then
-                            humanoid:TakeDamage(999)
-                        end
-                    end
-                end
-            end)
-        end)
-        
-        AddLog("✅ DAMAGE 999x ACTIVATED")
-    else
-        if Hacks.Damage.Connection then
-            Hacks.Damage.Connection:Disconnect()
-            Hacks.Damage.Connection = nil
-            AddLog("Damage hack disabled")
-        end
-    end
-end
-
-local function ToggleSpeed(enable)
-    if enable then
-        AddLog("Activating SPEED 999...")
-        
-        Hacks.Speed.Connection = RunService.Heartbeat:Connect(function()
-            pcall(function()
-                if LocalPlayer.Character then
-                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                    if humanoid then
-                        humanoid.WalkSpeed = 999
-                        humanoid.JumpPower = 150
-                        
-                        -- NoClip
-                        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
-                            if part:IsA("BasePart") then
-                                part.CanCollide = false
-                            end
-                        end
-                    end
-                end
-            end)
-        end)
-        
-        AddLog("✅ SPEED 999 ACTIVATED")
-    else
-        if Hacks.Speed.Connection then
-            Hacks.Speed.Connection:Disconnect()
-            Hacks.Speed.Connection = nil
-            
-            -- Reset speed
-            if LocalPlayer.Character then
-                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid.WalkSpeed = 16
-                    humanoid.JumpPower = 50
-                end
-            end
-            
-            AddLog("Speed hack disabled")
-        end
-    end
-end
-
-local function ToggleAttackSpeed(enable)
-    if enable then
-        AddLog("Activating MAX ATTACK SPEED...")
-        
-        Hacks.AttackSpeed.Connection = RunService.Heartbeat:Connect(function()
-            pcall(function()
-                -- Spam attack packets
-                for _, remote in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do
-                    if remote:IsA("RemoteEvent") and remote.Name:lower():find("attack") then
-                        for i = 1, 10 do
-                            remote:FireServer()
-                        end
-                    end
-                end
-                
-                -- Remove attack cooldowns
-                if LocalPlayer.Character then
-                    for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
-                        if v:IsA("NumberValue") and v.Name:lower():find("cooldown") then
-                            v.Value = 0
-                        end
-                    end
-                end
-            end)
-        end)
-        
-        AddLog("✅ MAX ATTACK SPEED ACTIVATED")
-    else
-        if Hacks.AttackSpeed.Connection then
-            Hacks.AttackSpeed.Connection:Disconnect()
-            Hacks.AttackSpeed.Connection = nil
-            AddLog("Attack speed hack disabled")
-        end
-    end
-end
-
-local function ToggleGodMode(enable)
-    if enable then
-        AddLog("Activating GOD MODE...")
-        
-        Hacks.GodMode.Connection = LocalPlayer.CharacterAdded:Connect(function(char)
-            wait(0.5)
-            local humanoid = char:WaitForChild("Humanoid")
-            humanoid.MaxHealth = math.huge
-            humanoid.Health = math.huge
-            
-            humanoid.Changed:Connect(function()
-                if humanoid.Health < 1000 then
-                    humanoid.Health = math.huge
-                end
-            end)
-        end)
-        
-        -- Apply sekarang
-        if LocalPlayer.Character then
-            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.MaxHealth = math.huge
-                humanoid.Health = math.huge
-            end
-        end
-        
-        AddLog("✅ GOD MODE ACTIVATED")
-    else
-        if Hacks.GodMode.Connection then
-            Hacks.GodMode.Connection:Disconnect()
-            Hacks.GodMode.Connection = nil
-            
-            -- Reset health
-            if LocalPlayer.Character then
-                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid.MaxHealth = 100
-                    humanoid.Health = 100
-                end
-            end
-            
-            AddLog("God mode disabled")
-        end
-    end
-end
+FeaturesFrame.CanvasSize = UDim2.new(0, 0, 0, #features * 85)
 
 -- ============================================
--- CREATE FEATURE CARDS
+-- UI TOGGLE FUNCTIONS
 -- ============================================
-CreateFeatureCard(
-    "DAMAGE",
-    "999x Damage Multiplier\nOne-Hit Kill enemies",
-    Color3.fromRGB(255, 50, 50),
-    ToggleDamage,
-    function() return Hacks.Damage.Active end
-)
+local UIOpen = false
 
-CreateFeatureCard(
-    "SPEED",
-    "WalkSpeed 999 + NoClip\nSuper fast movement",
-    Color3.fromRGB(50, 150, 255),
-    ToggleSpeed,
-    function() return Hacks.Speed.Active end
-)
-
-CreateFeatureCard(
-    "ATTACK SPEED",
-    "Max attack speed\nNo cooldowns, rapid attacks",
-    Color3.fromRGB(255, 150, 0),
-    ToggleAttackSpeed,
-    function() return Hacks.AttackSpeed.Active end
-)
-
-CreateFeatureCard(
-    "GOD MODE",
-    "Invincible, cannot die\nInfinite health",
-    Color3.fromRGB(0, 200, 100),
-    ToggleGodMode,
-    function() return Hacks.GodMode.Active end
-)
-
--- ============================================
--- UI TOGGLE LOGIC
--- ============================================
-local UIVisible = false
-
-ToggleButton.MouseButton1Click:Connect(function()
-    UIVisible = not UIVisible
-    MainPanel.Visible = UIVisible
+ToggleBtn.MouseButton1Click:Connect(function()
+    UIOpen = not UIOpen
+    MainPanel.Visible = UIOpen
     
-    if UIVisible then
-        ToggleButton.Text = "⬅️"
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 150, 50)
-        AddLog("UI Opened")
+    if UIOpen then
+        ToggleBtn.Text = "⬅️"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 50)
     else
-        ToggleButton.Text = "⚡"
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-        AddLog("UI Closed")
+        ToggleBtn.Text = "⚔️"
+        ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     end
     
     -- Animasi tombol
-    ToggleButton.Size = UDim2.new(0, 55, 0, 55)
+    ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
     wait(0.1)
-    ToggleButton.Size = UDim2.new(0, 60, 0, 60)
+    ToggleBtn.Size = UDim2.new(0, 65, 0, 65)
 end)
 
-CloseButton.MouseButton1Click:Connect(function()
-    UIVisible = false
+CloseBtn.MouseButton1Click:Connect(function()
+    UIOpen = false
     MainPanel.Visible = false
-    ToggleButton.Text = "⚡"
-    ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-    AddLog("UI Closed via X button")
+    ToggleBtn.Text = "⚔️"
+    ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     
-    -- Animasi tombol close
-    CloseButton.TextSize = 20
+    CloseBtn.TextSize = 20
     wait(0.1)
-    CloseButton.TextSize = 24
+    CloseBtn.TextSize = 24
 end)
 
 -- ============================================
 -- DRAGGABLE UI
 -- ============================================
-local dragging
-local dragInput
-local dragStart
-local startPos
-
-local function update(input)
-    local delta = input.Position - dragStart
-    MainPanel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
-
+local dragging, dragStart, startPos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position
         startPos = MainPanel.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
     end
 end)
 
 Header.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        MainPanel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
 
-UIS.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then
-        update(input)
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
     end
 end)
 
 -- ============================================
 -- INITIALIZATION
 -- ============================================
-AddLog("Advanced Hack UI Loaded")
-AddLog("Tap ⚡ button to open menu")
-AddLog("Toggle hacks ON/OFF as needed")
-
 UpdateStatus()
-
-print("========================================")
-print("ADVANCED HACK UI LOADED")
-print("Toggle button at right side")
-print("Features: Damage, Speed, Attack Speed, God Mode")
-print("All hacks are MANUAL toggle (no auto-run)")
-print("========================================")
 
 -- Mobile optimization
 if UIS.TouchEnabled then
-    AddLog("Mobile device detected")
-    ToggleButton.Size = UDim2.new(0, 70, 0, 70)
-    ToggleButton.Position = UDim2.new(1, -80, 0.5, -35)
-    ToggleButton.TextSize = 35
+    ToggleBtn.Size = UDim2.new(0, 75, 0, 75)
+    ToggleBtn.Position = UDim2.new(1, -85, 0.5, -37.5)
+    ToggleBtn.TextSize = 36
 end
+
+print("========================================")
+print("EXTREME SERVER BYPASS HACK LOADED")
+print("Game: " .. game.Name)
+print("Place ID: " .. game.PlaceId)
+print("Features: Extreme Damage, Max Attack Speed, Speed 999, God Mode")
+print("Tap ⚔️ button to open menu")
+print("========================================")
