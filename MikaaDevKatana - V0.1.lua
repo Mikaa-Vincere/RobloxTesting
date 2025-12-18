@@ -1,6 +1,7 @@
 -- =================================
--- MIKAADEV DELTA - COMPLETE WITH LOGIC
+-- MIKAADEV DELTA - GAME SPECIFIC FIX
 -- =================================
+-- Berdasarkan error log lu
 
 -- HAPUS UI LAMA
 for _, gui in pairs(game:GetService("CoreGui"):GetChildren()) do
@@ -13,145 +14,190 @@ end
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RS = game:GetService("ReplicatedStorage")
-local UIS = game:GetService("UserInputService")
+local Controllers = RS:FindFirstChild("Controllers")
 
--- STATUS
-local Hacks = {
-    Coin = {Active = false, Value = 9999},
-    Damage = {Active = false, Multiplier = 10},
-    Health = {Active = false, BonusHP = 500},
-    Speed = {Active = false, WalkSpeed = 50}
-}
-
--- ========== UI ==========
+-- ========== SIMPLE UI ==========
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MikaaDev_Final"
+ScreenGui.Name = "MikaaDev_Working"
 ScreenGui.Parent = game.CoreGui
 
 local Main = Instance.new("Frame")
 Main.Name = "Main"
-Main.Size = UDim2.new(0, 260, 0, 320)
-Main.Position = UDim2.new(0.05, 0, 0.3, 0)
+Main.Size = UDim2.new(0, 250, 0, 300)
+Main.Position = UDim2.new(0, 20, 0, 100)
 Main.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
 Main.BorderColor3 = Color3.fromRGB(0, 120, 255)
 Main.BorderSizePixel = 2
 Main.Active = true
 Main.Draggable = true
-Main.ZIndex = 1000
 Main.Parent = ScreenGui
 
 -- HEADER
 local Header = Instance.new("Frame")
 Header.Size = UDim2.new(1, 0, 0, 35)
 Header.BackgroundColor3 = Color3.fromRGB(0, 90, 180)
-Header.ZIndex = 1001
 Header.Parent = Main
 
 local Title = Instance.new("TextLabel")
 Title.Text = "MikaaDev Delta"
-Title.Size = UDim2.new(0.6, 0, 1, 0)
+Title.Size = UDim2.new(0.7, 0, 1, 0)
 Title.Position = UDim2.new(0, 10, 0, 0)
 Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.new(1, 1, 1)
+Title.TextColor3 = Color3.white
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 15
+Title.TextSize = 14
 Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.ZIndex = 1002
 Title.Parent = Header
 
 -- MINIMIZE BUTTON
 local MinBtn = Instance.new("TextButton")
 MinBtn.Text = "_"
-MinBtn.Size = UDim2.new(0, 30, 0, 25)
-MinBtn.Position = UDim2.new(1, -65, 0, 5)
+MinBtn.Size = UDim2.new(0, 25, 0, 25)
+MinBtn.Position = UDim2.new(1, -55, 0, 5)
 MinBtn.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
 MinBtn.TextColor3 = Color3.white
 MinBtn.Font = Enum.Font.GothamBold
-MinBtn.TextSize = 18
-MinBtn.ZIndex = 1002
+MinBtn.TextSize = 16
 MinBtn.Parent = Header
 
 -- CLOSE BUTTON
 local CloseBtn = Instance.new("TextButton")
 CloseBtn.Text = "X"
-CloseBtn.Size = UDim2.new(0, 30, 0, 25)
-CloseBtn.Position = UDim2.new(1, -30, 0, 5)
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -25, 0, 5)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 CloseBtn.TextColor3 = Color3.white
 CloseBtn.Font = Enum.Font.GothamBold
-CloseBtn.ZIndex = 1002
 CloseBtn.Parent = Header
 
--- SUBTITLE
-local Subtitle = Instance.new("TextLabel")
-Subtitle.Text = "TestingDevByMikaa"
-Subtitle.Size = UDim2.new(1, 0, 0, 20)
-Subtitle.Position = UDim2.new(0, 0, 0, 35)
-Subtitle.BackgroundTransparency = 1
-Subtitle.TextColor3 = Color3.fromRGB(150, 200, 255)
-Subtitle.Font = Enum.Font.Code
-Subtitle.TextSize = 10
-Subtitle.ZIndex = 1001
-Subtitle.Parent = Main
-
 -- FEATURES
-local FeaturesFrame = Instance.new("Frame")
-FeaturesFrame.Size = UDim2.new(1, -10, 1, -70)
-FeaturesFrame.Position = UDim2.new(0, 5, 0, 60)
-FeaturesFrame.BackgroundTransparency = 1
-FeaturesFrame.ZIndex = 1001
-FeaturesFrame.Parent = Main
+local Features = Instance.new("Frame")
+Features.Size = UDim2.new(1, -10, 1, -60)
+Features.Position = UDim2.new(0, 5, 0, 40)
+Features.BackgroundTransparency = 1
+Features.Parent = Main
 
--- ========== LOGIC FUNCTIONS ==========
-local function FindCoinValue()
-    -- Cari coin di berbagai lokasi
-    local locations = {
-        LocalPlayer:FindFirstChild("leaderstats"),
-        LocalPlayer:FindFirstChild("Stats"),
-        LocalPlayer:FindFirstChild("Data"),
-        LocalPlayer:FindFirstChild("PlayerStats")
-    }
+-- ========== GAME SPECIFIC HACKS ==========
+
+-- 1. COIN HACK (MENCARI DI STATS)
+local function CoinHack()
+    local btn = Instance.new("TextButton")
+    btn.Text = "COIN: OFF"
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, 0)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+    btn.TextColor3 = Color3.white
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = Features
     
-    for _, loc in pairs(locations) do
-        if loc then
-            for _, child in pairs(loc:GetChildren()) do
-                local name = child.Name:lower()
-                if (name:find("coin") or name:find("money") or name:find("uang")) and 
-                   (child:IsA("IntValue") or child:IsA("NumberValue")) then
-                    return child
+    local active = false
+    
+    btn.MouseButton1Click:Connect(function()
+        active = not active
+        
+        if active then
+            btn.Text = "COIN: ON"
+            btn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+            
+            spawn(function()
+                while active do
+                    -- Cari semua IntValue/NumberValue dengan nama coin
+                    for _, obj in pairs(game:GetDescendants()) do
+                        if (obj:IsA("IntValue") or obj:IsA("NumberValue")) then
+                            local name = obj.Name:lower()
+                            if name:find("coin") or name:find("money") or name:find("uang") then
+                                obj.Value = 9999
+                            end
+                        end
+                    end
+                    
+                    -- Coba cari di PlayerGui
+                    local playerGui = LocalPlayer:FindFirstChild("PlayerGui")
+                    if playerGui then
+                        for _, frame in pairs(playerGui:GetDescendants()) do
+                            if frame:IsA("TextLabel") or frame:IsA("TextButton") then
+                                local text = frame.Text
+                                if text and (text:find("Coin") or text:find("coin")) then
+                                    frame.Text = "9999"
+                                end
+                            end
+                        end
+                    end
+                    
+                    wait(0.5)
                 end
-            end
+            end)
+        else
+            btn.Text = "COIN: OFF"
+            btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
         end
-    end
-    return nil
+    end)
 end
 
-local function CoinHackLogic(enable)
-    Hacks.Coin.Active = enable
+-- 2. DAMAGE HACK (UNTUK KATANA - BERDASARKAN ERROR LOG)
+local function DamageHack()
+    local btn = Instance.new("TextButton")
+    btn.Text = "DAMAGE: OFF"
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, 45)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+    btn.TextColor3 = Color3.white
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = Features
     
-    if enable then
-        spawn(function()
-            while Hacks.Coin.Active do
-                -- METHOD 1: Direct value
-                local coinObj = FindCoinValue()
-                if coinObj then
-                    coinObj.Value = Hacks.Coin.Value
-                end
+    local active = false
+    
+    btn.MouseButton1Click:Connect(function()
+        active = not active
+        
+        if active then
+            btn.Text = "DAMAGE: ON"
+            btn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+            
+            -- CARI CONTROLLER UNTUK DAMAGE (dari error log)
+            if Controllers then
+                local charController = Controllers:FindFirstChild("GkaracterController") or
+                                      Controllers:FindFirstChild("CharacterController")
                 
-                -- METHOD 2: Hook remotes
-                local remotes = RS:FindFirstChild("Remotes")
-                if remotes then
-                    local updateRemote = remotes:FindFirstChild("UpdatePlayerStats") or
-                                        remotes:FindFirstChild("GeneralStatsUpdated")
+                if charController then
+                    local baseClient = charController:FindFirstChild("BaseCharacterClient")
                     
-                    if updateRemote and updateRemote:IsA("RemoteEvent") then
-                        local oldFire = updateRemote.FireServer
-                        updateRemote.FireServer = function(self, ...)
+                    if baseClient then
+                        -- Backup original script
+                        local original = baseClient:Clone()
+                        original.Name = "OriginalScript"
+                        original.Parent = baseClient.Parent
+                        
+                        -- Modify damage values
+                        local source = baseClient.Source
+                        
+                        -- Ganti damage multiplier (dari error: "+30%")
+                        source = source:gsub("%+%d+%%", "+300%")  -- 30% jadi 300%
+                        source = source:gsub("damage%s*=%s*%d+", "damage = damage * 10")
+                        source = source:gsub("Damage%s*=%s*%d+", "Damage = Damage * 10")
+                        
+                        baseClient.Source = source
+                        print("[MIKAADEV] Damage script modified!")
+                    end
+                end
+            end
+            
+            -- JUGA HOOK REMOTE EVENTS
+            for _, remote in pairs(RS:GetDescendants()) do
+                if remote:IsA("RemoteEvent") then
+                    local name = remote.Name:lower()
+                    if name:find("attack") or name:find("damage") or name:find("hit") then
+                        local oldFire = remote.FireServer
+                        remote.FireServer = function(self, ...)
                             local args = {...}
-                            if type(args[1]) == "table" then
-                                for key, val in pairs(args[1]) do
-                                    if tostring(key):lower():find("coin") then
-                                        args[1][key] = Hacks.Coin.Value
+                            for i, v in ipairs(args) do
+                                if type(v) == "number" and v > 0 then
+                                    args[i] = v * 10
+                                elseif type(v) == "table" then
+                                    for k, val in pairs(v) do
+                                        if type(val) == "number" and val > 0 then
+                                            v[k] = val * 10
+                                        end
                                     end
                                 end
                             end
@@ -159,185 +205,143 @@ local function CoinHackLogic(enable)
                         end
                     end
                 end
-                
-                wait(0.5)
             end
-        end)
-    end
-end
-
-local function DamageHackLogic(enable)
-    Hacks.Damage.Active = enable
-    
-    if enable then
-        -- Cari QueueBasicAttack remote (dari debug lu)
-        local remotes = RS:FindFirstChild("Remotes")
-        if remotes then
-            local playerChar = remotes:FindFirstChild("PlayerCharacter")
-            if playerChar then
-                local request = playerChar:FindFirstChild("Request")
-                if request then
-                    local queueAttack = request:FindFirstChild("QueueBasicAttack")
+        else
+            btn.Text = "DAMAGE: OFF"
+            btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+            
+            -- Restore original script
+            if Controllers then
+                local charController = Controllers:FindFirstChild("GkaracterController")
+                if charController then
+                    local original = charController:FindFirstChild("OriginalScript")
+                    local baseClient = charController:FindFirstChild("BaseCharacterClient")
                     
-                    if queueAttack and queueAttack:IsA("RemoteEvent") then
-                        local oldFire = queueAttack.FireServer
-                        queueAttack.FireServer = function(self, ...)
-                            local args = {...}
-                            -- Multiply damage numbers
-                            for i, v in ipairs(args) do
-                                if type(v) == "number" and v > 0 and v < 1000 then
-                                    args[i] = v * Hacks.Damage.Multiplier
-                                end
-                            end
-                            return oldFire(self, unpack(args))
-                        end
+                    if original and baseClient then
+                        baseClient.Source = original.Source
+                        original:Destroy()
                     end
                 end
             end
         end
-    end
+    end)
 end
 
-local function HealthHackLogic(enable)
-    Hacks.Health.Active = enable
+-- 3. SPEED HACK
+local function SpeedHack()
+    local btn = Instance.new("TextButton")
+    btn.Text = "SPEED: OFF"
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, 90)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+    btn.TextColor3 = Color3.white
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = Features
     
-    local function ApplyHealth()
-        if LocalPlayer.Character then
-            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                if enable then
-                    humanoid.MaxHealth = 1000
-                    humanoid.Health = 1000
-                    
-                    -- Auto regen
-                    humanoid.HealthChanged:Connect(function()
-                        if Hacks.Health.Active and humanoid.Health < 1000 then
-                            humanoid.Health = 1000
-                        end
-                    end)
-                else
-                    humanoid.MaxHealth = 100
-                    humanoid.Health = 100
+    local active = false
+    
+    btn.MouseButton1Click:Connect(function()
+        active = not active
+        
+        if active then
+            btn.Text = "SPEED: ON"
+            btn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+            
+            local function SetSpeed()
+                if LocalPlayer.Character then
+                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        humanoid.WalkSpeed = 50
+                        humanoid.JumpPower = 75
+                    end
                 end
             end
-        end
-    end
-    
-    ApplyHealth()
-    LocalPlayer.CharacterAdded:Connect(ApplyHealth)
-end
-
-local function SpeedHackLogic(enable)
-    Hacks.Speed.Active = enable
-    
-    local function ApplySpeed()
-        if LocalPlayer.Character then
-            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                if enable then
-                    humanoid.WalkSpeed = Hacks.Speed.WalkSpeed
-                    humanoid.JumpPower = 75
-                else
+            
+            SetSpeed()
+            LocalPlayer.CharacterAdded:Connect(SetSpeed)
+        else
+            btn.Text = "SPEED: OFF"
+            btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+            
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
                     humanoid.WalkSpeed = 16
                     humanoid.JumpPower = 50
                 end
             end
         end
-    end
-    
-    ApplySpeed()
-    LocalPlayer.CharacterAdded:Connect(ApplySpeed)
+    end)
 end
 
--- ========== CREATE FEATURE BUTTONS ==========
-local featureY = 0
-local featureHeight = 55
-
-local function CreateFeatureBtn(name, desc, logicFunc)
-    local Frame = Instance.new("Frame")
-    Frame.Size = UDim2.new(1, 0, 0, featureHeight)
-    Frame.Position = UDim2.new(0, 0, 0, featureY)
-    Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 55)
-    Frame.BorderSizePixel = 0
-    Frame.ZIndex = 1002
-    Frame.Parent = FeaturesFrame
+-- 4. HEALTH HACK
+local function HealthHack()
+    local btn = Instance.new("TextButton")
+    btn.Text = "HEALTH: OFF"
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, 135)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+    btn.TextColor3 = Color3.white
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = Features
     
-    local Label = Instance.new("TextLabel")
-    Label.Text = name
-    Label.Size = UDim2.new(0.65, 0, 0, 25)
-    Label.Position = UDim2.new(0, 10, 0, 5)
-    Label.BackgroundTransparency = 1
-    Label.TextColor3 = Color3.fromRGB(200, 220, 255)
-    Label.Font = Enum.Font.GothamBold
-    Label.TextSize = 14
-    Label.TextXAlignment = Enum.TextXAlignment.Left
-    Label.ZIndex = 1003
-    Label.Parent = Frame
+    local active = false
     
-    local Desc = Instance.new("TextLabel")
-    Desc.Text = desc
-    Desc.Size = UDim2.new(0.65, 0, 0, 20)
-    Desc.Position = UDim2.new(0, 10, 0, 30)
-    Desc.BackgroundTransparency = 1
-    Desc.TextColor3 = Color3.fromRGB(150, 180, 220)
-    Desc.Font = Enum.Font.Code
-    Desc.TextSize = 10
-    Desc.TextXAlignment = Enum.TextXAlignment.Left
-    Desc.ZIndex = 1003
-    Desc.Parent = Frame
-    
-    local Btn = Instance.new("TextButton")
-    Btn.Text = "OFF"
-    Btn.Size = UDim2.new(0.3, 0, 0, 30)
-    Btn.Position = UDim2.new(0.7, -5, 0.5, -15)
-    Btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-    Btn.TextColor3 = Color3.white
-    Btn.Font = Enum.Font.GothamBold
-    Btn.TextSize = 12
-    Btn.ZIndex = 1003
-    Btn.Parent = Frame
-    
-    Btn.MouseButton1Click:Connect(function()
-        local enable = Btn.Text == "OFF"
+    btn.MouseButton1Click:Connect(function()
+        active = not active
         
-        if enable then
-            Btn.Text = "ON"
-            Btn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        if active then
+            btn.Text = "HEALTH: ON"
+            btn.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+            
+            local function SetHealth()
+                if LocalPlayer.Character then
+                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        humanoid.MaxHealth = 1000
+                        humanoid.Health = 1000
+                        
+                        humanoid.HealthChanged:Connect(function()
+                            if active and humanoid.Health < 1000 then
+                                humanoid.Health = 1000
+                            end
+                        end)
+                    end
+                end
+            end
+            
+            SetHealth()
+            LocalPlayer.CharacterAdded:Connect(SetHealth)
         else
-            Btn.Text = "OFF"
-            Btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-        end
-        
-        -- Execute logic
-        if logicFunc then
-            logicFunc(enable)
+            btn.Text = "HEALTH: OFF"
+            btn.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+            
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid.MaxHealth = 100
+                    humanoid.Health = 100
+                end
+            end
         end
     end)
-    
-    featureY = featureY + featureHeight + 5
-    return Btn
 end
 
--- BUAT 4 FITUR
-CreateFeatureBtn("COIN", "Set to 9999 (Realtime)", CoinHackLogic)
-CreateFeatureBtn("DAMAGE", "Katana x10 Damage", DamageHackLogic)
-CreateFeatureBtn("HEALTH", "+500 HP Auto-Regen", HealthHackLogic)
-CreateFeatureBtn("SPEED", "3x Movement Speed", SpeedHackLogic)
+-- INITIALIZE HACKS
+CoinHack()
+DamageHack()
+SpeedHack()
+HealthHack()
 
 -- ========== UI CONTROLS ==========
-local isMinimized = false
 MinBtn.MouseButton1Click:Connect(function()
-    isMinimized = not isMinimized
-    
-    if isMinimized then
-        Main.Size = UDim2.new(0, 260, 0, 35)
-        FeaturesFrame.Visible = false
-        Subtitle.Visible = false
+    if Main.Size.Y.Offset == 300 then
+        Main.Size = UDim2.new(0, 250, 0, 35)
+        Features.Visible = false
         MinBtn.Text = "□"
     else
-        Main.Size = UDim2.new(0, 260, 0, 320)
-        FeaturesFrame.Visible = true
-        Subtitle.Visible = true
+        Main.Size = UDim2.new(0, 250, 0, 300)
+        Features.Visible = true
         MinBtn.Text = "_"
     end
 end)
@@ -346,19 +350,16 @@ CloseBtn.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
 
-UIS.InputBegan:Connect(function(input)
+-- HOTKEY
+game:GetService("UserInputService").InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.RightShift then
         Main.Visible = not Main.Visible
     end
 end)
 
--- ========== STARTUP MESSAGE ==========
+-- MESSAGE
 print("========================================")
-print("MIKAADEV DELTA - COMPLETE VERSION")
-print("UI + LOGIC LOADED!")
-print("Minimize: _ | Close: X | Hide: RightShift")
+print("MIKAADEV DELTA - GAME SPECIFIC VERSION")
+print("Based on your error log analysis")
 print("TestingDevByMikaa")
 print("========================================")
-
--- Force UI to front
-Main.Parent = ScreenGui
