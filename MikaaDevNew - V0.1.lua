@@ -1,11 +1,10 @@
--- MIKAA DEV TESTING EXPLOIT V3 | Dueling Grounds | @Owner: Mikaa | BALANCE DAMAGE KERASA DIKIT
+-- MIKAA DEV TESTING EXPLOIT V4 | Dueling Grounds | @Owner: Mikaa | FIX NIL ERROR + KERASA DIKIT
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MikaaDev_DuelGroundsV3"
+ScreenGui.Name = "MikaaDev_DuelGroundsV4"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
@@ -43,7 +42,7 @@ UIStroke.Parent = MainFrame
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundTransparency = 1
-Title.Text = "MIKAA DEV TESTING V3 | Balance Damage"
+Title.Text = "MIKAA DEV TESTING V4 | Fix Nil Error"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
@@ -91,12 +90,12 @@ local CoinCorner = Instance.new("UICorner")
 CoinCorner.CornerRadius = UDim.new(0, 8)
 CoinCorner.Parent = CoinBtn
 
--- BALANCE AURA (KERASA DIKIT x3 DAMAGE)
+-- BALANCE AURA
 local AuraBtn = Instance.new("TextButton")
 AuraBtn.Size = UDim2.new(1, -20, 0, 45)
 AuraBtn.Position = UDim2.new(0, 10, 0, 175)
 AuraBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-AuraBtn.Text = "⚔️ Balance Aura (x3 Kerasa) : OFF"
+AuraBtn.Text = "⚔️ Balance Aura (Kerasa Dikit) : OFF"
 AuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AuraBtn.TextScaled = true
 AuraBtn.Font = Enum.Font.Gotham
@@ -128,18 +127,16 @@ CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
 
 -- GODMODE SAFE
 local function setupGodmode(char)
-    if char then
-        pcall(function()
-            local hum = char:WaitForChild("Humanoid", 5)
-            if hum then
-                hum.MaxHealth = 500
-                hum.Health = 500
-                hum.HealthChanged:Connect(function()
-                    if hum.Health < 500 then hum.Health = 500 end
-                end)
-            end
-        end)
-    end
+    pcall(function()
+        local hum = char:WaitForChild("Humanoid", 5)
+        if hum then
+            hum.MaxHealth = 500
+            hum.Health = 500
+            hum.HealthChanged:Connect(function()
+                if hum.Health < 500 then hum.Health = 500 end
+            end)
+        end
+    end)
 end
 player.CharacterAdded:Connect(setupGodmode)
 if player.Character then setupGodmode(player.Character) end
@@ -174,23 +171,32 @@ CoinBtn.MouseButton1Click:Connect(function()
     CoinBtn.BackgroundColor3 = CoinEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
--- BALANCE AURA REALTIME (KERASA DIKIT - DELAY + LIGHT HIT)
+-- FIX NIL: CARI REMOTE LEBIH AMAN + WAIT TOOL
+local function getSwingRemote()
+    if player.Character then
+        local tool = player.Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
+        if tool then
+            return tool:FindFirstChild("Swing") or tool:FindFirstChild("Attack") or tool:FindFirstChild("LightAttack") or tool:FindFirstChild("HeavyAttack") or tool:FindFirstChild("Hit") or tool:FindFirstChildWhichIsA("RemoteEvent") or tool:FindFirstChildWhichIsA("RemoteFunction")
+        end
+    end
+    return nil
+end
+
 local lastHit = tick()
 spawn(function()
-    while task.wait(0.1) do
+    while task.wait(0.2) do
         if AuraEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             pcall(function()
                 local myPos = player.Character.HumanoidRootPart.Position
-                local tool = player.Character:FindFirstChildOfClass("Tool")
-                local remote = tool and (tool:FindFirstChild("Swing") or tool:FindFirstChild("Attack") or tool:FindFirstChildWhichIsA("RemoteEvent"))
-                if remote and tick() - lastHit > 0.3 then  -- DELAY BIAR KERASA
+                local remote = getSwingRemote()
+                if remote and tick() - lastHit > 0.4 then  -- DELAY LEBIH PANJANG BIAR KERASA + NO SPAM
                     for _, obj in pairs(Workspace:GetChildren()) do
                         if obj:FindFirstChild("Humanoid") and obj:FindFirstChild("HumanoidRootPart") and obj ~= player.Character and obj.Humanoid.Health > 0 then
                             local dist = (obj.HumanoidRootPart.Position - myPos).Magnitude
-                            if dist < 20 then
-                                remote:FireServer(obj.HumanoidRootPart.Position)  -- LIGHT HIT POS
+                            if dist < 18 then  -- JARAK DIKECILIN DIKIT BIAR LEBIH REAL
+                                remote:FireServer(obj.HumanoidRootPart.Position, "Light")  -- ARG EXTRA SAFETY, KERASA LIGHT HIT
                                 lastHit = tick()
-                                break  -- SATU HIT PER LOOP BIAR BALANCE
+                                break
                             end
                         end
                     end
@@ -202,8 +208,8 @@ end)
 
 AuraBtn.MouseButton1Click:Connect(function()
     AuraEnabled = not AuraEnabled
-    AuraBtn.Text = "⚔️ Balance Aura (x3 Kerasa) : " .. (AuraEnabled and "ON" or "OFF")
+    AuraBtn.Text = "⚔️ Balance Aura (Kerasa Dikit) : " .. (AuraEnabled and "ON" or "OFF")
     AuraBtn.BackgroundColor3 = AuraEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
-print("MIKAA DEV TESTING V3 Loaded | Balance Kerasa Dikit + God + Coins | @Mikaa")
+print("MIKAA DEV TESTING V4 Loaded | Fix Nil Error + Kerasa Dikit | @Mikaa")
