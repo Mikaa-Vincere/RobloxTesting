@@ -54,7 +54,7 @@ PanelCorner.Parent = MainPanel
 -- Title
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Text = "DAMAGE 999 HACK"
+Title.Text = "DAMAGE HACK BETA @byMikaa"
 Title.TextColor3 = Color3.fromRGB(255, 50, 50)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
@@ -92,7 +92,7 @@ StatusLabel.Parent = MainPanel
 -- ============================================
 -- ============ EDIT NILAI DI BAWAH INI ============
 local DAMAGE_MULTIPLIER = 100     -- Ubah angka ini untuk perkalian damage (contoh: 1000 = 1000x damage)
-local DAMAGE_VALUE = 50          -- Ubah angka ini untuk damage tetap (contoh: 9999 = langsung kill)
+local DAMAGE_VALUE = 80          -- Ubah angka ini untuk damage tetap (contoh: 9999 = langsung kill)
 local AUTO_ATTACK = false          -- true/false untuk auto attack musuh
 -- =============================================
 
