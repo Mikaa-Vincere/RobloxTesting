@@ -1,16 +1,17 @@
--- MIKAA DEV TESTING EXPLOIT V5 | Dueling Grounds | @Owner: Mikaa | COIN FIX + DAMAGE LEBIH KERASA
+-- MIKAA DEV TESTING EXPLOIT V7 | Dueling Grounds | @Owner: Mikaa | REALTIME COIN VISUAL + REAL CODES + DAMAGE GILA KERASA
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MikaaDev_DuelGroundsV5"
+ScreenGui.Name = "MikaaDev_DuelGroundsV7"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
 -- LOGO MINI TOGGLE
 local ToggleBtn = Instance.new("ImageButton")
-ToggleBtn.Name = "Toggle"
 ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
 ToggleBtn.Position = UDim2.new(0, 20, 0, 20)
 ToggleBtn.BackgroundTransparency = 1
@@ -18,11 +19,10 @@ ToggleBtn.Image = "rbxassetid://100166477433523"
 ToggleBtn.ImageTransparency = 0.1
 ToggleBtn.Parent = ScreenGui
 
--- MAIN UI
+-- MAIN UI BESAR
 local MainFrame = Instance.new("Frame")
-MainFrame.Name = "Main"
-MainFrame.Size = UDim2.new(0, 320, 0, 280)
-MainFrame.Position = UDim2.new(0.5, -160, 0.5, -140)
+MainFrame.Size = UDim2.new(0, 320, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -160, 0.5, -190)
 MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
 MainFrame.BackgroundTransparency = 0.1
 MainFrame.BorderSizePixel = 0
@@ -42,7 +42,7 @@ UIStroke.Parent = MainFrame
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundTransparency = 1
-Title.Text = "MIKAA DEV TESTING V5 | Damage Kerasa Banget"
+Title.Text = "MIKAA DEV TESTING V7 | Realtime Coin + Gila Damage"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
@@ -62,47 +62,49 @@ local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(0, 8)
 CloseCorner.Parent = CloseBtn
 
--- GODMODE
+-- GOD INFINITE
 local GodBtn = Instance.new("TextButton")
-GodBtn.Size = UDim2.new(1, -20, 0, 45)
+GodBtn.Size = UDim2.new(1, -20, 0, 40)
 GodBtn.Position = UDim2.new(0, 10, 0, 65)
 GodBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-GodBtn.Text = "🛡️ Godmode 500% : OFF"
+GodBtn.Text = "🛡️ Infinite Godmode : OFF"
 GodBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 GodBtn.TextScaled = true
 GodBtn.Font = Enum.Font.Gotham
 GodBtn.Parent = MainFrame
-local GodCorner = Instance.new("UICorner")
-GodCorner.CornerRadius = UDim.new(0, 8)
-GodCorner.Parent = GodBtn
 
--- COINS + GEMS
+-- COIN REALTIME + CODES
 local CoinBtn = Instance.new("TextButton")
-CoinBtn.Size = UDim2.new(1, -20, 0, 45)
-CoinBtn.Position = UDim2.new(0, 10, 0, 120)
+CoinBtn.Size = UDim2.new(1, -20, 0, 40)
+CoinBtn.Position = UDim2.new(0, 10, 0, 115)
 CoinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-CoinBtn.Text = "💰 Coins & Gems 9999 : OFF"
+CoinBtn.Text = "💰 Realtime 999999 + Real Codes : OFF"
 CoinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CoinBtn.TextScaled = true
 CoinBtn.Font = Enum.Font.Gotham
 CoinBtn.Parent = MainFrame
-local CoinCorner = Instance.new("UICorner")
-CoinCorner.CornerRadius = UDim.new(0, 8)
-CoinCorner.Parent = CoinBtn
 
--- KERASA AURA
+-- AURA GILA
 local AuraBtn = Instance.new("TextButton")
-AuraBtn.Size = UDim2.new(1, -20, 0, 45)
-AuraBtn.Position = UDim2.new(0, 10, 0, 175)
+AuraBtn.Size = UDim2.new(1, -20, 0, 40)
+AuraBtn.Position = UDim2.new(0, 10, 0, 165)
 AuraBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-AuraBtn.Text = "⚔️ Aura Kerasa Banget : OFF"
+AuraBtn.Text = "⚔️ Aura Gila x30 : OFF"
 AuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AuraBtn.TextScaled = true
 AuraBtn.Font = Enum.Font.Gotham
 AuraBtn.Parent = MainFrame
-local AuraCorner = Instance.new("UICorner")
-AuraCorner.CornerRadius = UDim.new(0, 8)
-AuraCorner.Parent = AuraBtn
+
+-- SPEED
+local SpeedBtn = Instance.new("TextButton")
+SpeedBtn.Size = UDim2.new(1, -20, 0, 40)
+SpeedBtn.Position = UDim2.new(0, 10, 0, 215)
+SpeedBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
+SpeedBtn.Text = "🚀 Speed 60 : OFF"
+SpeedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBtn.TextScaled = true
+SpeedBtn.Font = Enum.Font.Gotham
+SpeedBtn.Parent = MainFrame
 
 -- OWNER
 local OwnerLbl = Instance.new("TextLabel")
@@ -119,100 +121,124 @@ OwnerLbl.Parent = MainFrame
 local GodEnabled = false
 local CoinEnabled = false
 local AuraEnabled = false
+local SpeedEnabled = false
 
--- UI TOGGLE
-local function ToggleUI() MainFrame.Visible = not MainFrame.Visible end
+local function ToggleUI()
+    MainFrame.Visible = not MainFrame.Visible
+end
 ToggleBtn.MouseButton1Click:Connect(ToggleUI)
 CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
 
--- GODMODE SAFE
-local function setupGodmode(char)
+-- INFINITE GOD
+local function setupGod(char)
     pcall(function()
-        local hum = char:WaitForChild("Humanoid", 5)
-        if hum then
-            hum.MaxHealth = 500
-            hum.Health = 500
-            hum.HealthChanged:Connect(function()
-                if hum.Health < 500 then hum.Health = 500 end
-            end)
-        end
+        local hum = char:WaitForChild("Humanoid")
+        hum.MaxHealth = math.huge
+        hum.Health = math.huge
+        RunService.Heartbeat:Connect(function()
+            if GodEnabled then hum.Health = math.huge end
+        end)
     end)
 end
-player.CharacterAdded:Connect(setupGodmode)
-if player.Character then setupGodmode(player.Character) end
+player.CharacterAdded:Connect(setupGod)
+if player.Character then setupGod(player.Character) end
 
 GodBtn.MouseButton1Click:Connect(function()
     GodEnabled = not GodEnabled
-    GodBtn.Text = "🛡️ Godmode 500% : " .. (GodEnabled and "ON" or "OFF")
+    GodBtn.Text = "🛡️ Infinite Godmode : " .. (GodEnabled and "ON" or "OFF")
     GodBtn.BackgroundColor3 = GodEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
--- COINS & GEMS FIX (MUNcul PAS WIN DUEL)
-spawn(function()
-    while task.wait(0.3) do
-        if CoinEnabled then
-            pcall(function()
-                local stats = player:FindFirstChild("leaderstats")
-                if stats then
-                    local coins = stats:FindFirstChild("Coins") or stats:FindFirstChild("Coin")
-                    local gems = stats:FindFirstChild("Gems") or stats:FindFirstChild("Gem")
-                    if coins then coins.Value = 9999 end
-                    if gems then gems.Value = 9999 end
+-- SPEED 60
+RunService.RenderStepped:Connect(function()
+    if SpeedEnabled and player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = 60
+    end
+end)
+
+SpeedBtn.MouseButton1Click:Connect(function()
+    SpeedEnabled = not SpeedEnabled
+    SpeedBtn.Text = "🚀 Speed 60 : " .. (SpeedEnabled and "ON" or "OFF")
+    SpeedBtn.BackgroundColor3 = SpeedEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
+end)
+
+-- REALTIME COIN 999999 + AUTO REDEEM REAL CODES
+local realCodes = {"OneMillionFavorites", "GauntletsUpdate", "WingTheGoat", "FirstSpecialCode"}
+local redeemed = {}
+
+local function autoRedeem()
+    pcall(function()
+        local redeemRemote = ReplicatedStorage:FindFirstChildWhichIsA("RemoteEvent", true) -- cari generic
+        if redeemRemote and redeemRemote.Name:lower():find("redeem") or redeemRemote.Name:lower():find("code") then
+            for _, code in realCodes do
+                if not redeemed[code] then
+                    redeemRemote:FireServer(code)
+                    redeemed[code] = true
+                    task.wait(1)
                 end
-            end)
+            end
         end
+    end)
+end
+
+RunService.Heartbeat:Connect(function()
+    if CoinEnabled then
+        pcall(function()
+            local stats = player:FindFirstChild("leaderstats")
+            if stats then
+                for _, v in stats:GetChildren() do
+                    if v:IsA("IntValue") or v:IsA("NumberValue") then
+                        v.Value = 999999 -- REALTIME VISUAL
+                    end
+                end
+            end
+        end)
     end
 end)
 
 CoinBtn.MouseButton1Click:Connect(function()
     CoinEnabled = not CoinEnabled
-    CoinBtn.Text = "💰 Coins & Gems 9999 : " .. (CoinEnabled and "ON" or "OFF")
+    CoinBtn.Text = "💰 Realtime 999999 + Real Codes : " .. (CoinEnabled and "ON" or "OFF")
     CoinBtn.BackgroundColor3 = CoinEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
+    if CoinEnabled then autoRedeem() end
 end)
 
--- KERASA AURA LEBIH (ALTERNATE LIGHT/HEAVY, DELAY CEPET)
-local lastHit = tick()
-local heavyToggle = false
-spawn(function()
-    while task.wait(0.15) do
-        if AuraEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            pcall(function()
-                local myPos = player.Character.HumanoidRootPart.Position
-                local remote = getSwingRemote()
-                if remote and tick() - lastHit > 0.25 then
-                    for _, obj in pairs(Workspace:GetChildren()) do
-                        if obj:FindFirstChild("Humanoid") and obj:FindFirstChild("HumanoidRootPart") and obj ~= player.Character and obj.Humanoid.Health > 0 then
-                            local dist = (obj.HumanoidRootPart.Position - myPos).Magnitude
-                            if dist < 20 then
-                                local attackType = heavyToggle and "Heavy" or "Light"
-                                remote:FireServer(obj.HumanoidRootPart.Position, attackType)
-                                heavyToggle = not heavyToggle
-                                lastHit = tick()
-                                break
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-end)
-
--- GET REMOTE FIX (CARI LEBIH BANYAK)
-local function getSwingRemote()
+-- AURA GILA x30
+local function getRemote()
     if player.Character then
-        local tool = player.Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
+        local tool = player.Character:FindFirstChildOfClass("Tool")
         if tool then
-            return tool:FindFirstChild("Swing") or tool:FindFirstChild("Attack") or tool:FindFirstChild("LightAttack") or tool:FindFirstChild("HeavyAttack") or tool:FindFirstChild("Hit") or tool:FindFirstChildWhichIsA("RemoteEvent") or tool:FindFirstChildWhichIsA("RemoteFunction")
+            return tool:FindFirstChildWhichIsA("RemoteEvent")
         end
     end
     return nil
 end
 
+RunService.Heartbeat:Connect(function()
+    if AuraEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        pcall(function()
+            local myPos = player.Character.HumanoidRootPart.Position
+            local remote = getRemote()
+            if remote then
+                for _, obj in Workspace:GetChildren() do
+                    if obj ~= player.Character and obj:FindFirstChild("HumanoidRootPart") and obj:FindFirstChild("Humanoid") and obj.Humanoid.Health > 0 then
+                        local dist = (obj.HumanoidRootPart.Position - myPos).Magnitude
+                        if dist < 35 then
+                            remote:FireServer(obj.HumanoidRootPart.Position, "Light")
+                            remote:FireServer(obj.HumanoidRootPart.Position, "Heavy")
+                            remote:FireServer(obj.HumanoidRootPart.Position) -- EXTRA SADIS
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
 AuraBtn.MouseButton1Click:Connect(function()
     AuraEnabled = not AuraEnabled
-    AuraBtn.Text = "⚔️ Aura Kerasa Banget : " .. (AuraEnabled and "ON" or "OFF")
+    AuraBtn.Text = "⚔️ Aura Gila x30 : " .. (AuraEnabled and "ON" or "OFF")
     AuraBtn.BackgroundColor3 = AuraEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
-print("MIKAA DEV TESTING V5 Loaded | Coin Fix + Damage Kerasa Cepet | @Mikaa")
+print("MIKAA DEV TESTING V7 REALTIME Loaded | Coin Visual Instan + Real Codes + Damage Gila | @Mikaa")
