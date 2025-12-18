@@ -5,7 +5,7 @@
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local DamageMultiplier = 50 -- Ubah angka ini untuk mengatur perkalian damage (contoh: 10x)
+local DamageMultiplier = 999 -- Ubah angka ini untuk mengatur perkalian damage (contoh: 10x)
 
 -- Metode 1: Hook function damage yang ada di ReplicatedStorage/RemoteEvents
 local oldFireServer
