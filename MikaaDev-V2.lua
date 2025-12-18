@@ -1,161 +1,125 @@
 -- ============================================
--- UNIVERSAL FIGHTING GAME EXPLOIT PACK
--- Untuk game dengan sistem: HEAL, DODGE, DAMAGE, BLOCK
+-- SERVER-SIDE DAMAGE BYPASS
+-- Untuk game dengan damage calculation di server
 -- ============================================
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
--- CONFIGURASI
-local Config = {
-    DamageMultiplier = 999,          -- Perkalian damage (50x)
-    GodMode = true,                 -- Tidak bisa mati
-    InfiniteHeal = true,            -- Heal unlimited
-    AutoDodge = true,               -- Auto hindar serangan
-    NoCooldown = true,              -- No skill cooldown
-    OneHitKO = false                -- Musuh mati 1 pukulan
-}
-
--- UI NOTIFICATION
-local function Notify(title, text)
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = title,
-        Text = text,
-        Duration = 3
-    })
+-- METHOD 1: PACKET MANIPULATION (MITM Technique)
+local function manipulateOutgoingPackets()
+    local mt = getrawmetatable(game)
+    local oldNamecall = mt.__namecall
+    local oldIndex = mt.__index
+    
+    setreadonly(mt, false)
+    
+    -- Hook semua outgoing network packets
+    mt.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        
+        -- Tangkap packet damage
+        if method == "FireServer" then
+            local remoteName = tostring(self)
+            
+            -- Manipulasi damage packets
+            if remoteName:lower():find("damage") or 
+               remoteName:lower():find("hit") or 
+               remoteName:lower():find("attack") or
+               remoteName:lower():find("punch") then
+                
+                print("[PACKET INTERCEPTED]", remoteName)
+                
+                -- Ganti semua angka dalam packet
+                for i, arg in pairs(args) do
+                    if type(arg) == "number" and arg > 0 and arg < 1000 then
+                        args[i] = 99999  -- Set ke nilai sangat tinggi
+                        print("[DAMAGE MODIFIED]", arg, "->", args[i])
+                    end
+                end
+            end
+        end
+        
+        return oldNamecall(self, unpack(args))
+    end)
+    
+    setreadonly(mt, true)
+    print("[PACKET HOOK] Server-side bypass activated")
 end
 
-Notify("FIGHTING PACK", "Loaded for Kheirpoji/Dodge Game")
-
--- ========================
--- 1. DAMAGE MULTIPLIER
--- ========================
-local function HookDamageSystem()
-    for _, obj in pairs(game:GetDescendants()) do
-        if obj:IsA("RemoteEvent") then
-            local name = obj.Name:lower()
-            if name:find("damage") or name:find("hit") or name:find("punch") or name:find("attack") then
-                local oldFire = obj.FireServer
-                obj.FireServer = function(self, ...)
-                    local args = {...}
-                    for i, arg in pairs(args) do
-                        if type(arg) == "number" then
-                            -- Perkalian damage keluar
-                            if arg > 0 and arg < 1000 then
-                                args[i] = arg * Config.DamageMultiplier
-                            end
-                            -- Jika OneHitKO aktif
-                            if Config.OneHitKO and arg > 0 then
-                                args[i] = 999999
+-- METHOD 2: MEMORY EDITING (Direct value change)
+local function directMemoryEdit()
+    spawn(function()
+        while wait(0.1) do
+            pcall(function()
+                -- Cari dan modifikasi semua nilai damage di memory
+                for _, obj in pairs(workspace:GetDescendants()) do
+                    if obj:IsA("BasePart") then
+                        -- Jika objek memiliki tag damage
+                        if obj:GetAttribute("Damage") or obj.Name:lower():find("damage") then
+                            obj:SetAttribute("Damage", 99999)
+                        end
+                    end
+                end
+                
+                -- Modifikasi damage di player instance
+                if LocalPlayer.Character then
+                    for _, child in pairs(LocalPlayer.Character:GetDescendants()) do
+                        if child:IsA("NumberValue") then
+                            local name = child.Name:lower()
+                            if name:find("damage") or name:find("attack") or name:find("power") then
+                                child.Value = 99999
                             end
                         end
                     end
-                    return oldFire(self, unpack(args))
                 end
-                print("[HOOKED] Damage Event:", obj.Name)
+            end)
+        end
+    end)
+end
+
+-- METHOD 3: FAKE HIGH DAMAGE (Visual & UI Manipulation)
+local function fakeDamageDisplay()
+    -- Hook damage display system
+    local gui = game:GetService("CoreGui") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    
+    for _, screenGui in pairs(gui:GetDescendants()) do
+        if screenGui:IsA("TextLabel") or screenGui:IsA("TextButton") then
+            if screenGui.Text:match("%d+") then  -- Jika ada angka
+                local number = tonumber(screenGui.Text)
+                if number and number > 0 and number < 1000 then
+                    -- Ganti display damage
+                    screenGui:GetPropertyChangedSignal("Text"):Connect(function()
+                        if screenGui.Text:match("%d+") then
+                            local current = tonumber(screenGui.Text)
+                            if current and current < 1000 then
+                                screenGui.Text = tostring(current * 1000)
+                            end
+                        end
+                    })
+                end
             end
         end
     end
 end
 
--- ========================
--- 2. GOD MODE & INFINITE HEAL
--- ========================
-local function SetupGodMode()
-    LocalPlayer.CharacterAdded:Connect(function(char)
-        wait(0.5)
-        local humanoid = char:WaitForChild("Humanoid")
-        
-        if Config.GodMode then
-            humanoid.MaxHealth = math.huge
-            humanoid.Health = math.huge
-            
-            humanoid.Changed:Connect(function()
-                if humanoid.Health < 1000 then
-                    humanoid.Health = math.huge
-                end
-            end)
-        end
-        
-        if Config.InfiniteHeal then
-            -- Hook heal function
-            spawn(function()
-                while wait(0.1) do
-                    if humanoid.Health < humanoid.MaxHealth then
-                        humanoid.Health = humanoid.MaxHealth
-                    end
-                end
-            end)
-        end
-    end)
-end
-
--- ========================
--- 3. AUTO DODGE
--- ========================
-local function AutoDodgeSystem()
-    if not Config.AutoDodge then return end
-    
-    spawn(function()
-        while wait() do
-            pcall(function()
-                -- Cari event/method dodge
-                local remote = game:GetService("ReplicatedStorage"):FindFirstChild("DodgeEvent") 
-                             or game:GetService("ReplicatedStorage"):FindFirstChild("AvoidEvent")
-                
-                if remote then
-                    -- Trigger dodge secara konstan
-                    remote:FireServer()
-                else
-                    -- Alternatif: modify dodge cooldown
-                    for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
-                        if v.Name:lower():find("dodge") and v:IsA("NumberValue") then
-                            v.Value = 0  -- No cooldown
-                        end
-                    end
-                end
-            end)
-        end
-    end)
-end
-
--- ========================
--- 4. NO COOLDOWN SYSTEM
--- ========================
-local function RemoveCooldowns()
-    if not Config.NoCooldown then return end
-    
+-- METHOD 4: FORCE HIGH DAMAGE PACKET
+local function forceHighDamage()
     spawn(function()
         while wait(0.5) do
             pcall(function()
-                -- Hapus semua cooldown values
-                for _, v in pairs(game:GetDescendants()) do
-                    if v:IsA("NumberValue") or v:IsA("IntValue") then
-                        local name = v.Name:lower()
-                        if name:find("cool") or name:find("delay") or name:find("wait") or name:find("timer") then
-                            v.Value = 0
-                        end
-                    end
-                end
-            end)
-        end
-    end)
-end
-
--- ========================
--- 5. STATS BOOSTER (STRENGTH, POWER, ETC)
--- ========================
-local function BoostStats()
-    spawn(function()
-        while wait(2) do
-            pcall(function()
-                if LocalPlayer.Character then
-                    for _, v in pairs(LocalPlayer.Character:GetDescendants()) do
-                        if v:IsA("NumberValue") then
-                            local name = v.Name:lower()
-                            if name:find("str") or name:find("power") or name:find("attack") or name:find("damage") then
-                                v.Value = v.Value * Config.DamageMultiplier
+                -- Kirim packet damage tinggi secara paksa
+                local remotes = game:GetService("ReplicatedStorage"):GetChildren()
+                for _, remote in pairs(remotes) do
+                    if remote:IsA("RemoteEvent") then
+                        if remote.Name:lower():find("damage") or remote.Name:lower():find("hit") then
+                            -- Kirim damage 99999 ke semua musuh
+                            for _, player in pairs(Players:GetPlayers()) do
+                                if player ~= LocalPlayer and player.Character then
+                                    remote:FireServer(player.Character, 99999)
+                                end
                             end
                         end
                     end
@@ -165,68 +129,78 @@ local function BoostStats()
     end)
 end
 
--- ========================
--- 6. ANTI-STUN / ANTI-KNOCKBACK
--- ========================
-local function AntiStun()
-    spawn(function()
-        while wait() do
-            pcall(function()
-                local char = LocalPlayer.Character
-                if char then
-                    local humanoid = char:FindFirstChild("Humanoid")
-                    if humanoid then
-                        -- Hilangkan stun state
-                        for _, state in pairs(Enum.HumanoidStateType:GetEnumItems()) do
-                            if state.Name:find("Stun") or state.Name:find("Knock") or state.Name:find("Fall") then
-                                humanoid:SetStateEnabled(state, false)
+-- METHOD 5: HACK DAMAGE STATS DI SERVER (Jika menggunakan ModuleScript)
+local function hackDamageModule()
+    for _, module in pairs(game:GetDescendants()) do
+        if module:IsA("ModuleScript") then
+            if module.Name:lower():find("damage") or module.Name:lower():find("combat") then
+                pcall(function()
+                    local source = module.Source
+                    -- Ganti semua nilai damage dalam module
+                    source = string.gsub(source, "damage%s*=%s*%d+", "damage = 999999")
+                    source = string.gsub(source, "Damage%s*=%s*%d+", "Damage = 999999")
+                    source = string.gsub(source, "(%d+)%s*[*+/%-]%s*%a+", "999999")
+                    module.Source = source
+                    print("[MODULE HACKED]", module.Name)
+                end)
+            end
+        end
+    end
+end
+
+-- METHOD 6: ONE-HIT-KILL OBFUSCATED
+local function oneHitKill()
+    local connection
+    connection = RunService.Heartbeat:Connect(function()
+        pcall(function()
+            -- Deteksi saat player menyerang
+            if LocalPlayer.Character then
+                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    -- Cek jika sedang attack animation
+                    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
+                        if track.Name:lower():find("attack") or track.Name:lower():find("punch") then
+                            -- Kirim kill packet
+                            local args = {
+                                [1] = "Head",  -- Target body part
+                                [2] = 999999,  -- Damage
+                                [3] = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                            }
+                            
+                            -- Coba semua remote event
+                            for _, remote in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do
+                                if remote:IsA("RemoteEvent") then
+                                    pcall(function()
+                                        remote:FireServer(unpack(args))
+                                    end)
+                                end
                             end
                         end
                     end
                 end
-            end)
-        end
+            end
+        end)
     end)
 end
 
--- ========================
--- 7. AUTO WIN ROUND SYSTEM
--- ========================
-local function AutoWinRound()
+-- METHOD 7: CRASH OPPONENT INSTEAD (Alternative)
+local function crashOpponents()
     spawn(function()
-        while wait(5) do
-            pcall(function()
-                -- Cari round system
-                for _, v in pairs(game:GetDescendants()) do
-                    if v:IsA("IntValue") and (v.Name:find("round") or v.Name:find("bulat")) then
-                        -- Set round ke final
-                        v.Value = 10
-                    end
-                    if v:IsA("StringValue") and v.Name:find("winner") then
-                        -- Set player sebagai winner
-                        v.Value = LocalPlayer.Name
-                    end
-                end
-            end)
-        end
-    end)
-end
-
--- ========================
--- 8. VISUAL ESP (MUSUH HIGHLIGHT)
--- ========================
-local function EnemyESP()
-    spawn(function()
-        while wait(0.5) do
+        while wait(1) do
             pcall(function()
                 for _, player in pairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer and player.Character then
-                        local char = player.Character
-                        local highlight = char:FindFirstChild("ESP_Highlight") or Instance.new("Highlight")
-                        highlight.Name = "ESP_Highlight"
-                        highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                        highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
-                        highlight.Parent = char
+                    if player ~= LocalPlayer then
+                        -- Kirim data corrupt ke character opponent
+                        if player.Character then
+                            local root = player.Character:FindFirstChild("HumanoidRootPart")
+                            if root then
+                                -- Spam position packets untuk crash/lag
+                                for i = 1, 100 do
+                                    root.CFrame = CFrame.new(0, -1000, 0)
+                                    task.wait()
+                                end
+                            end
+                        end
                     end
                 end
             end)
@@ -234,52 +208,34 @@ local function EnemyESP()
     end)
 end
 
--- ========================
--- EXECUTE SEMUA SYSTEM
--- ========================
-HookDamageSystem()
-SetupGodMode()
-AutoDodgeSystem()
-RemoveCooldowns()
-BoostStats()
-AntiStun()
-AutoWinRound()
-EnemyESP()
+-- EXECUTE SEMUA METHOD
+manipulateOutgoingPackets()
+directMemoryEdit()
+fakeDamageDisplay()
+forceHighDamage()
+hackDamageModule()
+oneHitKill()
+-- crashOpponents()  -- Uncomment jika perlu
 
--- UI CONTROL PANEL
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = game.CoreGui
+-- UI FEEDBACK
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "SERVER-SIDE BYPASS",
+    Text = "Damage set to 99999 | All methods active",
+    Duration = 5
+})
 
-local function CreateButton(text, position, toggleFunc)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 150, 0, 40)
-    button.Position = position
-    button.Text = text
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Parent = ScreenGui
-    
-    button.MouseButton1Click:Connect(function()
-        toggleFunc()
-        Notify("SYSTEM", text .. " Toggled")
-    end)
+print("======================================")
+print("SERVER-SIDE DAMAGE BYPASS ACTIVATED")
+print("Jika masih tidak bekerja, game menggunakan:")
+print("1. Advanced anti-cheat")
+print("2. Encrypted packets")
+print("3. Validation server-side yang ketat")
+print("======================================")
+
+-- ALTERNATIVE: TRY FIND EXACT DAMAGE REMOTE
+print("\n[DEBUG] Mencari remote event damage...")
+for _, remote in pairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
+    if remote:IsA("RemoteEvent") then
+        print("Found RemoteEvent:", remote:GetFullName())
+    end
 end
-
-CreateButton(UDim2.new(0, 10, 0, 50), function()
-    Config.DamageMultiplier = Config.DamageMultiplier * 2
-    Notify("DAMAGE", "Now: " .. Config.DamageMultiplier .. "x")
-end)
-
-CreateButton(UDim2.new(0, 10, 0, 100), function()
-    Config.GodMode = not Config.GodMode
-    Notify("GOD MODE", Config.GodMode and "ON" or "OFF")
-end)
-
-CreateButton(UDim2.new(0, 10, 0, 150), function()
-    Config.AutoDodge = not Config.AutoDodge
-    Notify("AUTO DODGE", Config.AutoDodge and "ON" or "OFF")
-end)
-
-print("[SYSTEM LOADED] Fighting Game Exploit Pack Active")
-print("Game Features Detected: Heal, Dodge, Damage, Block System")
-print("Made for Delta Executor")
