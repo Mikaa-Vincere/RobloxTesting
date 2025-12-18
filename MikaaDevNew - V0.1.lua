@@ -1,10 +1,10 @@
--- MIKAA DEV TESTING EXPLOIT V4 | Dueling Grounds | @Owner: Mikaa | FIX NIL ERROR + KERASA DIKIT
+-- MIKAA DEV TESTING EXPLOIT V5 | Dueling Grounds | @Owner: Mikaa | COIN FIX + DAMAGE LEBIH KERASA
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "MikaaDev_DuelGroundsV4"
+ScreenGui.Name = "MikaaDev_DuelGroundsV5"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
@@ -42,7 +42,7 @@ UIStroke.Parent = MainFrame
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundTransparency = 1
-Title.Text = "MIKAA DEV TESTING V4 | Fix Nil Error"
+Title.Text = "MIKAA DEV TESTING V5 | Damage Kerasa Banget"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextScaled = true
 Title.Font = Enum.Font.GothamBold
@@ -76,12 +76,12 @@ local GodCorner = Instance.new("UICorner")
 GodCorner.CornerRadius = UDim.new(0, 8)
 GodCorner.Parent = GodBtn
 
--- COINS
+-- COINS + GEMS
 local CoinBtn = Instance.new("TextButton")
 CoinBtn.Size = UDim2.new(1, -20, 0, 45)
 CoinBtn.Position = UDim2.new(0, 10, 0, 120)
 CoinBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-CoinBtn.Text = "💰 Coins 9999 : OFF"
+CoinBtn.Text = "💰 Coins & Gems 9999 : OFF"
 CoinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 CoinBtn.TextScaled = true
 CoinBtn.Font = Enum.Font.Gotham
@@ -90,12 +90,12 @@ local CoinCorner = Instance.new("UICorner")
 CoinCorner.CornerRadius = UDim.new(0, 8)
 CoinCorner.Parent = CoinBtn
 
--- BALANCE AURA
+-- KERASA AURA
 local AuraBtn = Instance.new("TextButton")
 AuraBtn.Size = UDim2.new(1, -20, 0, 45)
 AuraBtn.Position = UDim2.new(0, 10, 0, 175)
 AuraBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-AuraBtn.Text = "⚔️ Balance Aura (Kerasa Dikit) : OFF"
+AuraBtn.Text = "⚔️ Aura Kerasa Banget : OFF"
 AuraBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 AuraBtn.TextScaled = true
 AuraBtn.Font = Enum.Font.Gotham
@@ -147,18 +147,17 @@ GodBtn.MouseButton1Click:Connect(function()
     GodBtn.BackgroundColor3 = GodEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
--- COINS SAFE
+-- COINS & GEMS FIX (MUNcul PAS WIN DUEL)
 spawn(function()
-    while task.wait(0.5) do
+    while task.wait(0.3) do
         if CoinEnabled then
             pcall(function()
                 local stats = player:FindFirstChild("leaderstats")
                 if stats then
-                    for _, v in pairs(stats:GetChildren()) do
-                        if v:IsA("IntValue") or v:IsA("NumberValue") then
-                            v.Value = 9999
-                        end
-                    end
+                    local coins = stats:FindFirstChild("Coins") or stats:FindFirstChild("Coin")
+                    local gems = stats:FindFirstChild("Gems") or stats:FindFirstChild("Gem")
+                    if coins then coins.Value = 9999 end
+                    if gems then gems.Value = 9999 end
                 end
             end)
         end
@@ -167,34 +166,27 @@ end)
 
 CoinBtn.MouseButton1Click:Connect(function()
     CoinEnabled = not CoinEnabled
-    CoinBtn.Text = "💰 Coins 9999 : " .. (CoinEnabled and "ON" or "OFF")
+    CoinBtn.Text = "💰 Coins & Gems 9999 : " .. (CoinEnabled and "ON" or "OFF")
     CoinBtn.BackgroundColor3 = CoinEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
--- FIX NIL: CARI REMOTE LEBIH AMAN + WAIT TOOL
-local function getSwingRemote()
-    if player.Character then
-        local tool = player.Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
-        if tool then
-            return tool:FindFirstChild("Swing") or tool:FindFirstChild("Attack") or tool:FindFirstChild("LightAttack") or tool:FindFirstChild("HeavyAttack") or tool:FindFirstChild("Hit") or tool:FindFirstChildWhichIsA("RemoteEvent") or tool:FindFirstChildWhichIsA("RemoteFunction")
-        end
-    end
-    return nil
-end
-
+-- KERASA AURA LEBIH (ALTERNATE LIGHT/HEAVY, DELAY CEPET)
 local lastHit = tick()
+local heavyToggle = false
 spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.15) do
         if AuraEnabled and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
             pcall(function()
                 local myPos = player.Character.HumanoidRootPart.Position
                 local remote = getSwingRemote()
-                if remote and tick() - lastHit > 0.4 then  -- DELAY LEBIH PANJANG BIAR KERASA + NO SPAM
+                if remote and tick() - lastHit > 0.25 then
                     for _, obj in pairs(Workspace:GetChildren()) do
                         if obj:FindFirstChild("Humanoid") and obj:FindFirstChild("HumanoidRootPart") and obj ~= player.Character and obj.Humanoid.Health > 0 then
                             local dist = (obj.HumanoidRootPart.Position - myPos).Magnitude
-                            if dist < 18 then  -- JARAK DIKECILIN DIKIT BIAR LEBIH REAL
-                                remote:FireServer(obj.HumanoidRootPart.Position, "Light")  -- ARG EXTRA SAFETY, KERASA LIGHT HIT
+                            if dist < 20 then
+                                local attackType = heavyToggle and "Heavy" or "Light"
+                                remote:FireServer(obj.HumanoidRootPart.Position, attackType)
+                                heavyToggle = not heavyToggle
                                 lastHit = tick()
                                 break
                             end
@@ -206,10 +198,21 @@ spawn(function()
     end
 end)
 
+-- GET REMOTE FIX (CARI LEBIH BANYAK)
+local function getSwingRemote()
+    if player.Character then
+        local tool = player.Character:FindFirstChildOfClass("Tool") or player.Backpack:FindFirstChildOfClass("Tool")
+        if tool then
+            return tool:FindFirstChild("Swing") or tool:FindFirstChild("Attack") or tool:FindFirstChild("LightAttack") or tool:FindFirstChild("HeavyAttack") or tool:FindFirstChild("Hit") or tool:FindFirstChildWhichIsA("RemoteEvent") or tool:FindFirstChildWhichIsA("RemoteFunction")
+        end
+    end
+    return nil
+end
+
 AuraBtn.MouseButton1Click:Connect(function()
     AuraEnabled = not AuraEnabled
-    AuraBtn.Text = "⚔️ Balance Aura (Kerasa Dikit) : " .. (AuraEnabled and "ON" or "OFF")
+    AuraBtn.Text = "⚔️ Aura Kerasa Banget : " .. (AuraEnabled and "ON" or "OFF")
     AuraBtn.BackgroundColor3 = AuraEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(40, 40, 45)
 end)
 
-print("MIKAA DEV TESTING V4 Loaded | Fix Nil Error + Kerasa Dikit | @Mikaa")
+print("MIKAA DEV TESTING V5 Loaded | Coin Fix + Damage Kerasa Cepet | @Mikaa")
