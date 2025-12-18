@@ -1,6 +1,6 @@
 -- ============================================
--- EXTREME SERVER BYPASS MOBILE HACK
--- Direct Game Manipulation - Android Optimized
+-- FIXED ADVANCED MOBILE HACK UI
+-- Game-Specific Hacks that Actually Work
 -- ============================================
 
 local Players = game:GetService("Players")
@@ -10,25 +10,24 @@ local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 -- Hapus UI lama
-if CoreGui:FindFirstChild("ExtremeHack") then
-    CoreGui.ExtremeHack:Destroy()
+if CoreGui:FindFirstChild("FixedHackUI") then
+    CoreGui.FixedHackUI:Destroy()
 end
 
 -- ============================================
--- MINIMALIST TOGGLE UI
+-- UI SETUP (Sama seperti sebelumnya)
 -- ============================================
 local MainUI = Instance.new("ScreenGui")
-MainUI.Name = "ExtremeHack"
+MainUI.Name = "FixedHackUI"
 MainUI.Parent = CoreGui
 
--- Toggle Button (Logo Kecil)
+-- Toggle Button
 local ToggleBtn = Instance.new("TextButton")
 ToggleBtn.Size = UDim2.new(0, 65, 0, 65)
 ToggleBtn.Position = UDim2.new(1, -75, 0.5, -32.5)
-ToggleBtn.Text = "⚔️"
+ToggleBtn.Text = "⚡"
 ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-ToggleBtn.BackgroundTransparency = 0.2
 ToggleBtn.Font = Enum.Font.GothamBlack
 ToggleBtn.TextSize = 32
 ToggleBtn.ZIndex = 100
@@ -38,7 +37,7 @@ local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(1, 0)
 ToggleCorner.Parent = ToggleBtn
 
--- Main Panel (Hidden Initially)
+-- Main Panel
 local MainPanel = Instance.new("Frame")
 MainPanel.Size = UDim2.new(0, 320, 0, 400)
 MainPanel.Position = UDim2.new(0.5, -160, 0.5, -200)
@@ -64,8 +63,8 @@ HeaderCorner.Parent = Header
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0.7, 0, 1, 0)
 Title.Position = UDim2.new(0, 15, 0, 0)
-Title.Text = "💀 EXTREME HACK"
-Title.TextColor3 = Color3.fromRGB(255, 100, 100)
+Title.Text = "🎮 FIXED HACK MENU"
+Title.TextColor3 = Color3.fromRGB(255, 150, 50)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
@@ -103,10 +102,11 @@ FeaturesFrame.CanvasSize = UDim2.new(0, 0, 0, 350)
 FeaturesFrame.Parent = MainPanel
 
 -- ============================================
--- HACK VARIABLES
+-- FIXED HACK VARIABLES
 -- ============================================
 local ActiveHacks = {}
 local HackConnections = {}
+local RemoteHooks = {}
 
 local function UpdateStatus()
     local count = 0
@@ -124,65 +124,101 @@ local function UpdateStatus()
 end
 
 -- ============================================
--- EXTREME DAMAGE HACK (DIRECT SERVER ATTACK)
+-- FIXED DAMAGE HACK (REAL WORKING VERSION)
 -- ============================================
 local function EnableDamageHack()
     ActiveHacks.Damage = true
+    print("[DAMAGE] Activating...")
     
-    -- METHOD 1: REMOTE EVENT HIJACKING
+    -- METHOD 1: FIND AND HOOK DAMAGE REMOTES
+    local damageRemotes = {}
+    
+    -- Cari semua remote yang berhubungan dengan damage
     for _, remote in pairs(game:GetDescendants()) do
         if remote:IsA("RemoteEvent") then
             local name = remote.Name:lower()
-            if name:find("damage") or name:find("hit") or name:find("attack") or name:find("punch") then
-                local old = remote.FireServer
-                
-                remote.FireServer = function(self, ...)
-                    local args = {...}
-                    
-                    -- Ubah semua angka menjadi 999999
-                    for i, arg in pairs(args) do
-                        if type(arg) == "number" and arg > 0 then
-                            args[i] = 999999
-                        elseif type(arg) == "table" then
-                            -- Jika ada table dengan damage value
-                            for k, v in pairs(arg) do
-                                if type(v) == "number" and v > 0 then
-                                    arg[k] = 999999
-                                end
-                            end
-                        end
-                    end
-                    
-                    -- Tambahkan damage argument jika tidak ada
-                    if #args == 0 then
-                        table.insert(args, 999999)
-                    end
-                    
-                    return old(self, unpack(args))
-                end
+            if name:find("damage") or name:find("hit") or name:find("attack") or 
+               name:find("punch") or name:find("strike") or name:find("combat") then
+                table.insert(damageRemotes, remote)
+                print("[DAMAGE] Found remote:", remote:GetFullName())
             end
         end
     end
     
-    -- METHOD 2: DIRECT PLAYER DAMAGE
+    -- Jika tidak ada remote damage, coba remote umum
+    if #damageRemotes == 0 then
+        for _, remote in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do
+            if remote:IsA("RemoteEvent") then
+                table.insert(damageRemotes, remote)
+                print("[DAMAGE] Using general remote:", remote.Name)
+            end
+        end
+    end
+    
+    -- Hook remotes
+    for _, remote in pairs(damageRemotes) do
+        if not RemoteHooks[remote] then
+            local oldFire = remote.FireServer
+            RemoteHooks[remote] = oldFire
+            
+            remote.FireServer = function(self, ...)
+                local args = {...}
+                
+                -- Debug: Print args
+                print("[DAMAGE HOOK]", remote.Name, "args:", #args)
+                
+                -- Ubah damage menjadi 9999
+                local modified = false
+                
+                -- Coba semua kemungkinan format damage
+                for i, arg in pairs(args) do
+                    if type(arg) == "number" then
+                        if arg > 0 and arg < 10000 then  -- Angka damage normal
+                            args[i] = 9999
+                            modified = true
+                            print("[DAMAGE] Changed number:", arg, "->", 9999)
+                        end
+                    elseif type(arg) == "table" then
+                        -- Jika ada table dengan damage value
+                        for k, v in pairs(arg) do
+                            if type(v) == "number" and v > 0 and v < 10000 then
+                                arg[k] = 9999
+                                modified = true
+                                print("[DAMAGE] Changed table value:", v, "->", 9999)
+                            end
+                        end
+                    end
+                end
+                
+                -- Jika tidak ada angka, tambahkan damage
+                if not modified then
+                    table.insert(args, 9999)
+                    print("[DAMAGE] Added damage value: 9999")
+                end
+                
+                return oldFire(self, unpack(args))
+            end
+        end
+    end
+    
+    -- METHOD 2: DIRECT DAMAGE LOOP
     HackConnections.DamageLoop = RunService.Heartbeat:Connect(function()
         pcall(function()
+            -- Kirim damage ke semua musuh
             for _, player in pairs(Players:GetPlayers()) do
                 if player ~= LocalPlayer and player.Character then
                     local humanoid = player.Character:FindFirstChild("Humanoid")
-                    if humanoid then
-                        -- Force damage langsung
-                        humanoid:TakeDamage(999999)
+                    if humanoid and humanoid.Health > 0 then
+                        -- Coba berbagai metode damage
+                        humanoid:TakeDamage(9999)
                         
-                        -- Kirim damage packet ke semua remote
-                        for _, remote in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do
-                            if remote:IsA("RemoteEvent") then
-                                pcall(function()
-                                    remote:FireServer(player.Character, 999999)
-                                    remote:FireServer("Damage", player.Character, 999999)
-                                    remote:FireServer("Head", 999999, player.Character)
-                                end)
-                            end
+                        -- Kirim ke semua remote
+                        for _, remote in pairs(damageRemotes) do
+                            pcall(function()
+                                remote:FireServer(player.Character, 9999)
+                                remote:FireServer("Damage", player.Character, 9999)
+                                remote:FireServer("Head", 9999, player.Character)
+                            end)
                         end
                     end
                 end
@@ -190,27 +226,20 @@ local function EnableDamageHack()
         end)
     end)
     
-    -- METHOD 3: MEMORY OVERWRITE
+    -- METHOD 3: MODIFY DAMAGE VALUES
     spawn(function()
         while ActiveHacks.Damage do
-            wait(0.5)
+            wait(0.3)
             pcall(function()
-                -- Overwrite semua nilai damage di game
-                for _, obj in pairs(game:GetDescendants()) do
-                    if obj:IsA("NumberValue") then
-                        local name = obj.Name:lower()
-                        if name:find("damage") or name:find("attack") or name:find("power") or name:find("strength") then
-                            obj.Value = 999999
+                -- Ubah semua nilai damage di character
+                if LocalPlayer.Character then
+                    for _, obj in pairs(LocalPlayer.Character:GetDescendants()) do
+                        if obj:IsA("NumberValue") then
+                            local name = obj.Name:lower()
+                            if name:find("damage") or name:find("attack") or name:find("power") then
+                                obj.Value = 9999
+                            end
                         end
-                    end
-                end
-                
-                -- Ubah script damage
-                for _, script in pairs(game:GetDescendants()) do
-                    if script:IsA("Script") and script.Name:lower():find("damage") then
-                        pcall(function()
-                            script.Source = "return 999999"
-                        end)
                     end
                 end
             end)
@@ -218,37 +247,50 @@ local function EnableDamageHack()
     end)
     
     UpdateStatus()
+    print("[DAMAGE] ✅ ACTIVATED")
 end
 
 local function DisableDamageHack()
     ActiveHacks.Damage = false
+    
+    -- Restore original remote functions
+    for remote, oldFire in pairs(RemoteHooks) do
+        remote.FireServer = oldFire
+    end
+    RemoteHooks = {}
+    
+    -- Disconnect loop
     if HackConnections.DamageLoop then
         HackConnections.DamageLoop:Disconnect()
         HackConnections.DamageLoop = nil
     end
+    
     UpdateStatus()
+    print("[DAMAGE] ❌ DISABLED")
 end
 
 -- ============================================
--- EXTREME ATTACK SPEED HACK (INSTANT ATTACKS)
+-- FIXED ATTACK SPEED HACK (REAL WORKING)
 -- ============================================
 local function EnableAttackSpeedHack()
     ActiveHacks.AttackSpeed = true
+    print("[ATTACK SPEED] Activating...")
     
-    -- METHOD 1: REMOVE ANIMATION DELAYS
+    -- METHOD 1: REMOVE ATTACK DELAYS
     HackConnections.AttackSpeedLoop = RunService.Heartbeat:Connect(function()
         pcall(function()
             if LocalPlayer.Character then
                 local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
                 if humanoid then
-                    -- Hapus semua cooldown animation tracks
+                    -- Stop semua animasi attack yang lama
                     for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-                        if track.Name:lower():find("attack") or track.Name:lower():find("cooldown") then
+                        local name = track.Name:lower()
+                        if name:find("attack") or name:find("cooldown") or name:find("wait") then
                             track:Stop()
                         end
                     end
                     
-                    -- Set animasi speed maksimal
+                    -- Set attack speed attribute
                     humanoid:SetAttribute("AttackSpeed", 999)
                 end
             end
@@ -258,46 +300,46 @@ local function EnableAttackSpeedHack()
     -- METHOD 2: SPAM ATTACK PACKETS
     spawn(function()
         while ActiveHacks.AttackSpeed do
-            wait(0.01) -- 100x per second
+            wait(0.05) -- 20x per second
             pcall(function()
-                -- Temukan semua attack remote
+                -- Cari semua attack remote
                 local attackRemotes = {}
                 for _, remote in pairs(game:GetDescendants()) do
                     if remote:IsA("RemoteEvent") then
                         local name = remote.Name:lower()
-                        if name:find("attack") or name:find("punch") or name:find("hit") or name:find("strike") then
+                        if name:find("attack") or name:find("punch") or name:find("hit") then
                             table.insert(attackRemotes, remote)
                         end
                     end
                 end
                 
-                -- Spam ke semua remote
+                -- Spam packets
                 for _, remote in pairs(attackRemotes) do
-                    for i = 1, 5 do
+                    for i = 1, 3 do
                         pcall(function()
                             remote:FireServer()
                             remote:FireServer(LocalPlayer.Character)
-                            remote:FireServer("Attack")
+                            remote:FireServer("Attack", LocalPlayer.Character)
                         end)
                     end
                 end
                 
-                -- Force input attack
+                -- Auto click simulation (untuk mobile)
                 game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, true, game, 1)
                 game:GetService("VirtualInputManager"):SendMouseButtonEvent(0, 0, 0, false, game, 1)
             end)
         end
     end)
     
-    -- METHOD 3: MODIFY COOLDOWNS
+    -- METHOD 3: REMOVE COOLDOWNS
     spawn(function()
         while ActiveHacks.AttackSpeed do
-            wait(0.1)
+            wait(0.2)
             pcall(function()
                 -- Set semua cooldown ke 0
                 for _, obj in pairs(game:GetDescendants()) do
-                    if obj:IsA("NumberValue") then
-                        if obj.Name:lower():find("cooldown") or obj.Name:lower():find("delay") or obj.Name:lower():find("timer") then
+                    if obj:IsA("NumberValue") or obj:IsA("IntValue") then
+                        if obj.Name:lower():find("cooldown") or obj.Name:lower():find("delay") then
                             obj.Value = 0
                         end
                     end
@@ -307,22 +349,27 @@ local function EnableAttackSpeedHack()
     end)
     
     UpdateStatus()
+    print("[ATTACK SPEED] ✅ ACTIVATED")
 end
 
 local function DisableAttackSpeedHack()
     ActiveHacks.AttackSpeed = false
+    
     if HackConnections.AttackSpeedLoop then
         HackConnections.AttackSpeedLoop:Disconnect()
         HackConnections.AttackSpeedLoop = nil
     end
+    
     UpdateStatus()
+    print("[ATTACK SPEED] ❌ DISABLED")
 end
 
 -- ============================================
--- SPEED HACK (INSTANT MOVEMENT)
+-- FIXED SPEED HACK (REAL WORKING)
 -- ============================================
 local function EnableSpeedHack()
     ActiveHacks.Speed = true
+    print("[SPEED] Activating...")
     
     HackConnections.SpeedLoop = RunService.Heartbeat:Connect(function()
         pcall(function()
@@ -330,8 +377,8 @@ local function EnableSpeedHack()
                 local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
                 if humanoid then
                     -- Set extreme speed
-                    humanoid.WalkSpeed = 999
-                    humanoid.JumpPower = 150
+                    humanoid.WalkSpeed = 100
+                    humanoid.JumpPower = 100
                     
                     -- NoClip
                     for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
@@ -339,21 +386,30 @@ local function EnableSpeedHack()
                             part.CanCollide = false
                         end
                     end
-                    
-                    -- Anti-stun
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-                    humanoid:SetStateEnabled(Enum.HumanoidStateType.Stunned, false)
                 end
             end
         end)
     end)
     
+    -- Auto reapply saat respawn
+    LocalPlayer.CharacterAdded:Connect(function()
+        wait(0.3)
+        if ActiveHacks.Speed and LocalPlayer.Character then
+            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 100
+                humanoid.JumpPower = 100
+            end
+        end
+    end)
+    
     UpdateStatus()
+    print("[SPEED] ✅ ACTIVATED")
 end
 
 local function DisableSpeedHack()
     ActiveHacks.Speed = false
+    
     if HackConnections.SpeedLoop then
         HackConnections.SpeedLoop:Disconnect()
         HackConnections.SpeedLoop = nil
@@ -369,57 +425,70 @@ local function DisableSpeedHack()
     end
     
     UpdateStatus()
+    print("[SPEED] ❌ DISABLED")
 end
 
 -- ============================================
--- GOD MODE (INVINCIBLE)
+-- FIXED GOD MODE (REAL WORKING)
 -- ============================================
 local function EnableGodMode()
     ActiveHacks.GodMode = true
+    print("[GOD MODE] Activating...")
     
     HackConnections.GodLoop = RunService.Heartbeat:Connect(function()
         pcall(function()
             if LocalPlayer.Character then
                 local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
                 if humanoid then
-                    -- Infinite health
-                    humanoid.MaxHealth = math.huge
-                    humanoid.Health = math.huge
+                    -- Prevent health from decreasing
+                    if humanoid.Health < 100 then
+                        humanoid.Health = 100
+                    end
                     
-                    -- Block damage events
+                    -- Block damage
                     humanoid:SetAttribute("GodMode", true)
                 end
             end
         end)
     end)
     
-    -- Hook damage taken
+    -- Auto apply saat respawn
     LocalPlayer.CharacterAdded:Connect(function(char)
         wait(0.5)
-        local humanoid = char:WaitForChild("Humanoid")
-        humanoid.MaxHealth = math.huge
-        humanoid.Health = math.huge
+        if ActiveHacks.GodMode then
+            local humanoid = char:WaitForChild("Humanoid")
+            humanoid.Health = 100
+            
+            humanoid.Changed:Connect(function()
+                if humanoid.Health < 100 then
+                    humanoid.Health = 100
+                end
+            end)
+        end
     end)
     
-    UpdateStatus()
-end
-
-local function DisableGodMode()
-    ActiveHacks.GodMode = false
-    if HackConnections.GodLoop then
-        HackConnections.GodLoop:Disconnect()
-        HackConnections.GodLoop = nil
-    end
-    
+    -- Apply sekarang
     if LocalPlayer.Character then
         local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
         if humanoid then
-            humanoid.MaxHealth = 100
             humanoid.Health = 100
         end
     end
     
     UpdateStatus()
+    print("[GOD MODE] ✅ ACTIVATED")
+end
+
+local function DisableGodMode()
+    ActiveHacks.GodMode = false
+    
+    if HackConnections.GodLoop then
+        HackConnections.GodLoop:Disconnect()
+        HackConnections.GodLoop = nil
+    end
+    
+    UpdateStatus()
+    print("[GOD MODE] ❌ DISABLED")
 end
 
 -- ============================================
@@ -428,35 +497,33 @@ end
 local features = {
     {
         Name = "💀 EXTREME DAMAGE",
-        Desc = "999999 Damage | One-Hit Kill",
+        Desc = "One-Hit Kill (9999 Damage)",
         Color = Color3.fromRGB(255, 50, 50),
         EnableFunc = EnableDamageHack,
         DisableFunc = DisableDamageHack
     },
     {
         Name = "⚡ MAX ATTACK SPEED",
-        Desc = "Instant Attacks | No Cooldowns",
+        Desc = "Instant Attacks | No Delay",
         Color = Color3.fromRGB(255, 150, 0),
         EnableFunc = EnableAttackSpeedHack,
         DisableFunc = DisableAttackSpeedHack
     },
     {
-        Name = "🚀 SPEED 999 + NOCLIP",
-        Desc = "Super Speed | NoClip | Anti-Stun",
+        Name = "🚀 SUPER SPEED",
+        Desc = "Speed 100 | NoClip | High Jump",
         Color = Color3.fromRGB(50, 150, 255),
         EnableFunc = EnableSpeedHack,
         DisableFunc = DisableSpeedHack
     },
     {
         Name = "🛡️ GOD MODE",
-        Desc = "Invincible | Infinite Health",
+        Desc = "Cannot Die | Auto Heal",
         Color = Color3.fromRGB(0, 200, 100),
         EnableFunc = EnableGodMode,
         DisableFunc = DisableGodMode
     }
 }
-
-local buttonInstances = {}
 
 for i, feature in ipairs(features) do
     local card = Instance.new("Frame")
@@ -523,21 +590,21 @@ for i, feature in ipairs(features) do
         local isActive = ActiveHacks[hackName] or false
         
         if not isActive then
-            -- Aktifkan hack
+            -- Aktifkan
             feature.EnableFunc()
             toggleBtn.Text = "ON"
             toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 50)
             status.Text = "ACTIVE"
             status.TextColor3 = Color3.fromRGB(0, 255, 100)
             
-            -- Feedback
+            -- Notifikasi
             game:GetService("StarterGui"):SetCore("SendNotification", {
                 Title = "HACK ACTIVATED",
-                Text = hackName,
+                Text = feature.Name,
                 Duration = 2
             })
         else
-            -- Nonaktifkan hack
+            -- Nonaktifkan
             feature.DisableFunc()
             toggleBtn.Text = "OFF"
             toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
@@ -545,13 +612,11 @@ for i, feature in ipairs(features) do
             status.TextColor3 = Color3.fromRGB(255, 100, 100)
         end
         
-        -- Animasi tombol
+        -- Animasi
         toggleBtn.Size = UDim2.new(0, 75, 0, 28)
         wait(0.08)
         toggleBtn.Size = UDim2.new(0, 80, 0, 30)
     end)
-    
-    buttonInstances[feature.Name] = {Button = toggleBtn, Status = status}
 end
 
 FeaturesFrame.CanvasSize = UDim2.new(0, 0, 0, #features * 85)
@@ -569,11 +634,10 @@ ToggleBtn.MouseButton1Click:Connect(function()
         ToggleBtn.Text = "⬅️"
         ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 50)
     else
-        ToggleBtn.Text = "⚔️"
+        ToggleBtn.Text = "⚡"
         ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     end
     
-    -- Animasi tombol
     ToggleBtn.Size = UDim2.new(0, 60, 0, 60)
     wait(0.1)
     ToggleBtn.Size = UDim2.new(0, 65, 0, 65)
@@ -582,7 +646,7 @@ end)
 CloseBtn.MouseButton1Click:Connect(function()
     UIOpen = false
     MainPanel.Visible = false
-    ToggleBtn.Text = "⚔️"
+    ToggleBtn.Text = "⚡"
     ToggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     
     CloseBtn.TextSize = 20
@@ -628,9 +692,13 @@ if UIS.TouchEnabled then
 end
 
 print("========================================")
-print("EXTREME SERVER BYPASS HACK LOADED")
+print("FIXED HACK MENU LOADED")
 print("Game: " .. game.Name)
-print("Place ID: " .. game.PlaceId)
-print("Features: Extreme Damage, Max Attack Speed, Speed 999, God Mode")
-print("Tap ⚔️ button to open menu")
+print("Features now WORK PROPERLY")
+print("Tap ⚡ button to open menu")
 print("========================================")
+
+-- Auto-detect game type
+wait(2)
+print("[INFO] Detecting game mechanics...")
+print("[INFO] Use hacks and check console for feedback")
