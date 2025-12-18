@@ -1,203 +1,294 @@
 -- ============================================
--- SERVER-SIDE DAMAGE BYPASS
--- Untuk game dengan damage calculation di server
+-- MOBILE DAMAGE HACK + SPEED 999 (ANDROID)
+-- Delta Executor Compatible
 -- ============================================
 
+-- UI Setup untuk Android (touch-friendly)
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
 
--- METHOD 1: PACKET MANIPULATION (MITM Technique)
-local function manipulateOutgoingPackets()
-    local mt = getrawmetatable(game)
-    local oldNamecall = mt.__namecall
-    local oldIndex = mt.__index
-    
-    setreadonly(mt, false)
-    
-    -- Hook semua outgoing network packets
-    mt.__namecall = newcclosure(function(self, ...)
-        local method = getnamecallmethod()
-        local args = {...}
-        
-        -- Tangkap packet damage
-        if method == "FireServer" then
-            local remoteName = tostring(self)
-            
-            -- Manipulasi damage packets
-            if remoteName:lower():find("damage") or 
-               remoteName:lower():find("hit") or 
-               remoteName:lower():find("attack") or
-               remoteName:lower():find("punch") then
-                
-                print("[PACKET INTERCEPTED]", remoteName)
-                
-                -- Ganti semua angka dalam packet
-                for i, arg in pairs(args) do
-                    if type(arg) == "number" and arg > 0 and arg < 1000 then
-                        args[i] = 99999  -- Set ke nilai sangat tinggi
-                        print("[DAMAGE MODIFIED]", arg, "->", args[i])
-                    end
-                end
-            end
-        end
-        
-        return oldNamecall(self, unpack(args))
-    end)
-    
-    setreadonly(mt, true)
-    print("[PACKET HOOK] Server-side bypass activated")
+-- Hapus UI lama jika ada
+if CoreGui:FindFirstChild("MobileHackUI") then
+    CoreGui.MobileHackUI:Destroy()
 end
 
--- METHOD 2: MEMORY EDITING (Direct value change)
-local function directMemoryEdit()
-    spawn(function()
-        while wait(0.1) do
-            pcall(function()
-                -- Cari dan modifikasi semua nilai damage di memory
-                for _, obj in pairs(workspace:GetDescendants()) do
-                    if obj:IsA("BasePart") then
-                        -- Jika objek memiliki tag damage
-                        if obj:GetAttribute("Damage") or obj.Name:lower():find("damage") then
-                            obj:SetAttribute("Damage", 99999)
-                        end
-                    end
-                end
-                
-                -- Modifikasi damage di player instance
-                if LocalPlayer.Character then
-                    for _, child in pairs(LocalPlayer.Character:GetDescendants()) do
-                        if child:IsA("NumberValue") then
-                            local name = child.Name:lower()
-                            if name:find("damage") or name:find("attack") or name:find("power") then
-                                child.Value = 99999
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end)
+-- Buat UI Mobile
+local MobileUI = Instance.new("ScreenGui")
+MobileUI.Name = "MobileHackUI"
+MobileUI.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 320, 0, 380) -- Lebih besar untuk mobile
+MainFrame.Position = UDim2.new(0, 10, 0, 10)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+MainFrame.BackgroundTransparency = 0.2
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = MobileUI
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "📱 MOBILE HACK v2.0"
+Title.TextColor3 = Color3.fromRGB(255, 100, 100)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.Parent = MainFrame
+
+-- Status
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, 0, 0, 30)
+StatusLabel.Position = UDim2.new(0, 0, 0, 45)
+StatusLabel.Text = "🔴 OFFLINE"
+StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Font = Enum.Font.GothamBold
+StatusLabel.TextSize = 18
+StatusLabel.Parent = MainFrame
+
+-- Damage Section
+local DamageFrame = Instance.new("Frame")
+DamageFrame.Size = UDim2.new(0.9, 0, 0, 80)
+DamageFrame.Position = UDim2.new(0.05, 0, 0, 85)
+DamageFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+DamageFrame.BorderSizePixel = 0
+DamageFrame.Parent = MainFrame
+
+local DamageCorner = Instance.new("UICorner")
+DamageCorner.CornerRadius = UDim.new(0, 8)
+DamageCorner.Parent = DamageFrame
+
+local DamageTitle = Instance.new("TextLabel")
+DamageTitle.Size = UDim2.new(1, 0, 0, 25)
+DamageTitle.Position = UDim2.new(0, 0, 0, 0)
+DamageTitle.Text = "💥 DAMAGE CONTROL"
+DamageTitle.TextColor3 = Color3.fromRGB(255, 150, 50)
+DamageTitle.BackgroundTransparency = 1
+DamageTitle.Font = Enum.Font.GothamBold
+DamageTitle.TextSize = 16
+DamageTitle.Parent = DamageFrame
+
+local MultiplierLabel = Instance.new("TextLabel")
+MultiplierLabel.Size = UDim2.new(1, 0, 0, 30)
+MultiplierLabel.Position = UDim2.new(0, 0, 0, 25)
+MultiplierLabel.Text = "MULTIPLIER: 100x"
+MultiplierLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+MultiplierLabel.BackgroundTransparency = 1
+MultiplierLabel.Font = Enum.Font.GothamBold
+MultiplierLabel.TextSize = 22
+MultiplierLabel.Parent = DamageFrame
+
+local DamageButton = Instance.new("TextButton")
+DamageButton.Size = UDim2.new(0.9, 0, 0, 25)
+DamageButton.Position = UDim2.new(0.05, 0, 0, 55)
+DamageButton.Text = "🔥 ACTIVATE DAMAGE 999x"
+DamageButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+DamageButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+DamageButton.Font = Enum.Font.GothamBold
+DamageButton.TextSize = 14
+DamageButton.Parent = DamageFrame
+
+-- Speed Section
+local SpeedFrame = Instance.new("Frame")
+SpeedFrame.Size = UDim2.new(0.9, 0, 0, 80)
+SpeedFrame.Position = UDim2.new(0.05, 0, 0, 175)
+SpeedFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+SpeedFrame.BorderSizePixel = 0
+SpeedFrame.Parent = MainFrame
+
+local SpeedCorner = Instance.new("UICorner")
+SpeedCorner.CornerRadius = UDim.new(0, 8)
+SpeedCorner.Parent = SpeedFrame
+
+local SpeedTitle = Instance.new("TextLabel")
+SpeedTitle.Size = UDim2.new(1, 0, 0, 25)
+SpeedTitle.Position = UDim2.new(0, 0, 0, 0)
+SpeedTitle.Text = "⚡ SPEED CONTROL"
+SpeedTitle.TextColor3 = Color3.fromRGB(100, 200, 255)
+SpeedTitle.BackgroundTransparency = 1
+SpeedTitle.Font = Enum.Font.GothamBold
+SpeedTitle.TextSize = 16
+SpeedTitle.Parent = SpeedFrame
+
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(1, 0, 0, 30)
+SpeedLabel.Position = UDim2.new(0, 0, 0, 25)
+SpeedLabel.Text = "SPEED: 16 (Normal)"
+SpeedLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+SpeedLabel.BackgroundTransparency = 1
+SpeedLabel.Font = Enum.Font.GothamBold
+SpeedLabel.TextSize = 22
+SpeedLabel.Parent = SpeedFrame
+
+local SpeedButton = Instance.new("TextButton")
+SpeedButton.Size = UDim2.new(0.9, 0, 0, 25)
+SpeedButton.Position = UDim2.new(0.05, 0, 0, 55)
+SpeedButton.Text = "🚀 ACTIVATE SPEED 999"
+SpeedButton.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+SpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedButton.Font = Enum.Font.GothamBold
+SpeedButton.TextSize = 14
+SpeedButton.Parent = SpeedFrame
+
+-- Log Console
+local LogFrame = Instance.new("ScrollingFrame")
+LogFrame.Size = UDim2.new(0.9, 0, 0, 100)
+LogFrame.Position = UDim2.new(0.05, 0, 0, 265)
+LogFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+LogFrame.BorderSizePixel = 0
+LogFrame.ScrollBarThickness = 4
+LogFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+LogFrame.Parent = MainFrame
+
+local LogCorner = Instance.new("UICorner")
+LogCorner.CornerRadius = UDim.new(0, 8)
+LogCorner.Parent = LogFrame
+
+local LogTitle = Instance.new("TextLabel")
+LogTitle.Size = UDim2.new(1, 0, 0, 20)
+LogTitle.Position = UDim2.new(0, 0, 0, 0)
+LogTitle.Text = "📝 SYSTEM LOG"
+LogTitle.TextColor3 = Color3.fromRGB(150, 150, 200)
+LogTitle.BackgroundTransparency = 1
+LogTitle.Font = Enum.Font.GothamBold
+LogTitle.TextSize = 14
+LogTitle.Parent = LogFrame
+
+-- ============================================
+-- DAMAGE HACK ENGINE (MOBILE OPTIMIZED)
+-- ============================================
+
+local DamageMultiplier = 100
+local SpeedValue = 16
+local IsDamageActive = false
+local IsSpeedActive = false
+local LogMessages = {}
+
+-- Fungsi Log untuk Mobile
+local function AddLog(message)
+    local timestamp = os.date("%H:%M:%S")
+    local logText = "[" .. timestamp .. "] " .. message
+    
+    table.insert(LogMessages, logText)
+    if #LogMessages > 8 then
+        table.remove(LogMessages, 1)
+    end
+    
+    -- Update log display
+    LogFrame:ClearAllChildren()
+    LogTitle.Parent = LogFrame
+    
+    for i, msg in ipairs(LogMessages) do
+        local logEntry = Instance.new("TextLabel")
+        logEntry.Size = UDim2.new(1, -10, 0, 20)
+        logEntry.Position = UDim2.new(0, 5, 0, 25 + (i-1)*22)
+        logEntry.Text = msg
+        logEntry.TextColor3 = Color3.fromRGB(200, 200, 200)
+        logEntry.BackgroundTransparency = 1
+        logEntry.Font = Enum.Font.Gotham
+        logEntry.TextSize = 12
+        logEntry.TextXAlignment = Enum.TextXAlignment.Left
+        logEntry.TextWrapped = false
+        logEntry.Parent = LogFrame
+    end
+    
+    print("[MOBILE HACK]", message)
 end
 
--- METHOD 3: FAKE HIGH DAMAGE (Visual & UI Manipulation)
-local function fakeDamageDisplay()
-    -- Hook damage display system
-    local gui = game:GetService("CoreGui") or game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+-- Update UI Status
+local function UpdateUI()
+    if IsDamageActive then
+        StatusLabel.Text = "🟢 DAMAGE ACTIVE"
+        StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        DamageButton.Text = "✅ DAMAGE 999x ACTIVE"
+        DamageButton.BackgroundColor3 = Color3.fromRGB(0, 200, 50)
+    else
+        DamageButton.Text = "🔥 ACTIVATE DAMAGE 999x"
+        DamageButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    end
     
-    for _, screenGui in pairs(gui:GetDescendants()) do
-        if screenGui:IsA("TextLabel") or screenGui:IsA("TextButton") then
-            if screenGui.Text:match("%d+") then  -- Jika ada angka
-                local number = tonumber(screenGui.Text)
-                if number and number > 0 and number < 1000 then
-                    -- Ganti display damage
-                    screenGui:GetPropertyChangedSignal("Text"):Connect(function()
-                        if screenGui.Text:match("%d+") then
-                            local current = tonumber(screenGui.Text)
-                            if current and current < 1000 then
-                                screenGui.Text = tostring(current * 1000)
-                            end
+    if IsSpeedActive then
+        SpeedButton.Text = "✅ SPEED 999 ACTIVE"
+        SpeedButton.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+    else
+        SpeedButton.Text = "🚀 ACTIVATE SPEED 999"
+        SpeedButton.BackgroundColor3 = Color3.fromRGB(50, 150, 255)
+    end
+    
+    MultiplierLabel.Text = "DAMAGE: " .. DamageMultiplier .. "x"
+    SpeedLabel.Text = "SPEED: " .. SpeedValue
+end
+
+-- ============================================
+-- DAMAGE HACK SYSTEM
+-- ============================================
+
+local function ActivateDamageHack()
+    if IsDamageActive then return end
+    
+    AddLog("Activating Damage Hack...")
+    DamageMultiplier = 999
+    IsDamageActive = true
+    
+    -- METHOD 1: Hook semua RemoteEvent
+    for _, remote in pairs(game:GetDescendants()) do
+        if remote:IsA("RemoteEvent") then
+            local name = remote.Name:lower()
+            if name:find("damage") or name:find("hit") or name:find("attack") or name:find("punch") then
+                local oldFire = remote.FireServer
+                
+                remote.FireServer = function(self, ...)
+                    local args = {...}
+                    
+                    -- Modifikasi semua angka
+                    for i, arg in pairs(args) do
+                        if type(arg) == "number" and arg > 0 then
+                            args[i] = arg * DamageMultiplier
+                            AddLog("Damage boosted: " .. arg .. " → " .. args[i])
                         end
-                    })
+                    end
+                    
+                    -- Jika tidak ada angka, tambahkan
+                    local hasNumber = false
+                    for _, arg in pairs(args) do
+                        if type(arg) == "number" then hasNumber = true end
+                    end
+                    
+                    if not hasNumber then
+                        table.insert(args, 100 * DamageMultiplier)
+                    end
+                    
+                    return oldFire(self, unpack(args))
                 end
+                
+                AddLog("Hooked: " .. remote.Name)
             end
         end
     end
-end
-
--- METHOD 4: FORCE HIGH DAMAGE PACKET
-local function forceHighDamage()
+    
+    -- METHOD 2: Brute Force Spam
     spawn(function()
-        while wait(0.5) do
+        while IsDamageActive do
+            wait(0.1)
             pcall(function()
-                -- Kirim packet damage tinggi secara paksa
-                local remotes = game:GetService("ReplicatedStorage"):GetChildren()
-                for _, remote in pairs(remotes) do
-                    if remote:IsA("RemoteEvent") then
-                        if remote.Name:lower():find("damage") or remote.Name:lower():find("hit") then
-                            -- Kirim damage 99999 ke semua musuh
-                            for _, player in pairs(Players:GetPlayers()) do
-                                if player ~= LocalPlayer and player.Character then
-                                    remote:FireServer(player.Character, 99999)
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end)
-end
-
--- METHOD 5: HACK DAMAGE STATS DI SERVER (Jika menggunakan ModuleScript)
-local function hackDamageModule()
-    for _, module in pairs(game:GetDescendants()) do
-        if module:IsA("ModuleScript") then
-            if module.Name:lower():find("damage") or module.Name:lower():find("combat") then
-                pcall(function()
-                    local source = module.Source
-                    -- Ganti semua nilai damage dalam module
-                    source = string.gsub(source, "damage%s*=%s*%d+", "damage = 999999")
-                    source = string.gsub(source, "Damage%s*=%s*%d+", "Damage = 999999")
-                    source = string.gsub(source, "(%d+)%s*[*+/%-]%s*%a+", "999999")
-                    module.Source = source
-                    print("[MODULE HACKED]", module.Name)
-                end)
-            end
-        end
-    end
-end
-
--- METHOD 6: ONE-HIT-KILL OBFUSCATED
-local function oneHitKill()
-    local connection
-    connection = RunService.Heartbeat:Connect(function()
-        pcall(function()
-            -- Deteksi saat player menyerang
-            if LocalPlayer.Character then
-                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    -- Cek jika sedang attack animation
-                    for _, track in pairs(humanoid:GetPlayingAnimationTracks()) do
-                        if track.Name:lower():find("attack") or track.Name:lower():find("punch") then
-                            -- Kirim kill packet
-                            local args = {
-                                [1] = "Head",  -- Target body part
-                                [2] = 999999,  -- Damage
-                                [3] = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-                            }
+                -- Spam damage ke semua musuh
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character then
+                        local hum = player.Character:FindFirstChild("Humanoid")
+                        if hum then
+                            -- Coba semua metode damage
+                            hum:TakeDamage(9999)
                             
-                            -- Coba semua remote event
+                            -- Spam remote events
                             for _, remote in pairs(game:GetService("ReplicatedStorage"):GetChildren()) do
                                 if remote:IsA("RemoteEvent") then
-                                    pcall(function()
-                                        remote:FireServer(unpack(args))
-                                    end)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-    end)
-end
-
--- METHOD 7: CRASH OPPONENT INSTEAD (Alternative)
-local function crashOpponents()
-    spawn(function()
-        while wait(1) do
-            pcall(function()
-                for _, player in pairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer then
-                        -- Kirim data corrupt ke character opponent
-                        if player.Character then
-                            local root = player.Character:FindFirstChild("HumanoidRootPart")
-                            if root then
-                                -- Spam position packets untuk crash/lag
-                                for i = 1, 100 do
-                                    root.CFrame = CFrame.new(0, -1000, 0)
-                                    task.wait()
+                                    remote:FireServer(player.Character, 9999)
                                 end
                             end
                         end
@@ -206,36 +297,170 @@ local function crashOpponents()
             end)
         end
     end)
+    
+    UpdateUI()
+    AddLog("✅ Damage 999x ACTIVATED!")
 end
 
--- EXECUTE SEMUA METHOD
-manipulateOutgoingPackets()
-directMemoryEdit()
-fakeDamageDisplay()
-forceHighDamage()
-hackDamageModule()
-oneHitKill()
--- crashOpponents()  -- Uncomment jika perlu
+-- ============================================
+-- SPEED 999 HACK SYSTEM
+-- ============================================
 
--- UI FEEDBACK
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "SERVER-SIDE BYPASS",
-    Text = "Damage set to 99999 | All methods active",
-    Duration = 5
-})
-
-print("======================================")
-print("SERVER-SIDE DAMAGE BYPASS ACTIVATED")
-print("Jika masih tidak bekerja, game menggunakan:")
-print("1. Advanced anti-cheat")
-print("2. Encrypted packets")
-print("3. Validation server-side yang ketat")
-print("======================================")
-
--- ALTERNATIVE: TRY FIND EXACT DAMAGE REMOTE
-print("\n[DEBUG] Mencari remote event damage...")
-for _, remote in pairs(game:GetService("ReplicatedStorage"):GetDescendants()) do
-    if remote:IsA("RemoteEvent") then
-        print("Found RemoteEvent:", remote:GetFullName())
+local function ActivateSpeedHack()
+    if IsSpeedActive then return end
+    
+    AddLog("Activating Speed 999...")
+    SpeedValue = 999
+    IsSpeedActive = true
+    
+    -- METHOD 1: Modify Humanoid Walkspeed
+    local function boostSpeed()
+        if LocalPlayer.Character then
+            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = SpeedValue
+                AddLog("Walkspeed set to " .. SpeedValue)
+            end
+        end
     end
+    
+    -- Apply speed saat spawn
+    LocalPlayer.CharacterAdded:Connect(function()
+        wait(0.5)
+        boostSpeed()
+    end)
+    
+    -- Apply sekarang
+    boostSpeed()
+    
+    -- METHOD 2: Constant Speed Maintenance
+    spawn(function()
+        while IsSpeedActive do
+            wait(0.1)
+            pcall(function()
+                if LocalPlayer.Character then
+                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid and humanoid.WalkSpeed < SpeedValue then
+                        humanoid.WalkSpeed = SpeedValue
+                    end
+                    
+                    -- Boost jump power juga
+                    if humanoid then
+                        humanoid.JumpPower = 100
+                    end
+                end
+            end)
+        end
+    end)
+    
+    -- METHOD 3: NoClip + Fly
+    spawn(function()
+        while IsSpeedActive do
+            wait()
+            pcall(function()
+                if LocalPlayer.Character then
+                    local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        -- NoClip
+                        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.CanCollide = false
+                            end
+                        end
+                        
+                        -- Fly controls (untuk mobile)
+                        local velocity = root.Velocity
+                        root.Velocity = Vector3.new(velocity.X, 0, velocity.Z)
+                    end
+                end
+            end)
+        end
+    end)
+    
+    UpdateUI()
+    AddLog("✅ Speed 999 ACTIVATED!")
 end
+
+-- ============================================
+-- BUTTON CONTROLS
+-- ============================================
+
+DamageButton.MouseButton1Click:Connect(function()
+    if not IsDamageActive then
+        ActivateDamageHack()
+    else
+        DamageMultiplier = 100
+        IsDamageActive = false
+        AddLog("Damage hack disabled")
+        UpdateUI()
+    end
+end)
+
+SpeedButton.MouseButton1Click:Connect(function()
+    if not IsSpeedActive then
+        ActivateSpeedHack()
+    else
+        SpeedValue = 16
+        IsSpeedActive = false
+        
+        -- Reset speed
+        if LocalPlayer.Character then
+            local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = 16
+            end
+        end
+        
+        AddLog("Speed hack disabled")
+        UpdateUI()
+    end
+end)
+
+-- ============================================
+-- AUTO-START FEATURES
+-- ============================================
+
+-- Auto-detect game start
+AddLog("System loaded on Android")
+AddLog("Game: " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name)
+AddLog("Ready for commands...")
+
+-- Auto-activate setelah 3 detik
+delay(3, function()
+    if not IsDamageActive then
+        AddLog("Tap buttons to activate hacks!")
+    end
+end)
+
+-- Touch controls info
+local InfoLabel = Instance.new("TextLabel")
+InfoLabel.Size = UDim2.new(1, 0, 0, 20)
+InfoLabel.Position = UDim2.new(0, 0, 0, 370)
+InfoLabel.Text = "👆 Tap buttons to toggle hacks"
+InfoLabel.TextColor3 = Color3.fromRGB(150, 150, 200)
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.Font = Enum.Font.Gotham
+InfoLabel.TextSize = 12
+InfoLabel.Parent = MainFrame
+
+-- Mobile vibration feedback (simulasi)
+local function VibrateButton(button)
+    local originalSize = button.Size
+    button.Size = UDim2.new(originalSize.X.Scale * 0.95, originalSize.X.Offset, 
+                           originalSize.Y.Scale * 0.95, originalSize.Y.Offset)
+    wait(0.1)
+    button.Size = originalSize
+end
+
+DamageButton.MouseButton1Down:Connect(function() VibrateButton(DamageButton) end)
+SpeedButton.MouseButton1Down:Connect(function() VibrateButton(SpeedButton) end)
+
+UpdateUI()
+AddLog("✅ Mobile Hack UI Ready!")
+
+print("========================================")
+print("MOBILE HACK LOADED FOR ANDROID")
+print("Damage: 999x available")
+print("Speed: 999 available")
+print("Touch the buttons to activate!")
+print("========================================")
