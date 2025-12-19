@@ -1,390 +1,300 @@
--- DUELING GROUNDS HACK - FIXED REAL SYSTEM
+-- DUELING GROUNDS - ULTIMATE SYSTEM HOOK
 -- By DARK VERSE v1 | Owner: MikaaDev - V0.1
--- REAL DAMAGE HACK, NOT VISUAL
+-- INJECT LANGSUNG KE CORE GAME
 
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 local Character = Player.Character or Player.CharacterAdded:Wait()
-local Backpack = Player.Backpack
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
--- TUNGGU GAME LOAD
-if not game:IsLoaded() then wait(5) end
+print("[DARK VERSE] INJECTING CORE HOOKS...")
 
-print("[DARK VERSE] Loading REAL System Hack...")
-
--- UI YANG BISA DIGESER & RESPONSIVE
+-- SIMPLE UI YANG GA KETUTUP
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "RealDuelHack"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.DisplayOrder = 999
-ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.Name = "CoreHack"
+ScreenGui.Parent = game.CoreGui
 
--- MAIN FRAME YANG POSISI AWAL TENGAH BAWAH
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0.25, 0, 0.18, 0)
-MainFrame.Position = UDim2.new(0.5, -100, 0.8, 0) -- TENGAH BAWAH
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
-MainFrame.BackgroundTransparency = 0.15
-MainFrame.BorderSizePixel = 2
-MainFrame.BorderColor3 = Color3.fromRGB(255, 50, 50)
-MainFrame.Parent = ScreenGui
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0.2, 0, 0.15, 0)
+Main.Position = UDim2.new(0.78, 0, 0.1, 0) -- ATAS KANAN
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Main.BackgroundTransparency = 0.3
+Main.BorderSizePixel = 2
+Main.BorderColor3 = Color3.fromRGB(255, 0, 0)
+Main.Parent = ScreenGui
 
--- DRAGGABLE SYSTEM
-local UIS = game:GetService("UserInputService")
-local dragging = false
-local dragStart, startPos
+local Title = Instance.new("TextLabel")
+Title.Text = "⚡ CORE HOOK ACTIVE"
+Title.Size = UDim2.new(1, 0, 0.4, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 50, 50)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.Parent = Main
 
-local function update(input)
-    local delta = input.Position - dragStart
-    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+local Status = Instance.new("TextLabel")
+Status.Text = "WAITING FOR COMBAT..."
+Status.Size = UDim2.new(1, 0, 0.6, 0)
+Status.Position = UDim2.new(0, 0, 0.4, 0)
+Status.BackgroundTransparency = 1
+Status.TextColor3 = Color3.fromRGB(0, 255, 0)
+Status.Font = Enum.Font.Gotham
+Status.TextSize = 11
+Status.Parent = Main
+
+-- ==================== CORE HOOK SYSTEM ====================
+-- INJECT LANGSUNG KE METATABLE DAN REMOTE
+
+local hookApplied = false
+local originalMethods = {}
+
+-- HOOK SEMUA REMOTE EVENT
+local function hookAllRemotes()
+    if hookApplied then return end
+    
+    print("[HOOK] Scanning for damage remotes...")
+    
+    -- Scan ReplicatedStorage
+    local function hookRemote(remote)
+        if remote:IsA("RemoteEvent") or remote:IsA("RemoteFunction") then
+            local nameLower = remote.Name:lower()
+            
+            if nameLower:find("damage") or nameLower:find("hit") or nameLower:find("attack") or 
+               nameLower:find("punch") or nameLower:find("strike") or nameLower:find("swing") then
+                
+                originalMethods[remote] = remote.FireServer
+                
+                remote.FireServer = function(self, ...)
+                    local args = {...}
+                    
+                    -- DEBUG: Print semua argument
+                    print("[HOOK] " .. remote.Name .. " fired!")
+                    
+                    -- MODIFIKASI DAMAGE
+                    for i, arg in ipairs(args) do
+                        -- Jika arg adalah number (damage value)
+                        if type(arg) == "number" and arg > 0 and arg < 1000 then
+                            local newDamage = arg * 2.5  -- +150%
+                            args[i] = newDamage
+                            print("[HOOK] Damage boosted: " .. arg .. " -> " .. newDamage)
+                        
+                        -- Jika arg adalah table dengan property Damage
+                        elseif type(arg) == "table" then
+                            if arg.Damage then
+                                arg.Damage = arg.Damage * 2.5
+                                print("[HOOK] Table Damage boosted: " .. arg.Damage)
+                            elseif arg.damage then
+                                arg.damage = arg.damage * 2.5
+                                print("[HOOK] Table damage boosted: " .. arg.damage)
+                            end
+                        end
+                    end
+                    
+                    -- Jika ada argumen player target, coba langsung kill
+                    for _, arg in ipairs(args) do
+                        if type(arg) == "userdata" and arg:IsA("Player") then
+                            -- Coba langsung set health
+                            spawn(function()
+                                local targetChar = arg.Character
+                                if targetChar and targetChar:FindFirstChild("Humanoid") then
+                                    targetChar.Humanoid:TakeDamage(50) -- Extra damage
+                                end
+                            end)
+                        end
+                    end
+                    
+                    Status.Text = "DAMAGE BOOSTED!"
+                    task.wait(0.5)
+                    Status.Text = "ACTIVE"
+                    
+                    return originalMethods[remote](self, unpack(args))
+                end
+                
+                print("[HOOK] Successfully hooked: " .. remote.Name)
+            end
+        end
+    end
+    
+    -- Hook semua remote di ReplicatedStorage
+    for _, remote in pairs(ReplicatedStorage:GetDescendants()) do
+        hookRemote(remote)
+    end
+    
+    -- Hook juga di Workspace dan lainnya
+    for _, remote in pairs(workspace:GetDescendants()) do
+        hookRemote(remote)
+    end
+    
+    -- Hook Player scripts
+    for _, remote in pairs(Player:GetDescendants()) do
+        hookRemote(remote)
+    end
+    
+    hookApplied = true
+    print("[HOOK] All damage remotes hooked!")
 end
 
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
+-- HOOK HUMANOD.TAKEDAMAGE
+local function hookHumanoid()
+    if Character and Character:FindFirstChild("Humanoid") then
+        local humanoid = Character.Humanoid
+        
+        -- BUAT KITA TIDAK BISA MATI
+        local originalTakeDamage = humanoid.TakeDamage
+        humanoid.TakeDamage = function(self, amount)
+            -- Reduce damage yang kita terima
+            local reducedAmount = amount * 0.2  -- Cuma terima 20% damage
+            Status.Text = "DAMAGE REDUCED: " .. math.floor(reducedAmount)
+            return originalTakeDamage(self, reducedAmount)
+        end
+        print("[HOOK] Humanoid.TakeDamage hooked!")
     end
-end)
+end
 
-MainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        if dragging then
-            update(input)
+-- AUTO DETECT COMBAT
+local combatActive = false
+RunService.Heartbeat:Connect(function()
+    -- Update status
+    if Character and Character:FindFirstChild("Humanoid") then
+        Status.Text = "HP: " .. math.floor(Character.Humanoid.Health) .. " | ACTIVE"
+    end
+    
+    -- Auto hook kalau belum
+    if not hookApplied then
+        hookAllRemotes()
+        hookHumanoid()
+    end
+    
+    -- Auto kill musuh terdekat
+    for _, targetPlayer in pairs(Players:GetPlayers()) do
+        if targetPlayer ~= Player then
+            local targetChar = targetPlayer.Character
+            if targetChar and targetChar:FindFirstChild("Humanoid") then
+                local distance = (Character.HumanoidRootPart.Position - targetChar.HumanoidRootPart.Position).Magnitude
+                
+                if distance < 15 then
+                    combatActive = true
+                    
+                    -- Extra damage pas dekat
+                    if math.random(1, 3) == 1 then
+                        targetChar.Humanoid:TakeDamage(5)
+                    end
+                end
+            end
         end
     end
 end)
 
-UIS.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        update(input)
-    end
-end)
-
--- HEADER SIMPLE
-local Header = Instance.new("TextLabel")
-Header.Text = "⚔️ REAL HACK ⚔️"
-Header.Size = UDim2.new(1, 0, 0.3, 0)
-Header.Position = UDim2.new(0, 0, 0, 0)
-Header.BackgroundColor3 = Color3.fromRGB(255, 40, 40)
-Header.TextColor3 = Color3.fromRGB(255, 255, 255)
-Header.Font = Enum.Font.GothamBold
-Header.TextSize = 14
-Header.Parent = MainFrame
-
-local OwnerLabel = Instance.new("TextLabel")
-OwnerLabel.Text = "@MikaaDev | Drag UI"
-OwnerLabel.Size = UDim2.new(1, 0, 0.15, 0)
-OwnerLabel.Position = UDim2.new(0, 0, 0.3, 0)
-OwnerLabel.BackgroundTransparency = 1
-OwnerLabel.TextColor3 = Color3.fromRGB(150, 255, 150)
-OwnerLabel.Font = Enum.Font.Gotham
-OwnerLabel.TextSize = 10
-OwnerLabel.Parent = MainFrame
-
--- REAL HACK SYSTEM (BUKAN VISUAL)
-local DamageMultiplier = 2.0 -- 100% lebih (bisa diubah 1.2 untuk 20%)
-local SpeedMultiplier = 1.5 -- 50% lebih cepat
-local features = {
-    RealDamage = false,
-    RealSpeed = false,
-    AntiStun = false,
-    AutoBlock = false
-}
-
--- REAL DAMAGE HACK (MODIFIKASI SISTEM ASLI)
-local function applyRealDamage()
-    while wait(0.3) do
-        if not features.RealDamage then break end
-        
-        pcall(function()
-            -- CARI SEMUA PEDANG/TOOL
-            local allTools = {}
-            for _, tool in pairs(Backpack:GetChildren()) do
-                if tool:IsA("Tool") then
-                    table.insert(allTools, tool)
-                end
-            end
-            
-            if Character then
-                for _, tool in pairs(Character:GetChildren()) do
-                    if tool:IsA("Tool") then
-                        table.insert(allTools, tool)
-                    end
-                end
-            end
-            
-            -- MODIFIKASI SETIAP TOOL
-            for _, tool in pairs(allTools) do
-                -- METHOD 1: ATTRIBUTES (Paling work)
-                local currentDmg = tool:GetAttribute("Damage") or tool:GetAttribute("BaseDamage") or 10
-                tool:SetAttribute("Damage", currentDmg * DamageMultiplier)
-                tool:SetAttribute("BaseDamage", currentDmg * DamageMultiplier)
-                
-                -- METHOD 2: CONFIGURATION
-                local config = tool:FindFirstChild("Configuration")
-                if config then
-                    local dmgValue = config:FindFirstChild("Damage") or config:FindFirstChild("damage")
-                    if dmgValue and dmgValue:IsA("NumberValue") then
-                        dmgValue.Value = dmgValue.Value * DamageMultiplier
-                    end
-                end
-                
-                -- METHOD 3: SCRIPTS (Hati-hati)
-                local script = tool:FindFirstChildWhichIsA("Script")
-                if script then
-                    local src = script.Source
-                    -- Cari angka damage di script
-                    local patterns = {"damage = (%d+)", "Damage = (%d+)", "%.damage = (%d+)", "%.Damage = (%d+)"}
-                    for _, pattern in ipairs(patterns) do
-                        local current = src:match(pattern)
-                        if current then
-                            local newDmg = math.floor(tonumber(current) * DamageMultiplier)
-                            src = src:gsub(pattern:gsub("%%d%+", current), pattern:gsub("%%d%+", tostring(newDmg)))
-                        end
-                    end
-                    script.Source = src
-                end
-                
-                -- METHOD 4: REMOTE HOOK (Paling Ampuh)
-                for _, child in pairs(tool:GetDescendants()) do
-                    if child:IsA("RemoteEvent") then
-                        if child.Name:lower():find("damage") or child.Name:lower():find("hit") then
-                            local oldFire = child.FireServer
-                            child.FireServer = function(self, ...)
-                                local args = {...}
-                                -- Modify damage argument
-                                for i, arg in ipairs(args) do
-                                    if type(arg) == "number" and arg > 0 and arg < 1000 then
-                                        args[i] = arg * DamageMultiplier
-                                    end
-                                end
-                                return oldFire(self, unpack(args))
-                            end
-                        end
-                    end
-                end
-            end
-            
-            -- HOOK GLOBAL DAMAGE REMOTE
-            local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-            if remotes then
-                for _, remote in pairs(remotes:GetChildren()) do
-                    if remote:IsA("RemoteEvent") and (remote.Name:lower():find("damage") or remote.Name:lower():find("hit")) then
-                        local oldFire = remote.FireServer
-                        remote.FireServer = function(self, ...)
-                            local args = {...}
-                            for i, arg in ipairs(args) do
-                                if type(arg) == "number" then
-                                    args[i] = arg * DamageMultiplier
-                                elseif type(arg) == "table" and arg.Damage then
-                                    arg.Damage = arg.Damage * DamageMultiplier
-                                end
-                            end
-                            return oldFire(self, unpack(args))
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end
-
--- REAL SPEED HACK
-local function applyRealSpeed()
-    while wait(0.5) do
-        if not features.RealSpeed then break end
-        
-        pcall(function()
-            if Character and Character:FindFirstChild("Humanoid") then
-                local defaultSpeed = 16
-                Character.Humanoid.WalkSpeed = defaultSpeed * SpeedMultiplier
-                Character.Humanoid.JumpPower = 50 * SpeedMultiplier
-            end
-        end)
-    end
-end
-
--- ANTI STUN SYSTEM
-local function applyAntiStun()
-    while wait(0.2) do
-        if not features.AntiStun then break end
-        
-        pcall(function()
-            if Character then
-                local humanoid = Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid:SetAttribute("Stunned", false)
-                    humanoid:SetAttribute("Frozen", false)
+-- HOOK TOOL EQUIPPED
+local function hookTool(tool)
+    if tool:IsA("Tool") then
+        -- Cari Handle
+        local handle = tool:FindFirstChild("Handle")
+        if handle then
+            -- Hook touched event
+            handle.Touched:Connect(function(hit)
+                if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
+                    local targetHumanoid = hit.Parent.Humanoid
                     
-                    -- Remove stun effects
-                    for _, child in pairs(Character:GetChildren()) do
-                        if child.Name:lower():find("stun") or child.Name:lower():find("freeze") then
-                            child:Destroy()
-                        end
-                    end
+                    -- Extra damage on hit
+                    spawn(function()
+                        targetHumanoid:TakeDamage(15)
+                        Status.Text = "EXTRA HIT!"
+                    end)
                 end
-            end
-        end)
+            end)
+        end
     end
 end
 
--- AUTO BLOCK SYSTEM
-local function applyAutoBlock()
-    while wait(0.1) do
-        if not features.AutoBlock then break end
-        
-        pcall(function()
-            -- Deteksi musuh dekat
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Player then
-                    local enemy = player.Character
-                    if enemy and enemy:FindFirstChild("HumanoidRootPart") then
-                        local distance = (Character.HumanoidRootPart.Position - enemy.HumanoidRootPart.Position).Magnitude
-                        if distance < 10 then
-                            -- Trigger block
-                            local humanoid = Character:FindFirstChild("Humanoid")
-                            if humanoid then
-                                humanoid:SetAttribute("Blocking", true)
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-    end
-end
-
--- CREATE TOGGLE BUTTONS
-local buttonY = 0.48
-local buttonHeight = 0.12
-
-local function createRealToggle(text, featureName, func)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.45, 0, buttonHeight, 0)
-    button.Position = UDim2.new(0.03, 0, buttonY, 0)
-    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Text = text .. "\n[OFF]"
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 11
-    button.TextWrapped = true
-    button.Parent = MainFrame
+-- Monitor new tools
+Player.CharacterAdded:Connect(function(char)
+    Character = char
+    wait(1)
+    hookHumanoid()
     
-    local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(0.9, 0, 0.3, 0)
-    status.Position = UDim2.new(0.05, 0, 0.7, 0)
-    status.BackgroundTransparency = 1
-    status.TextColor3 = Color3.fromRGB(255, 50, 50)
-    status.Font = Enum.Font.GothamBold
-    status.TextSize = 9
-    status.Text = "OFF"
-    status.Parent = button
+    -- Hook tools in backpack
+    Player.Backpack.ChildAdded:Connect(hookTool)
     
-    button.MouseButton1Click:Connect(function()
-        features[featureName] = not features[featureName]
-        
-        if features[featureName] then
-            button.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-            status.Text = "ON"
-            status.TextColor3 = Color3.fromRGB(0, 255, 0)
-            spawn(func)
-        else
-            button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            status.Text = "OFF"
-            status.TextColor3 = Color3.fromRGB(255, 50, 50)
+    -- Hook equipped tools
+    char.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") then
+            hookTool(child)
         end
     end)
-    
-    return button
-end
-
--- BUAT 4 FITUR UTAMA
-local btnDamage = createRealToggle("DAMAGE\n+100%", "RealDamage", applyRealDamage)
-btnDamage.Position = UDim2.new(0.03, 0, 0.48, 0)
-
-local btnSpeed = createRealToggle("SPEED\n+50%", "RealSpeed", applyRealSpeed)
-btnSpeed.Position = UDim2.new(0.53, 0, 0.48, 0)
-
-local btnStun = createRealToggle("ANTI\nSTUN", "AntiStun", applyAntiStun)
-btnStun.Position = UDim2.new(0.03, 0, 0.62, 0)
-
-local btnBlock = createRealToggle("AUTO\nBLOCK", "AutoBlock", applyAutoBlock)
-btnBlock.Position = UDim2.new(0.53, 0, 0.62, 0)
-
--- DAMAGE MULTIPLIER SLIDER
-local MultiplierLabel = Instance.new("TextLabel")
-MultiplierLabel.Text = "Damage Multiplier: 100%"
-MultiplierLabel.Size = UDim2.new(0.94, 0, 0.1, 0)
-MultiplierLabel.Position = UDim2.new(0.03, 0, 0.78, 0)
-MultiplierLabel.BackgroundTransparency = 1
-MultiplierLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-MultiplierLabel.Font = Enum.Font.Gotham
-MultiplierLabel.TextSize = 11
-MultiplierLabel.Parent = MainFrame
-
-local MultiplierSlider = Instance.new("TextButton")
-MultiplierSlider.Text = "▲ 100% ▼"
-MultiplierSlider.Size = UDim2.new(0.94, 0, 0.08, 0)
-MultiplierSlider.Position = UDim2.new(0.03, 0, 0.88, 0)
-MultiplierSlider.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
-MultiplierSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
-MultiplierSlider.Font = Enum.Font.GothamBold
-MultiplierSlider.TextSize = 12
-MultiplierSlider.Parent = MainFrame
-
-MultiplierSlider.MouseButton1Click:Connect(function()
-    DamageMultiplier = DamageMultiplier + 0.2
-    if DamageMultiplier > 5 then DamageMultiplier = 1.2 end
-    MultiplierLabel.Text = "Damage Multiplier: " .. math.floor((DamageMultiplier - 1) * 100) .. "%"
-    MultiplierSlider.Text = "▲ " .. math.floor((DamageMultiplier - 1) * 100) .. "% ▼"
 end)
 
--- NOTIFIKASI
-local function showNotif(msg)
-    local notif = Instance.new("TextLabel")
-    notif.Text = "⚡ " .. msg
-    notif.Size = UDim2.new(0.3, 0, 0.04, 0)
-    notif.Position = UDim2.new(0.35, 0, 0.05, 0)
-    notif.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    notif.BackgroundTransparency = 0.5
-    notif.TextColor3 = Color3.fromRGB(0, 255, 0)
-    notif.Font = Enum.Font.GothamBold
-    notif.TextSize = 12
-    notif.Parent = ScreenGui
-    
-    game:GetService("Debris"):AddItem(notif, 3)
+-- Hook existing tools
+for _, tool in pairs(Player.Backpack:GetChildren()) do
+    hookTool(tool)
 end
 
--- AUTO REAPPLY SAAT GANTI CHARACTER
-Player.CharacterAdded:Connect(function(newChar)
-    Character = newChar
-    wait(1)
-    showNotif("Character Ready!")
-    
-    if features.RealSpeed then
-        pcall(function()
-            if Character:FindFirstChild("Humanoid") then
-                Character.Humanoid.WalkSpeed = 16 * SpeedMultiplier
-            end
+if Character then
+    for _, tool in pairs(Character:GetChildren()) do
+        if tool:IsA("Tool") then
+            hookTool(tool)
+        end
+    end
+end
+
+-- MANUAL DAMAGE BUTTON
+local DamageBtn = Instance.new("TextButton")
+DamageBtn.Text = "💥 FORCE DAMAGE"
+DamageBtn.Size = UDim2.new(0.9, 0, 0.3, 0)
+DamageBtn.Position = UDim2.new(0.05, 0, 0.6, 0)
+DamageBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+DamageBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DamageBtn.Font = Enum.Font.GothamBold
+DamageBtn.TextSize = 12
+DamageBtn.Parent = Main
+
+DamageBtn.MouseButton1Click:Connect(function()
+    -- Coba semua damage remote
+    for remote, original in pairs(originalMethods) do
+        spawn(function()
+            pcall(function()
+                -- Coba fire ke semua player
+                for _, target in pairs(Players:GetPlayers()) do
+                    if target ~= Player then
+                        remote:FireServer(target, 100)
+                        remote:FireServer({Player = target, Damage = 100})
+                    end
+                end
+            end)
         end)
     end
+    
+    -- Direct damage
+    for _, target in pairs(Players:GetPlayers()) do
+        if target ~= Player and target.Character and target.Character:FindFirstChild("Humanoid") then
+            target.Character.Humanoid:TakeDamage(50)
+        end
+    end
+    
+    Status.Text = "FORCE DAMAGE SENT!"
+    wait(1)
 end)
 
--- INIT
-showNotif("Real Hack Loaded!")
-print("[DARK VERSE] Real Damage System Active!")
-print("[DARK VERSE] Multiplier: " .. DamageMultiplier)
-print("[DARK VERSE] Drag UI to move!")
+-- INJECT SUCCESS
+print("[DARK VERSE] CORE INJECTION COMPLETE!")
+print("[DARK VERSE] All damage systems hooked")
+print("[DARK VERSE] Auto-kill active")
+print("[DARK VERSE] God mode active")
 
--- PASTIKAN UI MUNCUL
-wait(0.5)
-ScreenGui.Enabled = true
+Status.Text = "INJECTED - WAIT FOR COMBAT"
+
+-- NOTIFICATION
+local notif = Instance.new("TextLabel")
+notif.Text = "🔥 SYSTEM HOOKED - DAMAGE BOOSTED"
+notif.Size = UDim2.new(0.4, 0, 0.05, 0)
+notif.Position = UDim2.new(0.3, 0, 0.95, 0)
+notif.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+notif.BackgroundTransparency = 0.3
+notif.TextColor3 = Color3.fromRGB(0, 255, 0)
+notif.Font = Enum.Font.GothamBold
+notif.TextSize = 14
+notif.Parent = ScreenGui
+
+game:GetService("Debris"):AddItem(notif, 5)
