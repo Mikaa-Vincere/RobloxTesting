@@ -1,6 +1,5 @@
--- DUELING GROUNDS HACK SCRIPT
+-- DUELING GROUNDS HACK SCRIPT - FIXED UI
 -- By DARK VERSE v1 | Owner: MikaaDev - V0.1
--- Special for Dueling Grounds PVP Game
 
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
@@ -9,151 +8,209 @@ local Backpack = Player.Backpack
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-print("[DARK VERSE] Game Detected: DUELING GROUNDS")
-print("[DARK VERSE] Game Type: PVP Fighting/Duel")
+-- Tunggu game loaded
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+wait(2)
 
--- UI Setup
+print("[DARK VERSE] Dueling Grounds Hack Loading...")
+
+-- UI Setup PASTI MUNCUL
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DuelingHack"
-ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "DuelingHack_MikaaDev"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.DisplayOrder = 999
+ScreenGui.Parent = game:GetService("CoreGui") -- PASTI MUNCUL DI COREGUI
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0.2, 0, 0.3, 0)
-MainFrame.Position = UDim2.new(0.78, 0, 0.68, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BorderSizePixel = 0
-MainFrame.BackgroundTransparency = 0.2
+MainFrame.Size = UDim2.new(0.2, 0, 0.35, 0)
+MainFrame.Position = UDim2.new(0.78, 0, 0.35, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.BorderSizePixel = 1
+MainFrame.BorderColor3 = Color3.fromRGB(255, 50, 50)
 MainFrame.Parent = ScreenGui
 
-local Logo = Instance.new("ImageLabel")
-Logo.Image = "rbxassetid://100166477433523"
-Logo.Size = UDim2.new(0.9, 0, 0.15, 0)
-Logo.Position = UDim2.new(0.05, 0, 0.05, 0)
-Logo.BackgroundTransparency = 1
-Logo.Parent = MainFrame
+-- LOGO MINI (KIRI ATAS)
+local LogoMini = Instance.new("ImageLabel")
+LogoMini.Name = "LogoMini"
+LogoMini.Image = "rbxassetid://100166477433523"
+LogoMini.Size = UDim2.new(0, 50, 0, 50)
+LogoMini.Position = UDim2.new(0.02, 0, 0.02, 0)
+LogoMini.BackgroundTransparency = 1
+LogoMini.Parent = ScreenGui
+
+-- DRAGGABLE UI
+local UserInputService = game:GetService("UserInputService")
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function updateInput(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateInput(input)
+    end
+end)
+
+-- HEADER
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0.15, 0)
+Header.Position = UDim2.new(0, 0, 0, 0)
+Header.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+Header.BorderSizePixel = 0
+Header.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Text = "DUELING GROUNDS HACK"
-Title.Size = UDim2.new(0.9, 0, 0.08, 0)
-Title.Position = UDim2.new(0.05, 0, 0.22, 0)
+Title.Text = "⚔️ DUELING HACK ⚔️"
+Title.Size = UDim2.new(1, 0, 0.7, 0)
+Title.Position = UDim2.new(0, 0, 0.15, 0)
 Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.fromRGB(255, 50, 50)
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 14
-Title.Parent = MainFrame
+Title.TextSize = 16
+Title.Parent = Header
 
 local OwnerLabel = Instance.new("TextLabel")
-OwnerLabel.Text = "@MikaaDev - V0.1"
-OwnerLabel.Size = UDim2.new(0.9, 0, 0.06, 0)
-OwnerLabel.Position = UDim2.new(0.05, 0, 0.3, 0)
+OwnerLabel.Text = "@MikaaDev - V0.1 | DARK VERSE v1"
+OwnerLabel.Size = UDim2.new(1, 0, 0.3, 0)
+OwnerLabel.Position = UDim2.new(0, 0, 0.7, 0)
 OwnerLabel.BackgroundTransparency = 1
-OwnerLabel.TextColor3 = Color3.fromRGB(0, 255, 150)
+OwnerLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
 OwnerLabel.Font = Enum.Font.Gotham
-OwnerLabel.TextSize = 11
-OwnerLabel.Parent = MainFrame
+OwnerLabel.TextSize = 10
+OwnerLabel.Parent = Header
 
--- FITUR UTAMA PVP GAME
+-- FITUR TOGGLE
 local features = {
-    ["OneHitKill"] = false,      -- 1 hit kill musuh
-    ["GodMode"] = false,         -- Tidak bisa mati
-    ["DamageBoost"] = false,     -- Damage multiplier
-    ["SpeedHack"] = false,       -- Speed movement
-    ["AntiStun"] = false,        -- Tidak bisa di-stun
-    ["AutoBlock"] = false,       -- Auto block attack
-    ["AutoDodge"] = false,       -- Auto dodge
-    ["RangeExtend"] = false,     -- Serangan jangkauan jauh
-    ["InfiniteCombo"] = false,   -- Combo tidak terputus
-    ["CoinsHack"] = false        -- Auto coin/rewards
+    OneHitKill = false,
+    GodMode = false,
+    Damage9999 = false,
+    Speed50 = false,
+    AntiStun = false,
+    AutoBlock = false,
+    Coin9999 = false,
+    NoClip = false
 }
 
--- ONE HIT KILL SYSTEM
-local function oneHitKillSystem()
-    while features["OneHitKill"] do
+local function setFeature(feature, state)
+    features[feature] = state
+end
+
+-- TOGGLE BUTTON FUNCTION
+local buttonY = 0.18
+local buttonCount = 0
+
+local function createFeatureButton(featureName, displayName, color)
+    local button = Instance.new("TextButton")
+    button.Name = featureName
+    button.Size = UDim2.new(0.9, 0, 0.08, 0)
+    button.Position = UDim2.new(0.05, 0, buttonY, 0)
+    button.BackgroundColor3 = color
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = "⭕ " .. displayName
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 12
+    button.Parent = MainFrame
+    
+    button.MouseButton1Click:Connect(function()
+        features[featureName] = not features[featureName]
+        
+        if features[featureName] then
+            button.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+            button.Text = "✅ " .. displayName .. " ON"
+        else
+            button.BackgroundColor3 = color
+            button.Text = "⭕ " .. displayName
+        end
+    end)
+    
+    buttonY = buttonY + 0.09
+    buttonCount = buttonCount + 1
+    
+    -- Adjust frame size based on buttons
+    MainFrame.Size = UDim2.new(0.2, 0, 0.15 + (buttonCount * 0.09), 0)
+    
+    return button
+end
+
+-- CREATE BUTTONS
+local buttons = {
+    createFeatureButton("OneHitKill", "ONE HIT KILL", Color3.fromRGB(200, 50, 50)),
+    createFeatureButton("GodMode", "GOD MODE", Color3.fromRGB(50, 150, 200)),
+    createFeatureButton("Damage9999", "DAMAGE 9999", Color3.fromRGB(200, 100, 50)),
+    createFeatureButton("Speed50", "SPEED 50", Color3.fromRGB(50, 200, 100)),
+    createFeatureButton("AntiStun", "ANTI STUN", Color3.fromRGB(150, 50, 200)),
+    createFeatureButton("AutoBlock", "AUTO BLOCK", Color3.fromRGB(200, 200, 50)),
+    createFeatureButton("Coin9999", "COIN 9999", Color3.fromRGB(50, 200, 200)),
+    createFeatureButton("NoClip", "NO CLIP", Color3.fromRGB(200, 150, 50))
+}
+
+-- SYSTEMS
+local function oneHitSystem()
+    while wait(0.5) do
+        if not features.OneHitKill then break end
         pcall(function()
-            -- Cari semua player musuh
-            for _, targetPlayer in pairs(Players:GetPlayers()) do
-                if targetPlayer ~= Player then
-                    local targetChar = targetPlayer.Character
-                    if targetChar and targetChar:FindFirstChild("Humanoid") then
-                        -- Direct kill
-                        targetChar.Humanoid.Health = 0
-                        
-                        -- Lewat remote jika ada
-                        local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-                        if remotes then
-                            local damageRemote = remotes:FindFirstChild("Damage") or remotes:FindFirstChild("Hit") or remotes:FindFirstChild("TakeDamage")
-                            if damageRemote then
-                                damageRemote:FireServer(targetPlayer, 99999)
-                            end
-                        end
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= Player then
+                    local char = player.Character
+                    if char and char:FindFirstChild("Humanoid") then
+                        char.Humanoid.Health = 0
                     end
                 end
             end
         end)
-        wait(0.3)
     end
 end
 
--- GOD MODE SYSTEM
 local function godModeSystem()
-    while features["GodMode"] do
+    while wait(0.3) do
+        if not features.GodMode then break end
         pcall(function()
             if Character and Character:FindFirstChild("Humanoid") then
-                local humanoid = Character.Humanoid
-                
-                -- Set health sangat tinggi
-                humanoid.MaxHealth = 99999
-                humanoid.Health = 99999
-                
-                -- Invincibility
-                humanoid:SetAttribute("Invincible", true)
-                
-                -- Cancel semua damage
-                for _, connection in pairs(getconnections(humanoid.Touched)) do
-                    connection:Disable()
-                end
+                Character.Humanoid.MaxHealth = 99999
+                Character.Humanoid.Health = 99999
             end
         end)
-        wait(0.5)
     end
 end
 
--- DAMAGE BOOST SYSTEM (9999 DAMAGE)
-local function damageBoostSystem()
-    while features["DamageBoost"] do
+local function damageSystem()
+    while wait(0.2) do
+        if not features.Damage9999 then break end
         pcall(function()
-            -- Modifikasi semua weapon/tool
             for _, tool in pairs(Backpack:GetChildren()) do
                 if tool:IsA("Tool") then
-                    -- Set damage attribute
                     tool:SetAttribute("Damage", 9999)
-                    tool:SetAttribute("BaseDamage", 9999)
-                    
-                    -- Modifikasi script damage
-                    local script = tool:FindFirstChildWhichIsA("Script")
-                    if script then
-                        local src = script.Source
-                        src = src:gsub("damage = %d+", "damage = 9999")
-                        src = src:gsub("Damage = %d+", "Damage = 9999")
-                        src = src:gsub("%.Damage = %d+", ".Damage = 9999")
-                        script.Source = src
-                    end
-                    
-                    -- Modifikasi configuration
-                    local config = tool:FindFirstChild("Configuration")
-                    if config then
-                        local dmg = config:FindFirstChild("Damage") or config:FindFirstChild("damage")
-                        if dmg then
-                            dmg.Value = 9999
-                        end
-                    end
-                    
-                    -- Tambah damage modifier
-                    tool:SetAttribute("DamageMultiplier", 100)
                 end
             end
-            
-            -- Juga untuk weapon di character
             if Character then
                 for _, tool in pairs(Character:GetChildren()) do
                     if tool:IsA("Tool") then
@@ -162,211 +219,135 @@ local function damageBoostSystem()
                 end
             end
         end)
-        wait(0.2)
     end
 end
 
--- SPEED HACK SYSTEM
-local function speedHackSystem()
-    while features["SpeedHack"] do
+local function speedSystem()
+    while wait(0.5) do
+        if not features.Speed50 then break end
         pcall(function()
             if Character and Character:FindFirstChild("Humanoid") then
                 Character.Humanoid.WalkSpeed = 50
                 Character.Humanoid.JumpPower = 100
             end
         end)
-        wait(0.5)
     end
 end
 
--- ANTI STUN SYSTEM
-local function antiStunSystem()
-    while features["AntiStun"] do
+local function coinSystem()
+    while wait(1) do
+        if not features.Coin9999 then break end
         pcall(function()
-            if Character then
-                -- Remove stun effects
-                for _, part in pairs(Character:GetChildren()) do
-                    if part:IsA("BasePart") then
-                        -- Hilangkan semua constraint/effect stun
-                        for _, constraint in pairs(part:GetChildren()) do
-                            if constraint.Name:lower():find("stun") or constraint.Name:lower():find("freeze") then
-                                constraint:Destroy()
-                            end
-                        end
-                    end
-                end
-                
-                -- Cancel stun animations
-                local humanoid = Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid:SetAttribute("Stunned", false)
-                    humanoid:SetAttribute("Frozen", false)
-                end
-            end
-        end)
-        wait(0.3)
-    end
-end
-
--- AUTO BLOCK SYSTEM
-local function autoBlockSystem()
-    while features["AutoBlock"] do
-        pcall(function()
-            -- Deteksi serangan datang
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Player then
-                    local enemyChar = player.Character
-                    if enemyChar and enemyChar:FindFirstChild("HumanoidRootPart") then
-                        local distance = (Character.HumanoidRootPart.Position - enemyChar.HumanoidRootPart.Position).Magnitude
-                        
-                        if distance < 10 then -- Jika musuh dekat
-                            -- Trigger block animation/state
-                            local humanoid = Character:FindFirstChild("Humanoid")
-                            if humanoid then
-                                -- Set blocking state
-                                humanoid:SetAttribute("Blocking", true)
-                                
-                                -- Cari remote block
-                                local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-                                if remotes then
-                                    local blockRemote = remotes:FindFirstChild("Block") or remotes:FindFirstChild("Defend")
-                                    if blockRemote then
-                                        blockRemote:FireServer(true)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end)
-        wait(0.1)
-    end
-end
-
--- COIN HACK SYSTEM
-local function coinHackSystem()
-    while features["CoinsHack"] do
-        pcall(function()
-            -- Method 1: Leaderstats
-            local leaderstats = Player:FindFirstChild("leaderstats")
-            if leaderstats then
-                for _, stat in pairs(leaderstats:GetChildren()) do
-                    if stat.Name:lower():find("coin") or stat.Name:lower():find("money") or stat.Name:lower():find("gold") then
+            local stats = Player:FindFirstChild("leaderstats")
+            if stats then
+                for _, stat in pairs(stats:GetChildren()) do
+                    if stat.Name:lower():find("coin") or stat.Name:lower():find("money") then
                         stat.Value = 9999
                     end
                 end
             end
-            
-            -- Method 2: Remote events
-            local remotes = ReplicatedStorage:FindFirstChild("Remotes")
-            if remotes then
-                for _, remote in pairs(remotes:GetChildren()) do
-                    if remote.Name:lower():find("coin") or remote.Name:lower():find("reward") or remote.Name:lower():find("currency") then
-                        remote:FireServer(9999, "Win")
+            Player:SetAttribute("Coins", 9999)
+        end)
+    end
+end
+
+local function noClipSystem()
+    while wait(0.5) do
+        if not features.NoClip then break end
+        pcall(function()
+            if Character then
+                for _, part in pairs(Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
                     end
                 end
             end
-            
-            -- Method 3: Game passes/shop
-            Player:SetAttribute("Coins", 9999)
-            Player:SetAttribute("Money", 9999)
         end)
-        wait(2)
     end
 end
 
--- CREATE TOGGLE BUTTONS
-local buttonY = 0.38
-local buttonHeight = 0.07
-
-local function createPVPToggle(text, featureName, func)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.9, 0, buttonHeight, 0)
-    button.Position = UDim2.new(0.05, 0, buttonY, 0)
-    button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Text = text .. " [OFF]"
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 10
-    button.Parent = MainFrame
-    
+-- START SYSTEMS WHEN TOGGLED
+for feature, button in pairs(buttons) do
     button.MouseButton1Click:Connect(function()
-        features[featureName] = not features[featureName]
-        
+        local featureName = button.Name
         if features[featureName] then
-            button.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-            button.Text = text .. " [ON]"
-            spawn(func)
-        else
-            button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            button.Text = text .. " [OFF]"
-            
-            -- Reset jika perlu
-            if featureName == "SpeedHack" and Character and Character:FindFirstChild("Humanoid") then
-                Character.Humanoid.WalkSpeed = 16
-                Character.Humanoid.JumpPower = 50
-            end
+            if featureName == "OneHitKill" then spawn(oneHitSystem) end
+            if featureName == "GodMode" then spawn(godModeSystem) end
+            if featureName == "Damage9999" then spawn(damageSystem) end
+            if featureName == "Speed50" then spawn(speedSystem) end
+            if featureName == "Coin9999" then spawn(coinSystem) end
+            if featureName == "NoClip" then spawn(noClipSystem) end
         end
     end)
-    
-    buttonY = buttonY + buttonHeight + 0.01
-    return button
 end
 
--- BUAT TOGGLE UNTUK DUELING GROUNDS
-createPVPToggle("ONE HIT KILL", "OneHitKill", oneHitKillSystem)
-createPVPToggle("GOD MODE", "GodMode", godModeSystem)
-createPVPToggle("DAMAGE 9999", "DamageBoost", damageBoostSystem)
-createPVPToggle("SPEED BOOST", "SpeedHack", speedHackSystem)
-createPVPToggle("ANTI STUN", "AntiStun", antiStunSystem)
-createPVPToggle("AUTO BLOCK", "AutoBlock", autoBlockSystem)
-createPVPToggle("COIN 9999", "CoinsHack", coinHackSystem)
+-- MINIMIZE BUTTON
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Text = "─"
+MinimizeBtn.Size = UDim2.new(0.05, 0, 0.05, 0)
+MinimizeBtn.Position = UDim2.new(0.95, 0, 0, 0)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.Parent = MainFrame
 
--- CHARACTER RECONNECT
+local minimized = false
+MinimizeBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        for _, child in pairs(MainFrame:GetChildren()) do
+            if child ~= Header and child ~= MinimizeBtn then
+                child.Visible = false
+            end
+        end
+        MainFrame.Size = UDim2.new(0.2, 0, 0.15, 0)
+        MinimizeBtn.Text = "＋"
+    else
+        for _, child in pairs(MainFrame:GetChildren()) do
+            child.Visible = true
+        end
+        MainFrame.Size = UDim2.new(0.2, 0, 0.15 + (buttonCount * 0.09), 0)
+        MinimizeBtn.Text = "─"
+    end
+end)
+
+-- NOTIFICATION
+local function notify(msg)
+    local notif = Instance.new("TextLabel")
+    notif.Text = "⚡ " .. msg
+    notif.Size = UDim2.new(0.3, 0, 0.05, 0)
+    notif.Position = UDim2.new(0.35, 0, 0.9, 0)
+    notif.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    notif.BackgroundTransparency = 0.3
+    notif.TextColor3 = Color3.fromRGB(0, 255, 0)
+    notif.Font = Enum.Font.GothamBold
+    notif.TextSize = 14
+    notif.Parent = ScreenGui
+    
+    wait(3)
+    notif:Destroy()
+end
+
+-- AUTO RECONNECT
 Player.CharacterAdded:Connect(function(newChar)
     Character = newChar
     wait(1)
-    
-    -- Re-apply active features
-    if features["GodMode"] then
-        pcall(function()
-            local humanoid = Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.MaxHealth = 99999
-                humanoid.Health = 99999
-            end
-        end)
-    end
-    
-    if features["SpeedHack"] then
-        pcall(function()
-            local humanoid = Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.WalkSpeed = 50
-                humanoid.JumpPower = 100
-            end
-        end)
-    end
+    notify("Character reconnected!")
 end)
 
--- AUTO UPDATE LOOP
-RunService.Heartbeat:Connect(function()
-    pcall(function()
-        -- Maintain active features
-        if features["GodMode"] and Character and Character:FindFirstChild("Humanoid") then
-            Character.Humanoid.Health = 99999
-        end
-        
-        if features["DamageBoost"] then
-            for _, tool in pairs(Backpack:GetChildren()) do
-                if tool:IsA("Tool") then
-                    tool:SetAttribute("Damage", 9999)
-                end
-            end
-        end
-    end)
-end)
+-- INIT
+notify("Dueling Grounds Hack Loaded!")
+print("[DARK VERSE] UI LOADED - Check top-right corner!")
+print("[DARK VERSE] Logo mini at top-left corner!")
 
-print("[DARK VERSE] Dueling Grounds Hack LOADED!")
-print("[DARK VERSE] Features: 1 Hit Kill, God Mode, Damage 9999, Speed, Anti-Stun, Auto Block, Coin Hack")
+-- FORCE UI VISIBLE
+ScreenGui.Enabled = true
+MainFrame.Visible = true
+LogoMini.Visible = true
+
+-- LAST RESORT: Jika masih tidak muncul
+wait(1)
+if not ScreenGui.Parent then
+    ScreenGui.Parent = game:GetService("CoreGui")
+    warn("[DARK VERSE] UI Force-parented to CoreGui")
+end
