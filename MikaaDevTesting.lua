@@ -1,5 +1,5 @@
 --==================================================
--- Mikaa Dev Testing (V1)
+-- Mikaa Dev Testing (V1) - UPDATED TEXT SIZE FIX
 --==================================================
 
 local Players = game:GetService("Players")
@@ -226,7 +226,6 @@ local colors = {
 local colorIndex=1
 notif.TextColor3=colors[colorIndex]
 
-
 local notifSpeedLabel = Instance.new("TextLabel", frame)
 notifSpeedLabel.Size = UDim2.new(0.6,0,0,18)
 notifSpeedLabel.Position = UDim2.new(0.05,0,0,178)
@@ -282,7 +281,9 @@ sendBtn.MouseButton1Click:Connect(function()
 	if textBox.Text == "" then return end
 
 	notif.Text = textBox.Text
-	notif.TextSize = tonumber(sizeBox.Text) or 20
+	-- FIX: Clamp text size ke max 100 biar nggak bug saat diubah terlalu besar
+	local desiredSize = tonumber(sizeBox.Text) or 20
+	notif.TextSize = math.clamp(desiredSize, 1, 100)
 	notif.Visible = true
 	runNotif = true
 
@@ -343,17 +344,17 @@ RunService.RenderStepped:Connect(function()
 	spFill.Size = UDim2.new(speedPercent / 100, 0, 1, 0)
     jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
 
-speedPercentLabel.Text = math.floor(speedPercent) .. "%"
-jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
+	speedPercentLabel.Text = math.floor(speedPercent) .. "%"
+	jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
 		
 	-- UPDATE TEXTBOX
 	if not isEditing(spBox) then
-	spBox.Text = math.floor(speedPercent) .. "%"
-end
+		spBox.Text = math.floor(speedPercent) .. "%"
+	end
 
-if not isEditing(jpBox) then
-	jpBox.Text = math.floor(jumpPercent) .. "%"
-		end
+	if not isEditing(jpBox) then
+		jpBox.Text = math.floor(jumpPercent) .. "%"
+	end
 	
 
 		
@@ -390,4 +391,4 @@ if not isEditing(jpBox) then
 	end
 end)
 
-print("Mikaa Dev Testing FINAL – LOCKED ✅")
+print("Mikaa Dev Testing FINAL – LOCKED ✅ (Text Size Fixed)")
