@@ -1,5 +1,5 @@
 --==================================================
--- Mikaa Dev Testing (FINAL – NO MORE CHANGES)
+-- Mikaa Dev Testing (V1)
 --==================================================
 
 local Players = game:GetService("Players")
@@ -19,9 +19,13 @@ local SPEED_SMOOTH = 0.15
 --================ STATE =================
 local targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
 local targetJump, currentJump = DEFAULT_JUMP, DEFAULT_JUMP
+local speedEnabled = false
+local jumpEnabled = false
 local walkOnWater = false
 local waterPart
 
+local speedPercent = 0
+local jumpPercent = 0
 --================ CHARACTER =================
 local function resetStats()
 	targetSpeed, currentSpeed = DEFAULT_SPEED, DEFAULT_SPEED
@@ -97,6 +101,54 @@ end
 
 makeLabel("SPEED",52)
 makeLabel("JUMP",84)
+
+local speedPercentLabel = Instance.new("TextLabel", frame)
+speedPercentLabel.Size = UDim2.new(0.3,0,0,18)
+speedPercentLabel.Position = UDim2.new(0.65,0,0,52)
+speedPercentLabel.Text = "0%"
+speedPercentLabel.TextScaled = true
+speedPercentLabel.BackgroundTransparency = 1
+speedPercentLabel.TextColor3 = Color3.fromRGB(0,170,255)
+
+local jumpPercentLabel = Instance.new("TextLabel", frame)
+jumpPercentLabel.Size = UDim2.new(0.3,0,0,18)
+jumpPercentLabel.Position = UDim2.new(0.65,0,0,84)
+jumpPercentLabel.Text = "0%"
+jumpPercentLabel.TextScaled = true
+jumpPercentLabel.BackgroundTransparency = 1
+jumpPercentLabel.TextColor3 = Color3.fromRGB(255,140,0)
+
+local speedBtn = Instance.new("TextButton", frame)
+speedBtn.Size = UDim2.new(0.45,0,0,18)
+speedBtn.Position = UDim2.new(0.05,0,0,120)
+speedBtn.Text = "SPEED : OFF"
+speedBtn.TextScaled = true
+speedBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+speedBtn.TextColor3 = Color3.new(1,1,1)
+
+local jumpBtn = Instance.new("TextButton", frame)
+jumpBtn.Size = UDim2.new(0.45,0,0,18)
+jumpBtn.Position = UDim2.new(0.5,0,0,120)
+jumpBtn.Text = "JUMP : OFF"
+jumpBtn.TextScaled = true
+jumpBtn.BackgroundColor3 = Color3.fromRGB(120,40,40)
+jumpBtn.TextColor3 = Color3.new(1,1,1)
+
+speedBtn.MouseButton1Click:Connect(function()
+	speedEnabled = not speedEnabled
+	speedBtn.Text = "SPEED : "..(speedEnabled and "ON" or "OFF")
+	speedBtn.BackgroundColor3 = speedEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
+
+jumpBtn.MouseButton1Click:Connect(function()
+	jumpEnabled = not jumpEnabled
+	jumpBtn.Text = "JUMP : "..(jumpEnabled and "ON" or "OFF")
+	jumpBtn.BackgroundColor3 = jumpEnabled
+		and Color3.fromRGB(40,120,40)
+		or Color3.fromRGB(120,40,40)
+end)
 
 local function makeBar(y,color)
 	local bar = Instance.new("Frame", frame)
@@ -174,6 +226,23 @@ local colors = {
 local colorIndex=1
 notif.TextColor3=colors[colorIndex]
 
+
+local notifSpeedLabel = Instance.new("TextLabel", frame)
+notifSpeedLabel.Size = UDim2.new(0.6,0,0,18)
+notifSpeedLabel.Position = UDim2.new(0.05,0,0,178)
+notifSpeedLabel.Text = "NOTIF SPEED"
+notifSpeedLabel.TextScaled = true
+notifSpeedLabel.BackgroundTransparency = 1
+notifSpeedLabel.TextColor3 = Color3.fromRGB(200,200,200)
+
+local notifSizeLabel = Instance.new("TextLabel", frame)
+notifSizeLabel.Size = UDim2.new(0.6,0,0,18)
+notifSizeLabel.Position = UDim2.new(0.05,0,0,206)
+notifSizeLabel.Text = "TEXT SIZE"
+notifSizeLabel.TextScaled = true
+notifSizeLabel.BackgroundTransparency = 1
+notifSizeLabel.TextColor3 = Color3.fromRGB(200,200,200)
+
 local runNotif=false
 local speedBox = makeBox(178,3)
 local sizeBox = makeBox(206,20)
@@ -210,40 +279,98 @@ stopBtn.MouseButton1Click:Connect(function()
 end)
 
 sendBtn.MouseButton1Click:Connect(function()
-	if textBox.Text=="" then return end
-	notif.Text=textBox.Text
-	notif.TextSize=tonumber(sizeBox.Text) or 20
-	runNotif=true
-	notif.Visible=true
-	local spd=tonumber(speedBox.Text) or 3
+	if textBox.Text == "" then return end
+
+	notif.Text = textBox.Text
+	notif.TextSize = tonumber(sizeBox.Text) or 20
+	notif.Visible = true
+	runNotif = true
+
+	local speed = tonumber(speedBox.Text) or 3
+	local screenWidth = gui.AbsoluteSize.X
+	local notifWidth = notif.AbsoluteSize.X
 
 	task.spawn(function()
 		while runNotif do
-			notif.Position=UDim2.new(1,0,notif.Position.Y.Scale,0)
-			while notif.Position.X.Offset>-320 and runNotif do
-				notif.Position-=UDim2.new(0,spd,0,0)
+			-- mulai dari luar kanan layar
+			notif.Position = UDim2.new(0, screenWidth + notifWidth, notif.Position.Y.Scale, 0)
+
+			-- jalan ke kiri sampai benar-benar keluar
+			while notif.Position.X.Offset > -notifWidth and runNotif do
+				notif.Position -= UDim2.new(0, speed, 0, 0)
 				RunService.RenderStepped:Wait()
 			end
+
+			RunService.RenderStepped:Wait()
 		end
 	end)
 end)
 
 --================ LOOP =================
+local function isEditing(box)
+	return box:IsFocused()
+end
+
 RunService.RenderStepped:Connect(function()
-	if dragS then targetSpeed=DEFAULT_SPEED+(MAX_WALK_SPEED-DEFAULT_SPEED)*percent(spBar) end
-	if dragJ then targetJump=DEFAULT_JUMP+(MAX_JUMP_POWER-DEFAULT_JUMP)*percent(jpBar) end
 
-	spFill.Size=UDim2.new((targetSpeed-DEFAULT_SPEED)/(MAX_WALK_SPEED-DEFAULT_SPEED),0,1,0)
-	jpFill.Size=UDim2.new((targetJump-DEFAULT_JUMP)/(MAX_JUMP_POWER-DEFAULT_JUMP),0,1,0)
+	-- SLIDER ➜ VALUE
+	if dragS then
+		local p = percent(spBar)
+		targetSpeed = DEFAULT_SPEED +
+			(MAX_WALK_SPEED - DEFAULT_SPEED) * p
+	end
 
-	spBox.Text=math.floor(targetSpeed)
-	jpBox.Text=math.floor(targetJump)
+	if dragJ then
+		local p = percent(jpBar)
+		targetJump = DEFAULT_JUMP +
+			(MAX_JUMP_POWER - DEFAULT_JUMP) * p
+	end
 
+	-- VALUE ➜ %
+	speedPercent = math.clamp(
+		((targetSpeed - DEFAULT_SPEED) /
+		(MAX_WALK_SPEED - DEFAULT_SPEED)) * 100,
+		0, 100
+	)
+
+	jumpPercent = math.clamp(
+		((targetJump - DEFAULT_JUMP) /
+		(MAX_JUMP_POWER - DEFAULT_JUMP)) * 100,
+		0, 100
+	)
+
+	-- UPDATE BAR
+	spFill.Size = UDim2.new(speedPercent / 100, 0, 1, 0)
+    jpFill.Size = UDim2.new(jumpPercent / 100, 0, 1, 0)
+
+speedPercentLabel.Text = math.floor(speedPercent) .. "%"
+jumpPercentLabel.Text = math.floor(jumpPercent) .. "%"
+		
+	-- UPDATE TEXTBOX
+	if not isEditing(spBox) then
+	spBox.Text = math.floor(speedPercent) .. "%"
+end
+
+if not isEditing(jpBox) then
+	jpBox.Text = math.floor(jumpPercent) .. "%"
+		end
+	
+
+		
 	if hum then
-		currentSpeed+=(targetSpeed-currentSpeed)*SPEED_SMOOTH
-		currentJump+=(targetJump-currentJump)*SPEED_SMOOTH
-		hum.WalkSpeed=currentSpeed
-		hum.JumpPower=currentJump
+	if speedEnabled then
+		currentSpeed += (targetSpeed-currentSpeed)*SPEED_SMOOTH
+		hum.WalkSpeed = currentSpeed
+	else
+		hum.WalkSpeed = DEFAULT_SPEED
+	end
+
+	if jumpEnabled then
+		currentJump += (targetJump-currentJump)*SPEED_SMOOTH
+		hum.JumpPower = currentJump
+	else
+		hum.JumpPower = DEFAULT_JUMP
+	  end
 	end
 
 	if walkOnWater and hrp then
