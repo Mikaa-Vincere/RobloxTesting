@@ -1,6 +1,4 @@
--- NECRO LITE - INFINITE HEALTH ONLY
--- Android Delta Compatible
--- Tap and hold to drag | Tap toggle menu
+-- MIKAADEV LITE - INFINITE HEALTH
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -262,4 +260,4 @@ end)
 wait(1)
 pcall(keepHealth)
 
-print("Health mod loaded | Tap and hold to drag")
+print("Health mod loaded")
