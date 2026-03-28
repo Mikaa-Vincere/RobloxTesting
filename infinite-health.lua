@@ -1,3 +1,5 @@
+-- MIKAA LITE - INFINITE HEALTH
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -209,4 +211,4 @@ end)
 -- Initial apply
 keepHealth()
 
-print("Health loaded")
+print("Health mod loaded")
