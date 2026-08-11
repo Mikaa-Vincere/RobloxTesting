@@ -6,7 +6,7 @@ local Config = {
 	AutoRejoinBoulders = false,
 	AutoBuyBombs = false,
 	RuneGrabRange = 20,
-	PickRange = 13,
+	PickRange = 20,
 	PickBurst = 1,
 	AutoSellThreshold = 0.5,
 	MountainCenter = Vector3.new(42.67, 1066.7, 102.2),
@@ -227,7 +227,7 @@ local TP = {
 	},
 }
 
-local PICK = {
+ local PICK = {
 	aimRange = 5000,
 	aimDot = 0.995,
 	range = Config.PickRange,
@@ -240,6 +240,122 @@ local PICK = {
 	instantRadius = 60,
 	instantTick = 0.25,
 }
+
+-- =============================================
+-- SUPER INSTANT FARM - SAFE VERSION
+-- =============================================
+local BrutalFarm = {
+    Active = false,
+    SpamCount = 30,
+    SpamDelay = 0.001,
+}
+
+-- Jangan override swing di sini! Nanti di-patch setelah semua fungsi loading selesai.
+
+-- Fungsi buat patch swing setelah semua siap
+local function PatchBrutalSwing()
+    -- Simpan fungsi swing asli
+    local OriginalSwing = swing or function() return false end
+    
+    -- Override dengan fungsi baru
+    swing = function(part, model, center, spot)
+        if not BrutalFarm.Active then
+            return OriginalSwing(part, model, center, spot)
+        end
+        
+        local event = Remotes and Remotes.DigRequest
+        if not event then return false end
+        
+        local character = LocalPlayer.Character
+        if not character then return false end
+        
+        local tool = character:FindFirstChildOfClass("Tool")
+        if not tool then return false end
+        
+        local name = tool.Name
+        local targetPos = spot or center or (part and part.Position) or nil
+        if not targetPos then return false end
+        
+        -- SPAM REMOTE
+        for i = 1, BrutalFarm.SpamCount do
+            pcall(function()
+                if event:IsA("RemoteEvent") then
+                    event:FireServer(name, targetPos)
+                end
+            end)
+            if BrutalFarm.SpamDelay > 0 then
+                task.wait(BrutalFarm.SpamDelay)
+            end
+        end
+        
+        -- Reset target
+        task.wait(0.01)
+        target = nil
+        loot = nil
+        anchor = nil
+        spotFrame = nil
+        
+        return true
+    end
+end
+
+-- Jalankan patch setelah semua fungsi siap
+task.spawn(function()
+    -- Tunggu sampe semua fungsi dan remotes siap
+    while not Remotes or not Remotes.DigRequest or not swing do
+        task.wait(0.1)
+    end
+    PatchBrutalSwing()
+end)
+
+-- Tambah UI Toggle (dijalankan setelah UI siap)
+task.spawn(function()
+    while not Tabs or not Tabs.farming or not Library do
+        task.wait(0.1)
+    end
+    
+    local BrutalBox = Tabs.farming:AddLeftGroupbox("Brutal Farm", "zap")
+    
+    BrutalBox:AddToggle("BrutalFarmMode", {
+        Text = "🔴 BRUTAL MODE (Spam Swing)",
+        Default = false,
+        Callback = function(value)
+            BrutalFarm.Active = value
+            if value then
+                Library:Notify("⚡ BRUTAL FARM ACTIVE - " .. BrutalFarm.SpamCount .. " hits per tick!")
+            else
+                Library:Notify("Brutal Farm OFF")
+            end
+        end,
+    })
+    
+    BrutalBox:AddSlider("SpamCount", {
+        Text = "Hits Per Tick",
+        Default = 30,
+        Min = 5,
+        Max = 100,
+        Rounding = 0,
+        Compact = false,
+        Callback = function(value)
+            BrutalFarm.SpamCount = value
+        end,
+    })
+    
+    BrutalBox:AddSlider("SpamDelay", {
+        Text = "Delay (ms)",
+        Default = 1,
+        Min = 0,
+        Max = 20,
+        Rounding = 0,
+        Suffix = "ms",
+        Compact = false,
+        Callback = function(value)
+            BrutalFarm.SpamDelay = value / 1000
+        end,
+    })
+end)
+-- =============================================
+
 
 local COLORS = {
 	money = Color3.fromRGB(60, 255, 90),
@@ -3813,9 +3929,9 @@ do
 		local PLACE_ID = game.PlaceId
 		local HOLD_DIST = 8
 		local SCAN_HOLD = 1.4
-		local SWING_GAP = 0.04
+		local SWING_GAP = 0.01
 		local SWING_BURST = 1
-		local SWING_FLOOR = 0.02
+		local SWING_FLOOR = 0.01
 		local COOLDOWN_KEYS = { "SwingCooldown", "DigCooldown", "Cooldown", "SwingSpeed", "DigSpeed" }
 		local AIM_ANGLES = { 0, 35, -35, 70, -70, 110, -110, 145, -145, 180 }
 		local AIM_LIFT = { 0, 5, -4, 12 }
@@ -4219,7 +4335,7 @@ do
 				for _, key in ipairs(COOLDOWN_KEYS) do
 					local value = tonumber(getAttr(pick, key))
 					if value and value > 0 then
-						return math.clamp(value, SWING_FLOOR, 0.5)
+						return math.clamp(value, SWING_FLOOR, 0.1)
 					end
 				end
 			end
@@ -4944,7 +5060,7 @@ do
 		local COLUMN_DRY = 25
 		local DIG_BURST = 1
 		local DIG_SINK = 1.2
-		local DIG_LIFT = 6
+		local DIG_LIFT = 1
 		local EQUIP_STEP = 0.5
 		local SELL_MARK = Config.AutoSellThreshold
 		local SELL_WAIT = 7
